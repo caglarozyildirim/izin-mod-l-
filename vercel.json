@@ -1,0 +1,16 @@
+{
+  "version": 2,
+  "name": "tez-medikal-izin-modulu",
+  "builds": [
+    {
+      "src": "**/*",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/$1"
+    }
+  ]
+}
