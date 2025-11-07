@@ -1,0 +1,1111 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tüm İzinler - Tez Medikal</title>
+    <link rel="stylesheet" href="css/design-system.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-brand">
+            <div style="width: 40px; height: 40px; background: var(--primary); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">TM</div>
+            <span>Tez Medikal</span>
+        </div>
+        <div class="navbar-menu">
+            <a href="dashboard.html" class="nav-link">Dashboard</a>
+            <a href="onay-yonetimi.html" class="nav-link">Onay Bekleyenler</a>
+            <a href="tum-izinler.html" class="nav-link active">Tüm İzinler</a>
+            <a href="raporlar.html" class="nav-link">Raporlar</a>
+        </div>
+        <div class="navbar-user">
+            <div class="user-info">
+                <div class="user-name" id="userName">-</div>
+                <div class="user-role" id="userRole">-</div>
+            </div>
+            <div class="user-avatar" id="userAvatar">-</div>
+            <button class="btn btn-ghost btn-sm" data-action="logout">Çıkış</button>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <div class="container-fluid">
+            <div class="page-header">
+                <h1 class="page-title">Tüm İzin Talepleri</h1>
+                <p class="page-subtitle">Tüm çalışanların izin taleplerini görüntüleyin</p>
+            </div>
+
+            <!-- Stats -->
+            <div class="grid grid-cols-4 mb-5">
+                <!-- Toplam Talep - Stacked Documents Icon -->
+                <div class="stat-card">
+                    <div class="stat-label">Toplam Talep</div>
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 12px;">
+                        <div class="stat-value" id="totalRequests">156</div>
+                        <svg width="60" height="60" viewBox="0 0 60 60" style="margin-right: 8px;">
+                            <!-- Layer 3 (Back) -->
+                            <rect x="22" y="14" width="28" height="36" rx="3" fill="#e0e7ff" opacity="0.4" style="animation: layer-slide 2s ease-in-out infinite; animation-delay: 0.4s;"/>
+                            <!-- Layer 2 (Middle) -->
+                            <rect x="18" y="10" width="28" height="36" rx="3" fill="#c7d2fe" opacity="0.6" style="animation: layer-slide 2s ease-in-out infinite; animation-delay: 0.2s;"/>
+                            <!-- Layer 1 (Front) -->
+                            <g style="animation: layer-slide 2s ease-in-out infinite;">
+                                <rect x="14" y="6" width="28" height="36" rx="3" fill="#6366f1" stroke="#4f46e5" stroke-width="2"/>
+                                <line x1="18" y1="14" x2="34" y2="14" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                                <line x1="18" y1="20" x2="38" y2="20" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                                <line x1="18" y1="26" x2="32" y2="26" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                            </g>
+                        </svg>
+                    </div>
+                    <div class="stat-subtitle">Tüm Zamanlar</div>
+                </div>
+
+                <!-- Onaylanan - Donut Chart -->
+                <div class="stat-card success">
+                    <div class="stat-label">Onaylanan</div>
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 12px;">
+                        <div class="stat-value" id="approvedRequests">132</div>
+                        <svg width="60" height="60" viewBox="0 0 60 60" style="margin-right: 8px; transform: rotate(-90deg);">
+                            <!-- Background Circle -->
+                            <circle cx="30" cy="30" r="20" fill="none" stroke="#e0f2e9" stroke-width="8"/>
+                            <!-- Progress Circle (84.6%) -->
+                            <circle cx="30" cy="30" r="20" fill="none" stroke="#10b981" stroke-width="8"
+                                    stroke-dasharray="126" stroke-dashoffset="19.4"
+                                    stroke-linecap="round"
+                                    style="animation: fill-donut 1.5s ease-out forwards;"/>
+                            <!-- Center Text -->
+                            <text x="30" y="35" text-anchor="middle" fill="#10b981" font-size="12" font-weight="bold" transform="rotate(90 30 30)">84.6%</text>
+                        </svg>
+                    </div>
+                    <div class="stat-subtitle">%84.6</div>
+                </div>
+
+                <!-- Bekleyen - Circular Progress Ring with Pulse -->
+                <div class="stat-card warning">
+                    <div class="stat-label">Bekleyen</div>
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 12px;">
+                        <div class="stat-value" id="pendingRequests">8</div>
+                        <svg width="60" height="60" viewBox="0 0 60 60" style="margin-right: 8px; transform: rotate(-90deg);">
+                            <!-- Background Circle -->
+                            <circle cx="30" cy="30" r="22" fill="none" stroke="#fef3c7" stroke-width="4"/>
+                            <!-- Pulsing Ring (5.1%) -->
+                            <circle cx="30" cy="30" r="22" fill="none" stroke="#f59e0b" stroke-width="4"
+                                    stroke-dasharray="138" stroke-dashoffset="131"
+                                    stroke-linecap="round"
+                                    style="animation: pulse-ring 2s ease-in-out infinite;"/>
+                            <!-- Center Dot -->
+                            <circle cx="30" cy="30" r="8" fill="#f59e0b" style="animation: pop-in 0.6s ease-out;"/>
+                            <!-- Center Text -->
+                            <text x="30" y="35" text-anchor="middle" fill="white" font-size="10" font-weight="bold" transform="rotate(90 30 30)">5.1%</text>
+                        </svg>
+                    </div>
+                    <div class="stat-subtitle">%5.1</div>
+                </div>
+
+                <!-- Reddedilen - Mini Bar Chart -->
+                <div class="stat-card danger">
+                    <div class="stat-label">Reddedilen</div>
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 12px;">
+                        <div class="stat-value" id="rejectedRequests">16</div>
+                        <svg width="60" height="60" viewBox="0 0 60 60" style="margin-right: 8px;">
+                            <!-- Bar Chart Background -->
+                            <rect x="10" y="10" width="40" height="40" rx="4" fill="#fef2f2"/>
+
+                            <!-- Bars -->
+                            <g style="animation: fade-in-up 0.8s ease-out;">
+                                <!-- Bar 1 (100%) -->
+                                <rect x="14" y="18" width="6" height="28" rx="2" fill="#fecaca">
+                                    <animate attributeName="height" from="0" to="28" dur="0.8s" fill="freeze"/>
+                                    <animate attributeName="y" from="46" to="18" dur="0.8s" fill="freeze"/>
+                                </rect>
+                                <!-- Bar 2 (65%) -->
+                                <rect x="23" y="28" width="6" height="18" rx="2" fill="#fca5a5">
+                                    <animate attributeName="height" from="0" to="18" dur="0.8s" begin="0.1s" fill="freeze"/>
+                                    <animate attributeName="y" from="46" to="28" dur="0.8s" begin="0.1s" fill="freeze"/>
+                                </rect>
+                                <!-- Bar 3 (40%) - Highlighted (10.3%) -->
+                                <rect x="32" y="35" width="6" height="11" rx="2" fill="#ef4444">
+                                    <animate attributeName="height" from="0" to="11" dur="0.8s" begin="0.2s" fill="freeze"/>
+                                    <animate attributeName="y" from="46" to="35" dur="0.8s" begin="0.2s" fill="freeze"/>
+                                </rect>
+                                <!-- Bar 4 (25%) -->
+                                <rect x="41" y="39" width="6" height="7" rx="2" fill="#fca5a5">
+                                    <animate attributeName="height" from="0" to="7" dur="0.8s" begin="0.3s" fill="freeze"/>
+                                    <animate attributeName="y" from="46" to="39" dur="0.8s" begin="0.3s" fill="freeze"/>
+                                </rect>
+                            </g>
+
+                            <!-- 10.3% Label -->
+                            <text x="30" y="54" text-anchor="middle" fill="#ef4444" font-size="10" font-weight="bold" style="animation: fade-in-up 0.8s ease-out 0.5s both;">10.3%</text>
+                        </svg>
+                    </div>
+                    <div class="stat-subtitle">%10.3</div>
+                </div>
+            </div>
+
+            <!-- Filters -->
+            <div class="card mb-4">
+                <div class="card-body" style="padding: 16px;">
+                    <div style="display: grid; grid-template-columns: 2fr 1.2fr 1fr 1fr auto; gap: 12px; align-items: center;">
+                        <div>
+                            <input list="employeeList" class="form-control" placeholder="Çalışan seçin veya arayın..." id="searchEmployee" oninput="filterRequests()">
+                            <datalist id="employeeList">
+                                <option value="Ahmet Yılmaz - Üretim">
+                                <option value="Fatma Kaya - Muhasebe">
+                                <option value="Mehmet Demir - IT">
+                                <option value="Ayşe Şahin - Satış">
+                                <option value="Can Kılıç - Üretim">
+                                <option value="Elif Öz - Muhasebe">
+                                <option value="Ali Yıldız - IT">
+                                <option value="Zeynep Arslan - Satış">
+                            </datalist>
+                        </div>
+                        <div>
+                            <select class="form-control form-select" id="statusFilter" onchange="filterRequests()">
+                                <option value="">Tüm Durumlar</option>
+                                <option value="pending">Beklemede</option>
+                                <option value="approved">Onaylandı</option>
+                                <option value="rejected">Reddedildi</option>
+                            </select>
+                        </div>
+                        <div>
+                            <input type="date" class="form-control" id="startDateFilter" onchange="filterRequests()" placeholder="Başlangıç">
+                        </div>
+                        <div>
+                            <input type="date" class="form-control" id="endDateFilter" onchange="filterRequests()" placeholder="Bitiş">
+                        </div>
+                        <div style="color: var(--text-tertiary); font-size: 14px; white-space: nowrap; padding: 0 12px;">
+                            <span id="filterResultCount">14 talep</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- All Requests Table -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">İzin Talepleri</h3>
+                    <div class="flex gap-md">
+                        <button class="btn btn-sm btn-success" onclick="exportExcel()">📥 Excel</button>
+                        <button class="btn btn-sm btn-secondary" onclick="exportPDF()">📄 PDF</button>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Talep No</th>
+                                <th>Çalışan</th>
+                                <th>Departman</th>
+                                <th>İzin Tipi</th>
+                                <th>Başlangıç</th>
+                                <th>Bitiş</th>
+                                <th>Gün</th>
+                                <th>Durum</th>
+                                <th>Talep Tarihi</th>
+                                <th>İşlemler</th>
+                            </tr>
+                        </thead>
+                        <tbody id="requestsTable">
+                            <!-- Mock Data - 15 Örnek Talep -->
+                            <tr data-status="approved" data-employee="Ahmet Yılmaz" data-department="Üretim" data-start="2025-11-10">
+                                <td><strong>REQ-001</strong></td>
+                                <td>Ahmet Yılmaz</td>
+                                <td>Üretim</td>
+                                <td>Yıllık İzin</td>
+                                <td>10.11.2025</td>
+                                <td>15.11.2025</td>
+                                <td>5 gün</td>
+                                <td><span class="badge badge-success">Onaylandı</span></td>
+                                <td>03.11.2025</td>
+                                <td>
+                                    <button class="btn btn-sm btn-secondary" onclick="showDetail('REQ-001', 'Ahmet Yılmaz', 'Üretim', 'Yıllık İzin', '10.11.2025', '15.11.2025', '5 gün', 'approved', 'Aile ziyareti')">👁 Detay</button>
+                                </td>
+                            </tr>
+                            <tr data-status="pending" data-employee="Fatma Kaya" data-department="Muhasebe" data-start="2025-11-06">
+                                <td><strong>REQ-002</strong></td>
+                                <td>Fatma Kaya</td>
+                                <td>Muhasebe</td>
+                                <td>Mazeret İzni</td>
+                                <td>06.11.2025</td>
+                                <td>06.11.2025</td>
+                                <td>4 saat</td>
+                                <td><span class="badge badge-warning">Beklemede</span></td>
+                                <td>04.11.2025</td>
+                                <td>
+                                    <div class="flex gap-sm">
+                                        <button class="btn btn-sm btn-secondary" onclick="showDetail('REQ-002', 'Fatma Kaya', 'Muhasebe', 'Mazeret İzni', '06.11.2025', '06.11.2025', '4 saat', 'pending', 'Doktor randevusu')">👁 Detay</button>
+                                        <button class="btn btn-sm btn-success" onclick="approveRequest('REQ-002', 'Fatma Kaya', this)">✓ Onayla</button>
+                                        <button class="btn btn-sm btn-danger" onclick="rejectRequest('REQ-002', 'Fatma Kaya', this)">✕ Reddet</button>
+                                        <button class="btn btn-sm btn-warning" onclick="reviseRequest('REQ-002', 'Fatma Kaya', this)">🔄 Revize</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr data-status="approved" data-employee="Mehmet Demir" data-department="IT" data-start="2025-10-28">
+                                <td><strong>REQ-003</strong></td>
+                                <td>Mehmet Demir</td>
+                                <td>IT</td>
+                                <td>Hastalık İzni</td>
+                                <td>28.10.2025</td>
+                                <td>30.10.2025</td>
+                                <td>3 gün</td>
+                                <td><span class="badge badge-success">Onaylandı</span></td>
+                                <td>27.10.2025</td>
+                                <td>
+                                    <button class="btn btn-sm btn-secondary" onclick="showDetail('REQ-003', 'Mehmet Demir', 'IT', 'Hastalık İzni', '28.10.2025', '30.10.2025', '3 gün', 'approved', 'Grip tedavisi')">👁 Detay</button>
+                                </td>
+                            </tr>
+                            <tr data-status="rejected" data-employee="Ayşe Şahin" data-department="Satış" data-start="2025-11-08">
+                                <td><strong>REQ-004</strong></td>
+                                <td>Ayşe Şahin</td>
+                                <td>Satış</td>
+                                <td>Yıllık İzin</td>
+                                <td>08.11.2025</td>
+                                <td>10.11.2025</td>
+                                <td>3 gün</td>
+                                <td><span class="badge badge-danger">Reddedildi</span></td>
+                                <td>01.11.2025</td>
+                                <td>
+                                    <button class="btn btn-sm btn-secondary" onclick="showDetail('REQ-004', 'Ayşe Şahin', 'Satış', 'Yıllık İzin', '08.11.2025', '10.11.2025', '3 gün', 'rejected', 'Kişisel sebep', 'Departmanda yoğunluk var')">👁 Detay</button>
+                                </td>
+                            </tr>
+                            <tr data-status="approved" data-employee="Can Kılıç" data-department="Üretim" data-start="2025-12-20">
+                                <td><strong>REQ-005</strong></td>
+                                <td>Can Kılıç</td>
+                                <td>Üretim</td>
+                                <td>Yıllık İzin</td>
+                                <td>20.12.2025</td>
+                                <td>27.12.2025</td>
+                                <td>7 gün</td>
+                                <td><span class="badge badge-success">Onaylandı</span></td>
+                                <td>15.11.2025</td>
+                                <td>
+                                    <button class="btn btn-sm btn-secondary" onclick="showDetail('REQ-005', 'Can Kılıç', 'Üretim', 'Yıllık İzin', '20.12.2025', '27.12.2025', '7 gün', 'approved', 'Yılbaşı tatili')">👁 Detay</button>
+                                </td>
+                            </tr>
+                            <tr data-status="pending" data-employee="Elif Öz" data-department="Muhasebe" data-start="2025-11-12">
+                                <td><strong>REQ-006</strong></td>
+                                <td>Elif Öz</td>
+                                <td>Muhasebe</td>
+                                <td>Eğitim İzni</td>
+                                <td>12.11.2025</td>
+                                <td>14.11.2025</td>
+                                <td>3 gün</td>
+                                <td><span class="badge badge-warning">Beklemede</span></td>
+                                <td>05.11.2025</td>
+                                <td>
+                                    <div class="flex gap-sm">
+                                        <button class="btn btn-sm btn-secondary" onclick="showDetail('REQ-006', 'Elif Öz', 'Muhasebe', 'Eğitim İzni', '12.11.2025', '14.11.2025', '3 gün', 'pending', 'Muhasebe eğitimi')">👁 Detay</button>
+                                        <button class="btn btn-sm btn-success" onclick="approveRequest('REQ-006', 'Elif Öz', this)">✓ Onayla</button>
+                                        <button class="btn btn-sm btn-danger" onclick="rejectRequest('REQ-006', 'Elif Öz', this)">✕ Reddet</button>
+                                        <button class="btn btn-sm btn-warning" onclick="reviseRequest('REQ-006', 'Elif Öz', this)">🔄 Revize</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr data-status="approved" data-employee="Ali Yıldız" data-department="IT" data-start="2025-09-15">
+                                <td><strong>REQ-007</strong></td>
+                                <td>Ali Yıldız</td>
+                                <td>IT</td>
+                                <td>Yıllık İzin</td>
+                                <td>15.09.2025</td>
+                                <td>20.09.2025</td>
+                                <td>5 gün</td>
+                                <td><span class="badge badge-success">Onaylandı</span></td>
+                                <td>01.09.2025</td>
+                                <td>
+                                    <button class="btn btn-sm btn-secondary" onclick="showDetail('REQ-007', 'Ali Yıldız', 'IT', 'Yıllık İzin', '15.09.2025', '20.09.2025', '5 gün', 'approved', 'Tatil planı')">👁 Detay</button>
+                                </td>
+                            </tr>
+                            <tr data-status="approved" data-employee="Zeynep Arslan" data-department="Satış" data-start="2025-08-05">
+                                <td><strong>REQ-008</strong></td>
+                                <td>Zeynep Arslan</td>
+                                <td>Satış</td>
+                                <td>Evlilik İzni</td>
+                                <td>05.08.2025</td>
+                                <td>09.08.2025</td>
+                                <td>5 gün</td>
+                                <td><span class="badge badge-success">Onaylandı</span></td>
+                                <td>15.07.2025</td>
+                                <td>
+                                    <button class="btn btn-sm btn-secondary" onclick="showDetail('REQ-008', 'Zeynep Arslan', 'Satış', 'Evlilik İzni', '05.08.2025', '09.08.2025', '5 gün', 'approved', 'Evlilik töreni')">👁 Detay</button>
+                                </td>
+                            </tr>
+                            <tr data-status="pending" data-employee="Ahmet Yılmaz" data-department="Üretim" data-start="2025-11-10">
+                                <td><strong>REQ-009</strong></td>
+                                <td>Ahmet Yılmaz</td>
+                                <td>Üretim</td>
+                                <td>Yıllık İzin</td>
+                                <td>10.11.2025</td>
+                                <td>15.11.2025</td>
+                                <td>5 gün</td>
+                                <td><span class="badge badge-warning">Beklemede</span></td>
+                                <td>03.11.2025</td>
+                                <td>
+                                    <div class="flex gap-sm">
+                                        <button class="btn btn-sm btn-secondary" onclick="showDetail('REQ-009', 'Ahmet Yılmaz', 'Üretim', 'Yıllık İzin', '10.11.2025', '15.11.2025', '5 gün', 'pending', 'Aile ziyareti')">👁 Detay</button>
+                                        <button class="btn btn-sm btn-success" onclick="approveRequest('REQ-009', 'Ahmet Yılmaz', this)">✓ Onayla</button>
+                                        <button class="btn btn-sm btn-danger" onclick="rejectRequest('REQ-009', 'Ahmet Yılmaz', this)">✕ Reddet</button>
+                                        <button class="btn btn-sm btn-warning" onclick="reviseRequest('REQ-009', 'Ahmet Yılmaz', this)">🔄 Revize</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr data-status="pending" data-employee="Mehmet Demir" data-department="IT" data-start="2025-11-18">
+                                <td><strong>REQ-010</strong></td>
+                                <td>Mehmet Demir</td>
+                                <td>IT</td>
+                                <td>Yıllık İzin</td>
+                                <td>18.11.2025</td>
+                                <td>22.11.2025</td>
+                                <td>5 gün</td>
+                                <td><span class="badge badge-warning">Beklemede</span></td>
+                                <td>07.11.2025</td>
+                                <td>
+                                    <div class="flex gap-sm">
+                                        <button class="btn btn-sm btn-secondary" onclick="showDetail('REQ-010', 'Mehmet Demir', 'IT', 'Yıllık İzin', '18.11.2025', '22.11.2025', '5 gün', 'pending', 'Kişisel işler')">👁 Detay</button>
+                                        <button class="btn btn-sm btn-success" onclick="approveRequest('REQ-010', 'Mehmet Demir', this)">✓ Onayla</button>
+                                        <button class="btn btn-sm btn-danger" onclick="rejectRequest('REQ-010', 'Mehmet Demir', this)">✕ Reddet</button>
+                                        <button class="btn btn-sm btn-warning" onclick="reviseRequest('REQ-010', 'Mehmet Demir', this)">🔄 Revize</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr data-status="pending" data-employee="Can Kılıç" data-department="Üretim" data-start="2025-12-20">
+                                <td><strong>REQ-011</strong></td>
+                                <td>Can Kılıç</td>
+                                <td>Üretim</td>
+                                <td>Yıllık İzin</td>
+                                <td>20.12.2025</td>
+                                <td>27.12.2025</td>
+                                <td>7 gün</td>
+                                <td><span class="badge badge-warning">Beklemede</span></td>
+                                <td>15.11.2025</td>
+                                <td>
+                                    <div class="flex gap-sm">
+                                        <button class="btn btn-sm btn-secondary" onclick="showDetail('REQ-011', 'Can Kılıç', 'Üretim', 'Yıllık İzin', '20.12.2025', '27.12.2025', '7 gün', 'pending', 'Yılbaşı tatili')">👁 Detay</button>
+                                        <button class="btn btn-sm btn-success" onclick="approveRequest('REQ-011', 'Can Kılıç', this)">✓ Onayla</button>
+                                        <button class="btn btn-sm btn-danger" onclick="rejectRequest('REQ-011', 'Can Kılıç', this)">✕ Reddet</button>
+                                        <button class="btn btn-sm btn-warning" onclick="reviseRequest('REQ-011', 'Can Kılıç', this)">🔄 Revize</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr data-status="pending" data-employee="Ali Yıldız" data-department="IT" data-start="2025-11-08">
+                                <td><strong>REQ-012</strong></td>
+                                <td>Ali Yıldız</td>
+                                <td>IT</td>
+                                <td>Hastalık İzni</td>
+                                <td>08.11.2025</td>
+                                <td>09.11.2025</td>
+                                <td>2 gün</td>
+                                <td><span class="badge badge-warning">Beklemede</span></td>
+                                <td>07.11.2025</td>
+                                <td>
+                                    <div class="flex gap-sm">
+                                        <button class="btn btn-sm btn-secondary" onclick="showDetail('REQ-012', 'Ali Yıldız', 'IT', 'Hastalık İzni', '08.11.2025', '09.11.2025', '2 gün', 'pending', 'Soğuk algınlığı')">👁 Detay</button>
+                                        <button class="btn btn-sm btn-success" onclick="approveRequest('REQ-012', 'Ali Yıldız', this)">✓ Onayla</button>
+                                        <button class="btn btn-sm btn-danger" onclick="rejectRequest('REQ-012', 'Ali Yıldız', this)">✕ Reddet</button>
+                                        <button class="btn btn-sm btn-warning" onclick="reviseRequest('REQ-012', 'Ali Yıldız', this)">🔄 Revize</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr data-status="pending" data-employee="Ayşe Şahin" data-department="Satış" data-start="2025-11-25">
+                                <td><strong>REQ-013</strong></td>
+                                <td>Ayşe Şahin</td>
+                                <td>Satış</td>
+                                <td>Yıllık İzin</td>
+                                <td>25.11.2025</td>
+                                <td>29.11.2025</td>
+                                <td>5 gün</td>
+                                <td><span class="badge badge-warning">Beklemede</span></td>
+                                <td>10.11.2025</td>
+                                <td>
+                                    <div class="flex gap-sm">
+                                        <button class="btn btn-sm btn-secondary" onclick="showDetail('REQ-013', 'Ayşe Şahin', 'Satış', 'Yıllık İzin', '25.11.2025', '29.11.2025', '5 gün', 'pending', 'Tatil planı')">👁 Detay</button>
+                                        <button class="btn btn-sm btn-success" onclick="approveRequest('REQ-013', 'Ayşe Şahin', this)">✓ Onayla</button>
+                                        <button class="btn btn-sm btn-danger" onclick="rejectRequest('REQ-013', 'Ayşe Şahin', this)">✕ Reddet</button>
+                                        <button class="btn btn-sm btn-warning" onclick="reviseRequest('REQ-013', 'Ayşe Şahin', this)">🔄 Revize</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr data-status="pending" data-employee="Hasan Çelik" data-department="Üretim" data-start="2025-11-15">
+                                <td><strong>REQ-014</strong></td>
+                                <td>Hasan Çelik</td>
+                                <td>Üretim</td>
+                                <td>Evlilik İzni</td>
+                                <td>15.11.2025</td>
+                                <td>17.11.2025</td>
+                                <td>3 gün</td>
+                                <td><span class="badge badge-warning">Beklemede</span></td>
+                                <td>08.11.2025</td>
+                                <td>
+                                    <div class="flex gap-sm">
+                                        <button class="btn btn-sm btn-secondary" onclick="showDetail('REQ-014', 'Hasan Çelik', 'Üretim', 'Evlilik İzni', '15.11.2025', '17.11.2025', '3 gün', 'pending', 'Düğün töreni')">👁 Detay</button>
+                                        <button class="btn btn-sm btn-success" onclick="approveRequest('REQ-014', 'Hasan Çelik', this)">✓ Onayla</button>
+                                        <button class="btn btn-sm btn-danger" onclick="rejectRequest('REQ-014', 'Hasan Çelik', this)">✕ Reddet</button>
+                                        <button class="btn btn-sm btn-warning" onclick="reviseRequest('REQ-014', 'Hasan Çelik', this)">🔄 Revize</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="card-footer">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span id="resultCount">14 talep gösteriliyor</span>
+                        <div class="flex gap-md">
+                            <button class="btn btn-sm btn-secondary">← Önceki</button>
+                            <span style="padding: 8px 16px;">Sayfa 1 / 1</span>
+                            <button class="btn btn-sm btn-secondary">Sonraki →</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Reject Modal -->
+    <div id="rejectModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); z-index: 9999; align-items: center; justify-content: center;">
+        <div style="background: white; border-radius: 16px; max-width: 600px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.3); animation: modalSlideIn 0.3s ease-out;" onclick="event.stopPropagation()">
+            <div style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; padding: 24px; border-radius: 16px 16px 0 0;">
+                <h4 style="margin: 0; font-size: 20px; font-weight: 600;">❌ İzin Talebini Reddet</h4>
+            </div>
+            <div style="padding: 24px;">
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; font-weight: 600; color: #1f2937; margin-bottom: 8px; font-size: 14px;">
+                        <span id="rejectEmployeeName"></span> için red sebebini girin:
+                    </label>
+                    <textarea id="rejectReason" rows="6" style="width: 100%; padding: 16px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 15px; font-family: inherit; resize: vertical; min-height: 120px; line-height: 1.6;" placeholder="Red sebebini detaylı olarak açıklayın..."></textarea>
+                </div>
+                <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                    <button onclick="closeRejectModal()" style="padding: 12px 24px; border: none; border-radius: 8px; background: #e5e7eb; color: #1f2937; font-weight: 600; cursor: pointer; font-size: 14px;">İptal</button>
+                    <button onclick="confirmReject()" style="padding: 12px 24px; border: none; border-radius: 8px; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; font-weight: 600; cursor: pointer; font-size: 14px; box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);">Tamam</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Revise Modal -->
+    <div id="reviseModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); z-index: 9999; align-items: center; justify-content: center;">
+        <div style="background: white; border-radius: 16px; max-width: 600px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.3); animation: modalSlideIn 0.3s ease-out;" onclick="event.stopPropagation()">
+            <div style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; padding: 24px; border-radius: 16px 16px 0 0;">
+                <h4 style="margin: 0; font-size: 20px; font-weight: 600;">🔄 Revizyon Talebi</h4>
+            </div>
+            <div style="padding: 24px;">
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; font-weight: 600; color: #1f2937; margin-bottom: 4px; font-size: 14px;">
+                        <span id="reviseEmployeeName"></span> için revize notunu girin:
+                    </label>
+                    <div style="font-size: 13px; color: #6b7280; margin-bottom: 12px;">(Örn: Tarih değişikliği, ek bilgi gerekli, vb.)</div>
+                    <textarea id="reviseNote" rows="6" style="width: 100%; padding: 16px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 15px; font-family: inherit; resize: vertical; min-height: 120px; line-height: 1.6;" placeholder="Revizyon gerektiren hususları detaylı olarak belirtin..."></textarea>
+                </div>
+                <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                    <button onclick="closeReviseModal()" style="padding: 12px 24px; border: none; border-radius: 8px; background: #e5e7eb; color: #1f2937; font-weight: 600; cursor: pointer; font-size: 14px;">İptal</button>
+                    <button onclick="confirmRevise()" style="padding: 12px 24px; border: none; border-radius: 8px; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; font-weight: 600; cursor: pointer; font-size: 14px; box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);">Tamam</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        @keyframes modalSlideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* Stat Card Animations */
+        @keyframes pulse-ring {
+            0%, 100% { stroke-dashoffset: 140; opacity: 1; }
+            50% { stroke-dashoffset: 120; opacity: 0.8; }
+        }
+
+        @keyframes progress-glow {
+            0%, 100% { box-shadow: 0 0 10px rgba(255, 193, 7, 0.5); }
+            50% { box-shadow: 0 0 20px rgba(255, 193, 7, 0.8); }
+        }
+
+        @keyframes fill-donut {
+            from { stroke-dashoffset: 201; }
+            to { stroke-dashoffset: 19.4; }
+        }
+
+        @keyframes fade-in-up {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes layer-slide {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-3px); }
+            100% { transform: translateY(0); }
+        }
+
+        @keyframes pop-in {
+            0% { transform: scale(0); opacity: 0; }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+    </style>
+
+    <script src="js/app.js"></script>
+    <script>
+        const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+
+        document.getElementById('userName').textContent = user.name || '-';
+        document.getElementById('userRole').textContent = user.role === 'manager' ? 'Yönetici' : user.role === 'hr' ? 'İnsan Kaynakları' : 'Operasyon';
+        document.getElementById('userAvatar').textContent = (user.name || '-').split(' ').map(n => n[0]).join('');
+
+        // Sayfa yüklendiğinde tüm talepleri WorkflowEngine'den yükle
+        let allRequests = [];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadAllRequests();
+        });
+
+        function loadAllRequests() {
+            // WorkflowEngine'den tüm talepleri al
+            allRequests = WorkflowEngine.getAllRequests();
+
+            // Tabloya render et
+            renderRequestsTable(allRequests);
+        }
+
+        function renderRequestsTable(requests) {
+            const tbody = document.getElementById('requestsTable');
+
+            if (requests.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8" style="text-align: center; padding: 40px; color: #6b7280;">
+                            <div style="font-size: 32px; margin-bottom: 8px;">📭</div>
+                            <div>Henüz izin talebi bulunmuyor</div>
+                        </td>
+                    </tr>
+                `;
+                updateResultCount();
+                return;
+            }
+
+            // Tarihe göre sırala (en yeni önce)
+            const sortedRequests = [...requests].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+            tbody.innerHTML = sortedRequests.map(req => {
+                const leaveTypeName = getLeaveTypeName(req.type);
+                const createdDate = new Date(req.createdAt).toLocaleDateString('tr-TR');
+                const statusBadge = getStatusBadge(req.status);
+                const statusText = getStatusText(req.status);
+                const currentStepLabel = req.workflow?.steps.find(s => s.step === req.workflow.currentStep)?.label || 'N/A';
+
+                return `
+                    <tr data-status="${req.status}" data-employee="${req.userName}" data-department="${req.userDepartment}" data-start="${req.startDate}">
+                        <td><strong>${req.id}</strong></td>
+                        <td>${req.userName}</td>
+                        <td>${req.userDepartment}</td>
+                        <td><span class="badge badge-info">${leaveTypeName}</span></td>
+                        <td>${req.startDate}</td>
+                        <td>${req.endDate}</td>
+                        <td>${req.days}</td>
+                        <td><span class="badge badge-${statusBadge}">${statusText}</span></td>
+                        <td>${createdDate}</td>
+                        <td>
+                            <button class="btn btn-sm btn-secondary" onclick="window.location.href='onay-yonetimi.html'">Detay</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            updateResultCount();
+        }
+
+        function getLeaveTypeName(type) {
+            const types = {
+                'annual': 'Yıllık İzin',
+                'marriage': 'Evlilik İzni',
+                'birth': 'Doğum İzni',
+                'death': 'Ölüm İzni',
+                'excuse': 'Mazeret İzni',
+                'paternity': 'Babalık İzni',
+                'unpaid': 'Ücretsiz İzin',
+                'advance': 'Avans İzin',
+                'education': 'Eğitim İzni',
+                'sickness': 'Hastalık İzni',
+                'adoption': 'Evlat Edinme İzni'
+            };
+            return types[type] || type;
+        }
+
+        function getStatusBadge(status) {
+            const badges = {
+                'pending': 'warning',
+                'manager_approved': 'info',
+                'operation_approved': 'info',
+                'approved': 'success',
+                'manager_rejected': 'danger',
+                'operation_rejected': 'danger',
+                'rejected': 'danger',
+                'revised': 'warning'
+            };
+            return badges[status] || 'secondary';
+        }
+
+        function getStatusText(status) {
+            const texts = {
+                'pending': 'Beklemede',
+                'manager_approved': 'Yönetici Onayladı',
+                'operation_approved': 'Operasyon Onayladı',
+                'approved': 'Onaylandı',
+                'manager_rejected': 'Yönetici Reddetti',
+                'operation_rejected': 'Operasyon Reddetti',
+                'rejected': 'Reddedildi',
+                'revised': 'Revize'
+            };
+            return texts[status] || status;
+        }
+
+        function filterRequests() {
+            const search = document.getElementById('searchEmployee').value.toLowerCase();
+            const status = document.getElementById('statusFilter').value;
+            const startDate = document.getElementById('startDateFilter').value;
+            const endDate = document.getElementById('endDateFilter').value;
+
+            const rows = document.querySelectorAll('#requestsTable tr[data-status]');
+            let visibleCount = 0;
+
+            rows.forEach(row => {
+                const rowEmployee = row.getAttribute('data-employee').toLowerCase();
+                const rowDepartment = row.getAttribute('data-department').toLowerCase();
+                const rowStatus = row.getAttribute('data-status');
+                const rowStart = row.getAttribute('data-start');
+
+                let show = true;
+
+                // Search filter
+                if (search && !rowEmployee.includes(search) && !rowDepartment.includes(search)) {
+                    show = false;
+                }
+
+                // Status filter
+                if (status && rowStatus !== status) {
+                    show = false;
+                }
+
+                // Date filter
+                if (startDate && rowStart < startDate) {
+                    show = false;
+                }
+                if (endDate && rowStart > endDate) {
+                    show = false;
+                }
+
+                row.style.display = show ? '' : 'none';
+                if (show) visibleCount++;
+            });
+
+            document.getElementById('resultCount').textContent = `${visibleCount} talep gösteriliyor`;
+            document.getElementById('filterResultCount').textContent = `${visibleCount} talep`;
+        }
+
+        function showDetail(reqNo, employee, department, leaveType, startDate, endDate, days, status, description, rejectionReason = '') {
+            const statusText = {
+                pending: 'Beklemede',
+                approved: 'Onaylandı',
+                rejected: 'Reddedildi'
+            };
+
+            const statusBadge = {
+                pending: 'warning',
+                approved: 'success',
+                rejected: 'danger'
+            };
+
+            const statusColors = {
+                pending: { bg: '#fff8e1', border: '#FFC107', text: '#F57C00' },
+                approved: { bg: '#e8f5e9', border: '#4CAF50', text: '#2E7D32' },
+                rejected: { bg: '#ffebee', border: '#f44336', text: '#c62828' }
+            };
+
+            const colors = statusColors[status];
+
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0, 0, 0, 0.6);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 9999;
+                padding: 20px;
+                backdrop-filter: blur(4px);
+            `;
+
+            modal.innerHTML = `
+                <div style="background: white; border-radius: 16px; max-width: 650px; width: 100%; max-height: 85vh; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3); animation: modalSlideIn 0.3s ease-out;">
+                    <!-- Header -->
+                    <div style="padding: 28px 32px; background: linear-gradient(135deg, ${colors.border} 0%, ${colors.text} 100%); position: relative;">
+                        <button onclick="this.closest('[style*=fixed]').remove()" style="position: absolute; top: 20px; right: 20px; width: 36px; height: 36px; border: none; background: rgba(255, 255, 255, 0.2); border-radius: 50%; cursor: pointer; font-size: 24px; line-height: 1; color: white; transition: all 0.2s; backdrop-filter: blur(10px);" onmouseover="this.style.background='rgba(255, 255, 255, 0.3)'" onmouseout="this.style.background='rgba(255, 255, 255, 0.2)'">×</button>
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <h2 style="font-size: 24px; font-weight: 700; margin: 0; color: white;">📋 ${reqNo}</h2>
+                            <span class="badge badge-${statusBadge[status]}" style="background: rgba(255, 255, 255, 0.9); color: ${colors.text}; font-size: 13px; padding: 6px 12px;">${statusText[status]}</span>
+                        </div>
+                        <p style="font-size: 15px; color: rgba(255, 255, 255, 0.9); margin: 8px 0 0 0; font-weight: 500;">${employee} • ${department}</p>
+                    </div>
+
+                    <!-- Body -->
+                    <div style="padding: 32px; overflow-y: auto; flex: 1; background: #f8f9fa;">
+                        <!-- İzin Detayları -->
+                        <div style="background: white; border-radius: 12px; padding: 24px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);">
+                            <h3 style="font-size: 14px; font-weight: 700; color: ${colors.text}; margin: 0 0 16px 0; text-transform: uppercase; letter-spacing: 0.5px;">📅 İzin Bilgileri</h3>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                                <div style="background: linear-gradient(135deg, ${colors.bg} 0%, ${colors.bg}dd 100%); padding: 16px; border-radius: 10px; border-left: 4px solid ${colors.border};">
+                                    <div style="font-size: 12px; color: #6c757d; margin-bottom: 6px; font-weight: 500;">İzin Tipi</div>
+                                    <div style="font-size: 16px; font-weight: 700; color: ${colors.text};">${leaveType}</div>
+                                </div>
+                                <div style="background: linear-gradient(135deg, ${colors.bg} 0%, ${colors.bg}dd 100%); padding: 16px; border-radius: 10px; border-left: 4px solid ${colors.border};">
+                                    <div style="font-size: 12px; color: #6c757d; margin-bottom: 6px; font-weight: 500;">Toplam Süre</div>
+                                    <div style="font-size: 16px; font-weight: 700; color: ${colors.text};">${days}</div>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2" style="gap: 20px;">
+                                <div>
+                                    <div style="font-size: 12px; color: #6c757d; margin-bottom: 6px; font-weight: 500;">🗓 Başlangıç</div>
+                                    <div style="font-size: 15px; font-weight: 600; color: #212529; background: #f8f9fa; padding: 10px 12px; border-radius: 8px;">${startDate}</div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 12px; color: #6c757d; margin-bottom: 6px; font-weight: 500;">🏁 Bitiş</div>
+                                    <div style="font-size: 15px; font-weight: 600; color: #212529; background: #f8f9fa; padding: 10px 12px; border-radius: 8px;">${endDate}</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Açıklama -->
+                        <div style="background: white; border-radius: 12px; padding: 24px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);">
+                            <h3 style="font-size: 14px; font-weight: 700; color: ${colors.text}; margin: 0 0 12px 0; text-transform: uppercase; letter-spacing: 0.5px;">💬 Açıklama</h3>
+                            <div style="padding: 20px; background: #f8f9fa; border-radius: 10px; font-size: 15px; line-height: 1.8; color: #495057; min-height: 100px;">${description || 'Açıklama eklenmedi.'}</div>
+                        </div>
+
+                        <!-- İş Akışı Timeline -->
+                        <div style="background: white; border-radius: 12px; padding: 24px; margin-bottom: ${rejectionReason ? '20px' : '0'}; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);">
+                            <h3 style="font-size: 14px; font-weight: 700; color: ${colors.text}; margin: 0 0 20px 0; text-transform: uppercase; letter-spacing: 0.5px;">🔄 İş Akışı</h3>
+                            <div style="position: relative;">
+                                <!-- Timeline Line -->
+                                <div style="position: absolute; left: 20px; top: 0; bottom: 0; width: 2px; background: linear-gradient(180deg, #10b981 0%, ${status === 'pending' ? '#FFC107 50%, #e5e7eb 100%' : status === 'approved' ? '#10b981 100%' : '#ef4444 50%, #e5e7eb 100%'});"></div>
+
+                                <!-- Timeline Items -->
+                                <div style="position: relative; margin-bottom: 24px;">
+                                    <div style="display: flex; align-items: start; gap: 16px;">
+                                        <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3); z-index: 1;">✓</div>
+                                        <div style="flex: 1; padding-top: 4px;">
+                                            <div style="font-weight: 600; color: #1f2937; margin-bottom: 4px;">Talep Oluşturuldu</div>
+                                            <div style="font-size: 13px; color: #6b7280;">${employee} tarafından • 03.11.2025 14:30</div>
+                                            <div style="margin-top: 8px; padding: 12px; background: #f0fdf4; border-left: 3px solid #10b981; border-radius: 6px; font-size: 14px; color: #059669;">İzin talebi oluşturuldu</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                ${status === 'pending' ? `
+                                <div style="position: relative; margin-bottom: 24px;">
+                                    <div style="display: flex; align-items: start; gap: 16px;">
+                                        <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #FFC107 0%, #F57C00 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3); z-index: 1;">⏱</div>
+                                        <div style="flex: 1; padding-top: 4px;">
+                                            <div style="font-weight: 600; color: #1f2937; margin-bottom: 4px;">Onay Bekliyor</div>
+                                            <div style="font-size: 13px; color: #6b7280;">Yönetici onayı bekleniyor</div>
+                                            <div style="margin-top: 8px; padding: 12px; background: #fff8e1; border-left: 3px solid #FFC107; border-radius: 6px; font-size: 14px; color: #F57C00;">Onay bekleniyor</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div style="position: relative; margin-bottom: 24px;">
+                                    <div style="display: flex; align-items: start; gap: 16px;">
+                                        <div style="width: 40px; height: 40px; background: #e5e7eb; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #9ca3af; font-weight: bold; z-index: 1;">3</div>
+                                        <div style="flex: 1; padding-top: 4px; opacity: 0.5;">
+                                            <div style="font-weight: 600; color: #6b7280; margin-bottom: 4px;">İK Onayı</div>
+                                            <div style="font-size: 13px; color: #9ca3af;">Beklemede</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div style="position: relative;">
+                                    <div style="display: flex; align-items: start; gap: 16px;">
+                                        <div style="width: 40px; height: 40px; background: #e5e7eb; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #9ca3af; font-weight: bold; z-index: 1;">4</div>
+                                        <div style="flex: 1; padding-top: 4px; opacity: 0.5;">
+                                            <div style="font-weight: 600; color: #6b7280; margin-bottom: 4px;">İzin Kullanımı</div>
+                                            <div style="font-size: 13px; color: #9ca3af;">Beklemede</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                ` : status === 'approved' ? `
+                                <div style="position: relative; margin-bottom: 24px;">
+                                    <div style="display: flex; align-items: start; gap: 16px;">
+                                        <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3); z-index: 1;">✓</div>
+                                        <div style="flex: 1; padding-top: 4px;">
+                                            <div style="font-weight: 600; color: #1f2937; margin-bottom: 4px;">Yönetici Onayı</div>
+                                            <div style="font-size: 13px; color: #6b7280;">Onaylandı • 04.11.2025 10:15</div>
+                                            <div style="margin-top: 8px; padding: 12px; background: #f0fdf4; border-left: 3px solid #10b981; border-radius: 6px; font-size: 14px; color: #059669;">Yönetici onayı verildi</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div style="position: relative; margin-bottom: 24px;">
+                                    <div style="display: flex; align-items: start; gap: 16px;">
+                                        <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3); z-index: 1;">✓</div>
+                                        <div style="flex: 1; padding-top: 4px;">
+                                            <div style="font-weight: 600; color: #1f2937; margin-bottom: 4px;">İK Onayı</div>
+                                            <div style="font-size: 13px; color: #6b7280;">Onaylandı • 04.11.2025 15:20</div>
+                                            <div style="margin-top: 8px; padding: 12px; background: #f0fdf4; border-left: 3px solid #10b981; border-radius: 6px; font-size: 14px; color: #059669;">İK onayı verildi</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div style="position: relative;">
+                                    <div style="display: flex; align-items: start; gap: 16px;">
+                                        <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3); z-index: 1;">✓</div>
+                                        <div style="flex: 1; padding-top: 4px;">
+                                            <div style="font-weight: 600; color: #1f2937; margin-bottom: 4px;">İzin Kullanımı</div>
+                                            <div style="font-size: 13px; color: #6b7280;">${startDate} - ${endDate}</div>
+                                            <div style="margin-top: 8px; padding: 12px; background: #f0fdf4; border-left: 3px solid #10b981; border-radius: 6px; font-size: 14px; color: #059669;">İzin onaylandı ve kullanılabilir</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                ` : `
+                                <div style="position: relative; margin-bottom: 24px;">
+                                    <div style="display: flex; align-items: start; gap: 16px;">
+                                        <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3); z-index: 1;">✕</div>
+                                        <div style="flex: 1; padding-top: 4px;">
+                                            <div style="font-weight: 600; color: #1f2937; margin-bottom: 4px;">Talep Reddedildi</div>
+                                            <div style="font-size: 13px; color: #6b7280;">Reddedildi • 04.11.2025 11:30</div>
+                                            <div style="margin-top: 8px; padding: 12px; background: #fef2f2; border-left: 3px solid #ef4444; border-radius: 6px; font-size: 14px; color: #dc2626;">İzin talebi reddedildi</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div style="position: relative; margin-bottom: 24px;">
+                                    <div style="display: flex; align-items: start; gap: 16px;">
+                                        <div style="width: 40px; height: 40px; background: #e5e7eb; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #9ca3af; font-weight: bold; z-index: 1;">3</div>
+                                        <div style="flex: 1; padding-top: 4px; opacity: 0.5;">
+                                            <div style="font-weight: 600; color: #6b7280; margin-bottom: 4px;">İK Onayı</div>
+                                            <div style="font-size: 13px; color: #9ca3af;">İptal edildi</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div style="position: relative;">
+                                    <div style="display: flex; align-items: start; gap: 16px;">
+                                        <div style="width: 40px; height: 40px; background: #e5e7eb; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #9ca3af; font-weight: bold; z-index: 1;">4</div>
+                                        <div style="flex: 1; padding-top: 4px; opacity: 0.5;">
+                                            <div style="font-weight: 600; color: #6b7280; margin-bottom: 4px;">İzin Kullanımı</div>
+                                            <div style="font-size: 13px; color: #9ca3af;">İptal edildi</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                `}
+                            </div>
+                        </div>
+
+                        ${rejectionReason ? `
+                            <!-- Red Sebebi -->
+                            <div style="background: white; border-radius: 12px; padding: 24px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); border: 2px solid #f44336;">
+                                <h3 style="font-size: 14px; font-weight: 700; color: #c62828; margin: 0 0 12px 0; text-transform: uppercase; letter-spacing: 0.5px;">⚠️ Red Sebebi</h3>
+                                <div style="padding: 16px; background: #ffebee; border-radius: 10px; font-size: 14px; line-height: 1.6; color: #c62828; font-weight: 500;">${rejectionReason}</div>
+                            </div>
+                        ` : ''}
+                    </div>
+
+                    <!-- Footer -->
+                    <div style="padding: 20px 32px; background: white; border-top: 1px solid #e9ecef; display: flex; justify-content: flex-end;">
+                        <button onclick="this.closest('[style*=fixed]').remove()" class="btn btn-primary">Kapat</button>
+                    </div>
+                </div>
+
+                <style>
+                    @keyframes modalSlideIn {
+                        from {
+                            opacity: 0;
+                            transform: translateY(-20px);
+                        }
+                        to {
+                            opacity: 1;
+                            transform: translateY(0);
+                        }
+                    }
+                </style>
+            `;
+
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    modal.style.animation = 'fadeOut 0.2s ease-out';
+                    setTimeout(() => modal.remove(), 200);
+                }
+            });
+
+            document.body.appendChild(modal);
+        }
+
+        function approveRequest(requestId, employeeName, button) {
+            if (confirm(`${employeeName} için izin talebini onaylamak istediğinize emin misiniz?`)) {
+                App.showNotification(`${employeeName} için izin talebi onaylandı.`, 'success');
+
+                // Remove row with animation (green background)
+                const row = button.closest('tr');
+                row.style.transition = 'all 0.3s ease';
+                row.style.backgroundColor = '#e8f5e9';
+                setTimeout(() => {
+                    row.remove();
+                    updateResultCount();
+                }, 500);
+            }
+        }
+
+        // Global variables for modal context
+        let currentRequestId = null;
+        let currentRequestRow = null;
+
+        function rejectRequest(requestId, employeeName, button) {
+            // Store context
+            currentRequestId = requestId;
+            currentRequestRow = button.closest('tr');
+
+            // Set employee name and show modal
+            document.getElementById('rejectEmployeeName').textContent = employeeName;
+            document.getElementById('rejectReason').value = '';
+            document.getElementById('rejectModal').style.display = 'flex';
+
+            // Focus on textarea
+            setTimeout(() => document.getElementById('rejectReason').focus(), 100);
+        }
+
+        function closeRejectModal() {
+            document.getElementById('rejectModal').style.display = 'none';
+            currentRequestId = null;
+            currentRequestRow = null;
+        }
+
+        function confirmReject() {
+            const reason = document.getElementById('rejectReason').value.trim();
+
+            if (!reason) {
+                alert('Lütfen red sebebini girin!');
+                return;
+            }
+
+            const employeeName = document.getElementById('rejectEmployeeName').textContent;
+
+            // Simulate rejection
+            App.showNotification(`${employeeName} için izin talebi reddedildi.`, 'warning');
+
+            // Remove row from table
+            if (currentRequestRow) {
+                currentRequestRow.style.transition = 'all 0.3s ease';
+                currentRequestRow.style.backgroundColor = '#ffebee';
+                setTimeout(() => {
+                    currentRequestRow.remove();
+                    updateResultCount();
+                }, 500);
+            }
+
+            closeRejectModal();
+        }
+
+        function reviseRequest(requestId, employeeName, button) {
+            // Store context
+            currentRequestId = requestId;
+            currentRequestRow = button.closest('tr');
+
+            // Set employee name and show modal
+            document.getElementById('reviseEmployeeName').textContent = employeeName;
+            document.getElementById('reviseNote').value = '';
+            document.getElementById('reviseModal').style.display = 'flex';
+
+            // Focus on textarea
+            setTimeout(() => document.getElementById('reviseNote').focus(), 100);
+        }
+
+        function closeReviseModal() {
+            document.getElementById('reviseModal').style.display = 'none';
+            currentRequestId = null;
+            currentRequestRow = null;
+        }
+
+        function confirmRevise() {
+            const revisionNote = document.getElementById('reviseNote').value.trim();
+
+            if (!revisionNote) {
+                alert('Lütfen revizyon notunu girin!');
+                return;
+            }
+
+            const employeeName = document.getElementById('reviseEmployeeName').textContent;
+
+            // Simulate revision request
+            App.showNotification(`${employeeName} için revize talebi gönderildi.`, 'info');
+
+            // Remove row from table with orange/yellow background
+            if (currentRequestRow) {
+                currentRequestRow.style.transition = 'all 0.3s ease';
+                currentRequestRow.style.backgroundColor = '#fff3e0';
+                setTimeout(() => {
+                    currentRequestRow.remove();
+                    updateResultCount();
+                }, 500);
+            }
+
+            closeReviseModal();
+        }
+
+        // Close modals on backdrop click
+        document.getElementById('rejectModal').addEventListener('click', function(e) {
+            if (e.target === this) closeRejectModal();
+        });
+
+        document.getElementById('reviseModal').addEventListener('click', function(e) {
+            if (e.target === this) closeReviseModal();
+        });
+
+        // Close modals on ESC key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeRejectModal();
+                closeReviseModal();
+            }
+        });
+
+        function updateResultCount() {
+            const rows = document.querySelectorAll('#requestsTable tr[data-status]');
+            let visibleCount = 0;
+            rows.forEach(row => {
+                if (row.style.display !== 'none') {
+                    visibleCount++;
+                }
+            });
+            document.getElementById('resultCount').textContent = `${visibleCount} talep gösteriliyor`;
+            document.getElementById('filterResultCount').textContent = `${visibleCount} talep`;
+        }
+
+        function exportExcel() {
+            App.showNotification('Excel raporu indiriliyor...', 'success');
+        }
+
+        function exportPDF() {
+            App.showNotification('PDF raporu indiriliyor...', 'success');
+        }
+
+        // Tarih input'larına tıklandığında takvimi otomatik aç
+        document.querySelectorAll('input[type="date"]').forEach(input => {
+            input.addEventListener('click', function(e) {
+                if (this.showPicker) {
+                    try {
+                        this.showPicker();
+                    } catch (err) {
+                        console.log('showPicker desteklenmiyor');
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

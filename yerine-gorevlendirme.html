@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yerine Görevlendirme - Tez Medikal</title>
+    <link rel="stylesheet" href="css/design-system.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-brand">
+            <div style="width: 40px; height: 40px; background: var(--primary); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">TM</div>
+            <span>Tez Medikal</span>
+        </div>
+        <div class="navbar-menu">
+            <a href="dashboard.html" class="nav-link">Dashboard</a>
+            <a href="yerine-gorevlendirme.html" class="nav-link active">Yerine Görevlendirme</a>
+            <a href="tum-izinler.html" class="nav-link">Tüm İzinler</a>
+        </div>
+        <div class="navbar-user">
+            <div class="user-info">
+                <div class="user-name" id="userName">-</div>
+                <div class="user-role" id="userRole">Operasyon</div>
+            </div>
+            <div class="user-avatar" id="userAvatar">-</div>
+            <button class="btn btn-ghost btn-sm" data-action="logout">Çıkış</button>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <div class="container-fluid" style="max-width: 1800px; margin: 0 auto;">
+            <div class="page-header">
+                <h1 class="page-title">Yerine Görevlendirme</h1>
+                <p class="page-subtitle">Saha çalışanları için yerine görevlendirme taleplerini yönetin</p>
+            </div>
+
+            <!-- Stats -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 24px; margin-bottom: 32px;">
+                <div class="stat-card" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); border: none;">
+                    <div class="stat-label" style="color: rgba(255, 255, 255, 0.9);">⏱️ Bekleyen Atamalar</div>
+                    <div class="stat-value" style="color: white;" id="pendingCount">5</div>
+                    <div class="stat-subtitle" style="color: rgba(255, 255, 255, 0.8);">Talep</div>
+                </div>
+                <div class="stat-card" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); border: none;">
+                    <div class="stat-label" style="color: rgba(255, 255, 255, 0.9);">✅ Tamamlanan Atamalar</div>
+                    <div class="stat-value" style="color: white;">23</div>
+                    <div class="stat-subtitle" style="color: rgba(255, 255, 255, 0.8);">Bu Ay</div>
+                </div>
+                <div class="stat-card" style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); border: none;">
+                    <div class="stat-label" style="color: rgba(255, 255, 255, 0.9);">👥 Müsait Personel</div>
+                    <div class="stat-value" style="color: white;" id="availableCount">12</div>
+                    <div class="stat-subtitle" style="color: rgba(255, 255, 255, 0.8);">Kişi</div>
+                </div>
+                <div class="stat-card" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); border: none;">
+                    <div class="stat-label" style="color: rgba(255, 255, 255, 0.9);">📍 Aktif Lokasyon</div>
+                    <div class="stat-value" style="color: white;">8</div>
+                    <div class="stat-subtitle" style="color: rgba(255, 255, 255, 0.8);">Proje</div>
+                </div>
+            </div>
+
+            <!-- Filters -->
+            <div class="card mb-4" style="border: none; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); border-radius: 16px;">
+                <div class="card-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px 24px; border: none;">
+                    <h3 class="card-title" style="color: white; font-size: 18px; margin: 0; font-weight: 600;">🔍 Filtreler</h3>
+                </div>
+                <div class="card-body" style="padding: 24px;">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px;">
+                        <div class="form-group m-0">
+                            <label class="form-label">Lokasyon / Proje</label>
+                            <select class="form-control form-select" id="locationFilter">
+                                <option value="">Tüm Lokasyonlar</option>
+                                <option value="istanbul-fab">İstanbul Fabrika A</option>
+                                <option value="ankara-tesis">Ankara Tesis B</option>
+                                <option value="izmir-depo">İzmir Depo C</option>
+                                <option value="bursa-uretim">Bursa Üretim D</option>
+                            </select>
+                        </div>
+                        <div class="form-group m-0">
+                            <label class="form-label">Durum</label>
+                            <select class="form-control form-select" id="statusFilter">
+                                <option value="pending">Beklemede</option>
+                                <option value="assigned">Atandı</option>
+                                <option value="completed">Tamamlandı</option>
+                                <option value="all">Tümü</option>
+                            </select>
+                        </div>
+                        <div class="form-group m-0">
+                            <label class="form-label">Tarih Aralığı</label>
+                            <input type="date" class="form-control" id="dateFilter">
+                        </div>
+                        <div class="form-group m-0" style="display: flex; align-items: flex-end;">
+                            <button class="btn btn-primary" onclick="filterAssignments()" style="width: 100%;">Filtrele</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 400px; gap: 24px;">
+                <!-- Sol: Görevlendirme Bekleyen Talepler -->
+                <div class="card" style="border: none; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); border-radius: 16px;">
+                    <div class="card-header" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); padding: 20px 24px; border: none; display: flex; justify-content: space-between; align-items: center;">
+                        <h3 class="card-title" style="color: white; font-size: 18px; margin: 0; font-weight: 600;">⏱️ Görevlendirme Bekleyen Talepler</h3>
+                        <span style="background: rgba(255, 255, 255, 0.2); padding: 4px 12px; border-radius: 12px; color: white; font-size: 14px; font-weight: 600;" id="pendingBadge">5 Talep</span>
+                    </div>
+                    <div class="table-container">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Talep No</th>
+                                    <th>Personel</th>
+                                    <th>Lokasyon</th>
+                                    <th>İzin Tarihleri</th>
+                                    <th>Gün</th>
+                                    <th>İşlemler</th>
+                                </tr>
+                            </thead>
+                            <tbody id="pendingAssignments">
+                                <tr>
+                                    <td><strong>REQ_001</strong></td>
+                                    <td>Ahmet Yılmaz</td>
+                                    <td><span class="badge badge-info">İstanbul Fabrika A</span></td>
+                                    <td>10.11.2025 - 15.11.2025</td>
+                                    <td><strong>5 gün</strong></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-success" onclick="showAssignmentModal('REQ_001')">👤 Ata</button>
+                                        <button class="btn btn-sm btn-secondary" onclick="showRequestDetail('REQ_001')">👁 Detay</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>REQ_002</strong></td>
+                                    <td>Fatma Kaya</td>
+                                    <td><span class="badge badge-info">Ankara Tesis B</span></td>
+                                    <td>12.11.2025 - 14.11.2025</td>
+                                    <td><strong>3 gün</strong></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-success" onclick="showAssignmentModal('REQ_002')">👤 Ata</button>
+                                        <button class="btn btn-sm btn-secondary" onclick="showRequestDetail('REQ_002')">👁 Detay</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>REQ_003</strong></td>
+                                    <td>Mehmet Demir</td>
+                                    <td><span class="badge badge-info">İzmir Depo C</span></td>
+                                    <td>15.11.2025 - 20.11.2025</td>
+                                    <td><strong>5 gün</strong></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-success" onclick="showAssignmentModal('REQ_003')">👤 Ata</button>
+                                        <button class="btn btn-sm btn-secondary" onclick="showRequestDetail('REQ_003')">👁 Detay</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>REQ_004</strong></td>
+                                    <td>Ayşe Şahin</td>
+                                    <td><span class="badge badge-info">Bursa Üretim D</span></td>
+                                    <td>18.11.2025 - 22.11.2025</td>
+                                    <td><strong>4 gün</strong></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-success" onclick="showAssignmentModal('REQ_004')">👤 Ata</button>
+                                        <button class="btn btn-sm btn-secondary" onclick="showRequestDetail('REQ_004')">👁 Detay</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>REQ_005</strong></td>
+                                    <td>Can Yıldız</td>
+                                    <td><span class="badge badge-info">İstanbul Fabrika A</span></td>
+                                    <td>20.11.2025 - 25.11.2025</td>
+                                    <td><strong>5 gün</strong></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-success" onclick="showAssignmentModal('REQ_005')">👤 Ata</button>
+                                        <button class="btn btn-sm btn-secondary" onclick="showRequestDetail('REQ_005')">👁 Detay</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Sağ: Müsait Personel Havuzu -->
+                <div>
+                    <div class="card mb-4" style="border: none; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); border-radius: 16px;">
+                        <div class="card-header" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); padding: 20px 24px; border: none;">
+                            <h3 class="card-title" style="color: white; font-size: 18px; margin: 0; font-weight: 600;">👥 Müsait Personel Havuzu</h3>
+                        </div>
+                        <div class="card-body" style="padding: 16px;">
+                            <div class="form-group">
+                                <input type="text" class="form-control" placeholder="Personel ara..." id="searchPersonnel">
+                            </div>
+                            <div id="personnelList" style="max-height: 500px; overflow-y: auto;">
+                                <div class="personnel-item" style="padding: 16px; border: 1px solid #e5e7eb; border-radius: 12px; margin-bottom: 12px; cursor: pointer; transition: all 0.2s;" onclick="selectPersonnel('per_001')" onmouseover="this.style.background='#f8f9fa'" onmouseout="this.style.background='white'">
+                                    <div style="display: flex; align-items: center; gap: 12px;">
+                                        <div style="width: 48px; height: 48px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 18px;">AK</div>
+                                        <div style="flex: 1;">
+                                            <div style="font-weight: 600; color: #1f2937; margin-bottom: 4px;">Ali Koç</div>
+                                            <div style="font-size: 13px; color: #6b7280;">Saha Teknisyeni • Üretim</div>
+                                            <div style="font-size: 12px; color: #10b981; margin-top: 4px;">✓ Müsait</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="personnel-item" style="padding: 16px; border: 1px solid #e5e7eb; border-radius: 12px; margin-bottom: 12px; cursor: pointer; transition: all 0.2s;" onclick="selectPersonnel('per_002')" onmouseover="this.style.background='#f8f9fa'" onmouseout="this.style.background='white'">
+                                    <div style="display: flex; align-items: center; gap: 12px;">
+                                        <div style="width: 48px; height: 48px; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 18px;">SY</div>
+                                        <div style="flex: 1;">
+                                            <div style="font-weight: 600; color: #1f2937; margin-bottom: 4px;">Selin Yılmaz</div>
+                                            <div style="font-size: 13px; color: #6b7280;">Saha Sorumlusu • Teknik</div>
+                                            <div style="font-size: 12px; color: #10b981; margin-top: 4px;">✓ Müsait</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="personnel-item" style="padding: 16px; border: 1px solid #e5e7eb; border-radius: 12px; margin-bottom: 12px; cursor: pointer; transition: all 0.2s;" onclick="selectPersonnel('per_003')" onmouseover="this.style.background='#f8f9fa'" onmouseout="this.style.background='white'">
+                                    <div style="display: flex; align-items: center; gap: 12px;">
+                                        <div style="width: 48px; height: 48px; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 18px;">ED</div>
+                                        <div style="flex: 1;">
+                                            <div style="font-weight: 600; color: #1f2937; margin-bottom: 4px;">Emre Dağ</div>
+                                            <div style="font-size: 13px; color: #6b7280;">Montaj Uzmanı • Üretim</div>
+                                            <div style="font-size: 12px; color: #10b981; margin-top: 4px;">✓ Müsait</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="personnel-item" style="padding: 16px; border: 1px solid #e5e7eb; border-radius: 12px; margin-bottom: 12px; cursor: pointer; transition: all 0.2s;" onclick="selectPersonnel('per_004')" onmouseover="this.style.background='#f8f9fa'" onmouseout="this.style.background='white'">
+                                    <div style="display: flex; align-items: center; gap: 12px;">
+                                        <div style="width: 48px; height: 48px; background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 18px;">ZA</div>
+                                        <div style="flex: 1;">
+                                            <div style="font-weight: 600; color: #1f2937; margin-bottom: 4px;">Zeynep Arslan</div>
+                                            <div style="font-size: 13px; color: #6b7280;">Servis Teknisyeni • Bakım</div>
+                                            <div style="font-size: 12px; color: #10b981; margin-top: 4px;">✓ Müsait</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Görevlendirme Geçmişi -->
+                    <div class="card" style="border: none; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); border-radius: 16px;">
+                        <div class="card-header" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); padding: 20px 24px; border: none;">
+                            <h3 class="card-title" style="color: white; font-size: 18px; margin: 0; font-weight: 600;">📜 Son Görevlendirmeler</h3>
+                        </div>
+                        <div class="card-body" style="padding: 16px;">
+                            <div style="max-height: 300px; overflow-y: auto;">
+                                <div style="padding: 12px; background: #f8f9fa; border-radius: 8px; margin-bottom: 8px;">
+                                    <div style="font-size: 13px; color: #6b7280; margin-bottom: 4px;">05.11.2025</div>
+                                    <div style="font-weight: 600; color: #1f2937; font-size: 14px; margin-bottom: 4px;">REQ_098 → Ali Koç</div>
+                                    <div style="font-size: 12px; color: #059669;">✓ Tamamlandı</div>
+                                </div>
+                                <div style="padding: 12px; background: #f8f9fa; border-radius: 8px; margin-bottom: 8px;">
+                                    <div style="font-size: 13px; color: #6b7280; margin-bottom: 4px;">04.11.2025</div>
+                                    <div style="font-weight: 600; color: #1f2937; font-size: 14px; margin-bottom: 4px;">REQ_097 → Selin Yılmaz</div>
+                                    <div style="font-size: 12px; color: #059669;">✓ Tamamlandı</div>
+                                </div>
+                                <div style="padding: 12px; background: #f8f9fa; border-radius: 8px; margin-bottom: 8px;">
+                                    <div style="font-size: 13px; color: #6b7280; margin-bottom: 4px;">03.11.2025</div>
+                                    <div style="font-weight: 600; color: #1f2937; font-size: 14px; margin-bottom: 4px;">REQ_096 → Emre Dağ</div>
+                                    <div style="font-size: 12px; color: #059669;">✓ Tamamlandı</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="js/app.js"></script>
+    <script>
+        const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+        document.getElementById('userName').textContent = user.name || 'Operasyon Yöneticisi';
+        document.getElementById('userAvatar').textContent = (user.name || 'O').split(' ').map(n => n[0]).join('');
+
+        function showAssignmentModal(requestId) {
+            const modal = document.createElement('div');
+            modal.className = 'modal-backdrop';
+            modal.style.cssText = 'position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 9999; animation: fadeIn 0.2s ease-out;';
+
+            modal.innerHTML = `
+                <div style="background: white; border-radius: 16px; max-width: 600px; width: 100%; max-height: 85vh; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3); animation: modalSlideIn 0.3s ease-out;">
+                    <div style="padding: 28px 32px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); position: relative;">
+                        <button onclick="this.closest('.modal-backdrop').remove()" style="position: absolute; top: 20px; right: 20px; background: rgba(255, 255, 255, 0.2); border: none; border-radius: 8px; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: white; font-size: 20px;">×</button>
+                        <h3 style="margin: 0; color: white; font-size: 22px; font-weight: 600;">👤 Yerine Görevlendirme</h3>
+                        <p style="margin: 8px 0 0 0; color: rgba(255, 255, 255, 0.9); font-size: 14px;">Talep No: ${requestId}</p>
+                    </div>
+                    <div style="padding: 32px; overflow-y: auto; flex: 1; background: #f8f9fa;">
+                        <div style="background: white; border-radius: 12px; padding: 24px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);">
+                            <h4 style="margin: 0 0 20px 0; color: #1f2937; font-size: 16px; font-weight: 600;">İzne Giden Personel</h4>
+                            <div style="display: grid; gap: 12px;">
+                                <div><strong>Personel:</strong> Ahmet Yılmaz</div>
+                                <div><strong>Lokasyon:</strong> İstanbul Fabrika A</div>
+                                <div><strong>İzin Tarihleri:</strong> 10.11.2025 - 15.11.2025 (5 gün)</div>
+                                <div><strong>Proje:</strong> Fabrika A Bakım Operasyonu</div>
+                            </div>
+                        </div>
+                        <div style="background: white; border-radius: 12px; padding: 24px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);">
+                            <h4 style="margin: 0 0 20px 0; color: #1f2937; font-size: 16px; font-weight: 600;">Atama Bilgileri</h4>
+                            <div class="form-group">
+                                <label class="form-label form-label-required">Yerine Görevlendirilecek Personel</label>
+                                <select class="form-control form-select" id="assignedPersonnel" required>
+                                    <option value="">Seçiniz...</option>
+                                    <option value="per_001">Ali Koç - Saha Teknisyeni</option>
+                                    <option value="per_002">Selin Yılmaz - Saha Sorumlusu</option>
+                                    <option value="per_003">Emre Dağ - Montaj Uzmanı</option>
+                                    <option value="per_004">Zeynep Arslan - Servis Teknisyeni</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Müşteri Bilgilendirme Durumu</label>
+                                <select class="form-control form-select" id="customerNotified">
+                                    <option value="yes">Müşteri Bilgilendirildi</option>
+                                    <option value="no">Müşteri Bilgilendirilecek</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Atama Notu</label>
+                                <textarea class="form-control" rows="3" id="assignmentNote" placeholder="Opsiyonel not ekleyebilirsiniz..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="padding: 20px 32px; background: #f8f9fa; border-top: 1px solid #e5e7eb; display: flex; gap: 12px;">
+                        <button onclick="this.closest('.modal-backdrop').remove()" style="flex: 1; padding: 12px; background: #6b7280; color: white; border: none; border-radius: 8px; font-size: 15px; font-weight: 500; cursor: pointer;">İptal</button>
+                        <button onclick="confirmAssignment('${requestId}')" style="flex: 1; padding: 12px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; border-radius: 8px; font-size: 15px; font-weight: 500; cursor: pointer;">✓ Ata ve Onayla</button>
+                    </div>
+                </div>
+            `;
+
+            document.body.appendChild(modal);
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) modal.remove();
+            });
+        }
+
+        function confirmAssignment(requestId) {
+            const personnel = document.getElementById('assignedPersonnel').value;
+            if (!personnel) {
+                alert('Lütfen görevlendirilecek personeli seçin!');
+                return;
+            }
+
+            // Atama işlemi burada yapılır
+            document.querySelector('.modal-backdrop').remove();
+            alert('Görevlendirme başarıyla tamamlandı!');
+
+            // Sayfayı yenile
+            location.reload();
+        }
+
+        function showRequestDetail(requestId) {
+            alert('Talep detayları: ' + requestId);
+        }
+
+        function selectPersonnel(personnelId) {
+            alert('Personel seçildi: ' + personnelId);
+        }
+
+        function filterAssignments() {
+            alert('Filtreleme uygulandı');
+        }
+
+        // Tarih input'larına tıklandığında takvimi otomatik aç
+        document.querySelectorAll('input[type="date"]').forEach(input => {
+            input.addEventListener('click', function(e) {
+                if (this.showPicker) {
+                    try {
+                        this.showPicker();
+                    } catch (err) {
+                        console.log('showPicker desteklenmiyor');
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

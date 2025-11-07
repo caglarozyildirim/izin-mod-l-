@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yeni İzin Talebi - Tez Medikal</title>
+    <link rel="stylesheet" href="css/design-system.css">
+    <!-- Flatpickr CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <style>
+        /* Flatpickr özel stiller */
+        .flatpickr-calendar {
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+        }
+        .flatpickr-day.holiday {
+            color: #dc2626 !important;
+            font-weight: bold;
+            background: #fee2e2 !important;
+        }
+        .flatpickr-day.weekend {
+            color: #9ca3af !important;
+            background: #f3f4f6 !important;
+        }
+        .flatpickr-day.selected {
+            background: #3b82f6 !important;
+            border-color: #3b82f6 !important;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-brand">
+            <div style="width: 40px; height: 40px; background: var(--primary); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">TM</div>
+            <span>Tez Medikal</span>
+        </div>
+        <div class="navbar-menu">
+            <a href="dashboard.html" class="nav-link">Dashboard</a>
+            <a href="izinlerim.html" class="nav-link">İzinlerim</a>
+            <a href="yeni-talep.html" class="nav-link active">Yeni Talep</a>
+        </div>
+        <div class="navbar-user">
+            <div class="user-info">
+                <div class="user-name" id="userName">-</div>
+                <div class="user-role" id="userRole">-</div>
+            </div>
+            <div class="user-avatar" id="userAvatar">-</div>
+            <button class="btn btn-ghost btn-sm" data-action="logout">Çıkış</button>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <div class="container-fluid" style="max-width: 1600px; margin: 0 auto;">
+            <div class="page-header">
+                <h1 class="page-title">Yeni İzin Talebi</h1>
+                <p class="page-subtitle">İzin talebinizi oluşturun</p>
+            </div>
+
+            <!-- İzin Bakiyesi Bar -->
+            <div class="grid grid-cols-3 mb-5">
+                <!-- Hak Edilen İzin - Calendar Icon -->
+                <div class="stat-card" style="position: relative; overflow: visible;">
+                    <div style="display: flex; justify-content: space-between; align-items: start;">
+                        <div style="flex: 1;">
+                            <div class="stat-label">Hak Edilen İzin</div>
+                            <div class="stat-value" id="earnedBalance" style="font-size: 42px;">20</div>
+                            <div class="stat-subtitle">Gün</div>
+                        </div>
+                        <div style="position: relative;">
+                            <svg width="70" height="70" viewBox="0 0 70 70" style="overflow: visible;">
+                                <!-- Calendar base -->
+                                <rect x="10" y="15" width="50" height="45" rx="4" fill="#e3f2fd" stroke="#2196F3" stroke-width="2" style="animation: fade-in-up 0.5s ease-out;"/>
+                                <!-- Calendar header -->
+                                <rect x="10" y="15" width="50" height="12" rx="4" fill="#2196F3" style="animation: fade-in-up 0.5s ease-out 0.1s both;"/>
+                                <!-- Calendar rings -->
+                                <circle cx="22" cy="15" r="3" fill="#1976D2" style="animation: pop-in 0.3s ease-out 0.3s both;"/>
+                                <circle cx="48" cy="15" r="3" fill="#1976D2" style="animation: pop-in 0.3s ease-out 0.3s both;"/>
+                                <!-- Checkmark -->
+                                <path d="M 25 35 L 32 42 L 45 29" stroke="#4CAF50" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round" style="animation: draw-line 0.8s ease-out 0.4s both;"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div style="margin-top: 12px; font-size: 13px; color: #1976D2; display: flex; align-items: center; gap: 4px;">
+                        <span style="font-weight: 600;">Yıllık</span> hakkınız
+                    </div>
+                </div>
+
+                <!-- Kullanılan İzin - Progress Ring -->
+                <div class="stat-card warning" style="position: relative; overflow: visible;">
+                    <div style="display: flex; justify-content: space-between; align-items: start;">
+                        <div style="flex: 1;">
+                            <div class="stat-label">Kullanılan İzin</div>
+                            <div class="stat-value" id="usedBalance" style="font-size: 42px;">5</div>
+                            <div class="stat-subtitle">Gün</div>
+                        </div>
+                        <div style="position: relative;">
+                            <svg width="80" height="80" style="transform: rotate(-90deg);">
+                                <!-- Background circle -->
+                                <circle cx="40" cy="40" r="32" fill="none" stroke="#fff3cd" stroke-width="6" opacity="0.3"/>
+                                <!-- Progress circle (5/20 = 25%) -->
+                                <circle id="usedProgressCircle" cx="40" cy="40" r="32" fill="none" stroke="#FFC107" stroke-width="6"
+                                        stroke-dasharray="201" stroke-dashoffset="150"
+                                        stroke-linecap="round"
+                                        style="filter: drop-shadow(0 0 6px rgba(255, 193, 7, 0.5)); animation: fill-donut 1.5s ease-out;"/>
+                            </svg>
+                            <div id="usedPercentage" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center;">
+                                <div style="font-size: 15px; font-weight: 700; color: #F57C00; line-height: 1;">25%</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 12px; height: 4px; background: rgba(255, 193, 7, 0.2); border-radius: 2px; overflow: hidden;">
+                        <div id="usedProgressBar" style="height: 100%; width: 25%; background: linear-gradient(90deg, #FFC107, #F57C00); animation: progress-glow 2s ease-in-out infinite;"></div>
+                    </div>
+                </div>
+
+                <!-- Kalan İzin - Battery/Progress Bar -->
+                <div class="stat-card success" style="position: relative; overflow: visible;">
+                    <div style="display: flex; justify-content: space-between; align-items: start;">
+                        <div style="flex: 1;">
+                            <div class="stat-label">Kalan İzin</div>
+                            <div class="stat-value" id="remainingBalance" style="font-size: 42px;">15</div>
+                            <div class="stat-subtitle">Gün</div>
+                        </div>
+                        <div style="position: relative;">
+                            <svg width="70" height="70" viewBox="0 0 70 70">
+                                <!-- Battery outline -->
+                                <rect x="12" y="22" width="45" height="26" rx="3" fill="none" stroke="#4CAF50" stroke-width="2.5" style="animation: fade-in-up 0.5s ease-out;"/>
+                                <!-- Battery tip -->
+                                <rect x="57" y="30" width="4" height="10" rx="1" fill="#4CAF50" style="animation: fade-in-up 0.5s ease-out 0.1s both;"/>
+                                <!-- Battery fill (75%) -->
+                                <rect id="batteryFill" x="15" y="25" width="33" height="20" rx="2" fill="url(#gradient-battery)" style="animation: fade-in-up 0.8s ease-out 0.2s both;"/>
+                                <defs>
+                                    <linearGradient id="gradient-battery" x1="0%" y1="0%" x2="100%" y2="0%">
+                                        <stop offset="0%" style="stop-color:#4CAF50;stop-opacity:1" />
+                                        <stop offset="100%" style="stop-color:#2E7D32;stop-opacity:1" />
+                                    </linearGradient>
+                                </defs>
+                                <!-- Sparkle -->
+                                <path d="M 35 35 L 37 35 L 36 33 L 37 31 L 35 31 L 34 33 Z" fill="#FFF" opacity="0.8" style="animation: pop-in 0.4s ease-out 0.5s both;"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div id="remainingPercentage" style="margin-top: 12px; display: flex; gap: 4px; align-items: center; color: #2E7D32; font-size: 13px; font-weight: 600;">
+                        <span style="font-size: 16px;">✓</span> %75 kalan
+                    </div>
+                </div>
+            </div>
+
+            <form id="leaveRequestForm">
+                <!-- İki Sütun Layout -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(600px, 1fr)); gap: 24px; margin-bottom: 24px;">
+                    <!-- Sol: Personel Bilgileri -->
+                    <div class="card" style="border: none; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); border-radius: 16px; overflow: hidden;">
+                        <div class="card-header" style="background: linear-gradient(135deg, #4B9F8E 0%, #3a8070 100%); padding: 20px 24px; border: none;">
+                            <h3 class="card-title" style="color: white; font-size: 18px; margin: 0; font-weight: 600;">👤 Personel Bilgileri</h3>
+                        </div>
+                        <div class="card-body" style="padding: 24px;">
+                            <div class="form-group">
+                                <label class="form-label">Ad Soyad</label>
+                                <input type="text" class="form-control" id="fullName" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Departman</label>
+                                <input type="text" class="form-control" id="department" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Unvan</label>
+                                <input type="text" class="form-control" id="title" value="Uzman" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Kurum</label>
+                                <input type="text" class="form-control" id="company" value="Tez Medikal A.Ş." readonly>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Anlaşma Şekli</label>
+                                <input type="text" class="form-control" id="contractType" value="Belirsiz Süreli" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">İş Yeri</label>
+                                <select class="form-control form-select" id="workLocation">
+                                    <option value="genel">Genel Müdürlük</option>
+                                    <option value="saha">Saha</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">İş Başı Tarihi</label>
+                                <input type="text" class="form-control" id="startWorkDate" value="01.01.2020" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">İzin Hak Ediş Tarihi</label>
+                                <input type="text" class="form-control" id="leaveEarnDate" value="01.01.2025" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Talep Tarihi</label>
+                                <input type="text" class="form-control" id="requestDate" readonly>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sağ: İzin Detayları -->
+                    <div class="card" style="border: none; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); border-radius: 16px; overflow: hidden;">
+                    <div class="card-header" style="background: linear-gradient(135deg, #17A2B8 0%, #138496 100%); padding: 20px 24px; border: none;">
+                        <h3 class="card-title" style="color: white; font-size: 18px; margin: 0; font-weight: 600;">📝 İzin Detayları</h3>
+                    </div>
+                    <div class="card-body" style="padding: 24px;">
+                        <div class="form-group">
+                            <label class="form-label form-label-required">İzin Tipi</label>
+                            <select class="form-control form-select" id="leaveType" required>
+                                <option value="">Seçiniz...</option>
+                                <option value="annual">Yıllık İzin</option>
+                                <option value="marriage">Evlilik İzni</option>
+                                <option value="birth">Doğum İzni</option>
+                                <option value="death">Ölüm İzni</option>
+                                <option value="excuse">Mazeret İzni</option>
+                                <option value="paternity">Babalık İzni</option>
+                                <option value="unpaid">Ücretsiz İzin</option>
+                                <option value="advance">Avans İzin</option>
+                                <option value="education">Eğitim İzni</option>
+                                <option value="sickness">Hastalık İzni</option>
+                                <option value="adoption">Evlat Edinme İzni</option>
+                            </select>
+                        </div>
+
+                        <div class="grid grid-cols-2">
+                            <div class="form-group">
+                                <label class="form-label form-label-required">Başlangıç Tarihi</label>
+                                <input type="date" class="form-control" id="startDate" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label form-label-required">Bitiş Tarihi</label>
+                                <input type="date" class="form-control" id="endDate" required>
+                            </div>
+                        </div>
+
+                        <!-- Mazeret İzni Saat Alanları -->
+                        <div id="excuseTimeFields" style="display: none;">
+                            <div class="grid grid-cols-2">
+                                <div class="form-group">
+                                    <label class="form-label">Başlangıç Saati</label>
+                                    <input type="time" class="form-control" id="startTime">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Bitiş Saati</label>
+                                    <input type="time" class="form-control" id="endTime">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Toplam Gün</label>
+                            <input type="text" class="form-control" id="totalDays" readonly value="0">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Açıklama</label>
+                            <textarea class="form-control" id="description" rows="4" placeholder="İzin sebebinizi belirtiniz..."></textarea>
+                        </div>
+                    </div>
+                    </div>
+                </div>
+
+                <!-- Saha Çalışanı İçin Ek Alanlar -->
+                <div class="card mb-4" id="sahaFields" style="display: none; border: none; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); border-radius: 16px; overflow: hidden;">
+                    <div class="card-header" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); padding: 20px 24px; border: none;">
+                        <h3 class="card-title" style="color: white; font-size: 18px; margin: 0; font-weight: 600;">🏗️ Saha Bilgileri</h3>
+                    </div>
+                    <div class="card-body" style="padding: 24px;">
+                        <div class="form-group">
+                            <label class="form-label">Proje / Lokasyon</label>
+                            <input type="text" class="form-control" id="projectLocation" placeholder="Örn: İstanbul Fabrika A">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Proje Sorumlusu / Ekip Lideri</label>
+                            <input type="text" class="form-control" id="projectLeader" placeholder="Örn: Mehmet Yılmaz">
+                        </div>
+
+                        <div class="form-check mb-3">
+                            <input type="checkbox" id="needReplacement" class="form-check-input">
+                            <label class="form-check-label" for="needReplacement">
+                                Yerine görevlendirme talep ediyorum
+                            </label>
+                        </div>
+
+                        <div class="form-check mb-3">
+                            <input type="checkbox" id="notifyMIL" class="form-check-input">
+                            <label class="form-check-label" for="notifyMIL">
+                                Müşteri İlişkileri (MİL) bilgilendirilsin
+                            </label>
+                        </div>
+
+                        <div class="form-check">
+                            <input type="checkbox" id="noServiceGap" class="form-check-input">
+                            <label class="form-check-label" for="noServiceGap">
+                                Eksik hizmet oluşmayacak
+                            </label>
+                        </div>
+
+                        <div id="serviceGapFields" style="margin-top: 16px;">
+                            <div class="grid grid-cols-2">
+                                <div class="form-group">
+                                    <label class="form-label">Eksik Hizmet Sağlayacak Firma</label>
+                                    <input type="text" class="form-control" id="serviceCompany">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Eksik Hizmet Süresi</label>
+                                    <input type="text" class="form-control" id="serviceDuration" placeholder="Örn: 5 gün">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Buttons -->
+                <div class="card" style="border: none; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); border-radius: 16px; overflow: hidden;">
+                    <div class="card-body" style="padding: 24px;">
+                        <div class="flex gap-md justify-end">
+                            <a href="dashboard.html" class="btn btn-secondary">İptal</a>
+                            <button type="submit" class="btn btn-primary" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; padding: 12px 32px; font-weight: 600;">✓ Talebi Gönder</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <!-- Flatpickr JS -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/tr.js"></script>
+    <script src="js/calendar-helper.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+        const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+        const userData = JSON.parse(localStorage.getItem(`userData_${user.id}`) || '{}');
+
+        document.getElementById('userName').textContent = user.name || '-';
+        document.getElementById('userRole').textContent = user.role === 'employee' ? 'Personel' : 'Yönetici';
+        document.getElementById('userAvatar').textContent = (user.name || '-').split(' ').map(n => n[0]).join('');
+        document.getElementById('fullName').value = user.name || '';
+        document.getElementById('department').value = user.department || '';
+
+        // Saha alanlarını göster/gizle fonksiyonu
+        function toggleSahaFields() {
+            const workLocation = document.getElementById('workLocation').value;
+            const sahaFields = document.getElementById('sahaFields');
+
+            if (workLocation === 'saha') {
+                sahaFields.style.display = 'block';
+                console.log('Saha alanları gösteriliyor');
+            } else {
+                sahaFields.style.display = 'none';
+                console.log('Saha alanları gizleniyor');
+            }
+        }
+
+        // İş yeri varsayılan değerini ayarla (departmana göre)
+        const sahaKeywords = ['üretim', 'saha', 'teknik', 'servis', 'montaj', 'bakım'];
+        const userDepartment = (user.department || '').toLowerCase();
+        const isSaha = sahaKeywords.some(keyword => userDepartment.includes(keyword));
+        document.getElementById('workLocation').value = isSaha ? 'saha' : 'genel';
+
+        // Sayfa yüklendiğinde saha alanlarını kontrol et
+        toggleSahaFields();
+
+        // Talep tarihini bugünün tarihi olarak ayarla
+        const today = new Date().toLocaleDateString('tr-TR');
+        document.getElementById('requestDate').value = today;
+
+        if (userData.leaveBalance) {
+            const earned = userData.leaveBalance.earned || 20;
+            const used = userData.leaveBalance.used || 5;
+            const remaining = userData.leaveBalance.remaining || 15;
+
+            document.getElementById('earnedBalance').textContent = earned;
+            document.getElementById('usedBalance').textContent = used;
+            document.getElementById('remainingBalance').textContent = remaining;
+
+            // Calculate percentages
+            const usedPercentage = Math.round((used / earned) * 100);
+            const remainingPercentage = Math.round((remaining / earned) * 100);
+
+            // Update used leave progress ring and bar
+            const usedCircumference = 201; // 2 * π * r where r=32
+            const usedOffset = usedCircumference - (usedCircumference * usedPercentage / 100);
+            const progressCircle = document.getElementById('usedProgressCircle');
+            if (progressCircle) {
+                progressCircle.style.strokeDashoffset = usedOffset;
+            }
+            document.getElementById('usedPercentage').querySelector('div').textContent = usedPercentage + '%';
+            document.getElementById('usedProgressBar').style.width = usedPercentage + '%';
+
+            // Update remaining leave battery fill
+            const batteryMaxWidth = 39; // Max width of battery fill
+            const batteryWidth = (batteryMaxWidth * remainingPercentage / 100);
+            document.getElementById('batteryFill').setAttribute('width', batteryWidth);
+            document.getElementById('remainingPercentage').innerHTML = '<span style="font-size: 16px;">✓</span> %' + remainingPercentage + ' kalan';
+        }
+
+        // İzin tipi değiştiğinde
+        document.getElementById('leaveType').addEventListener('change', function() {
+            const excuseFields = document.getElementById('excuseTimeFields');
+            excuseFields.style.display = this.value === 'excuse' ? 'block' : 'none';
+        });
+
+        // Çalışma yeri değiştiğinde
+        document.getElementById('workLocation').addEventListener('change', toggleSahaFields);
+
+        // Eksik hizmet checkbox
+        document.getElementById('noServiceGap').addEventListener('change', function() {
+            const fields = document.getElementById('serviceGapFields');
+            fields.style.display = this.checked ? 'none' : 'block';
+        });
+
+        // Flatpickr ile tarih seçicileri başlat
+        let startDatePicker, endDatePicker;
+
+        startDatePicker = flatpickr("#startDate", {
+            ...getFlatpickrConfig(),
+            onChange: function(selectedDates, dateStr, instance) {
+                // Bitiş tarihinin minimum değerini güncelle
+                if (endDatePicker && selectedDates[0]) {
+                    endDatePicker.set('minDate', selectedDates[0]);
+                }
+                updateLeaveDaysDisplay();
+            }
+        });
+
+        endDatePicker = flatpickr("#endDate", {
+            ...getFlatpickrConfig(),
+            onChange: function(selectedDates, dateStr, instance) {
+                updateLeaveDaysDisplay();
+            }
+        });
+
+        // İş günü sayısını hesapla ve göster
+        function updateLeaveDaysDisplay() {
+            const startInput = document.getElementById('startDate');
+            const endInput = document.getElementById('endDate');
+
+            if (startInput.value && endInput.value) {
+                // Flatpickr'dan tarihleri al
+                const startDate = startDatePicker.selectedDates[0];
+                const endDate = endDatePicker.selectedDates[0];
+
+                if (startDate && endDate && startDate <= endDate) {
+                    const workingDaysCount = calculateWorkingDays(startDate, endDate);
+                    document.getElementById('totalDays').value = workingDaysCount + ' iş günü';
+                } else {
+                    document.getElementById('totalDays').value = '0 iş günü';
+                }
+            }
+        }
+
+        // Form submit
+        document.getElementById('leaveRequestForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const requestData = {
+                type: document.getElementById('leaveType').value,
+                startDate: document.getElementById('startDate').value,
+                endDate: document.getElementById('endDate').value,
+                days: document.getElementById('totalDays').value,
+                description: document.getElementById('description').value,
+                workLocation: document.getElementById('workLocation').value,
+                needReplacement: document.getElementById('needReplacement')?.checked || false,
+                // Saha workflow additional fields
+                projectLocation: document.getElementById('projectLocation')?.value || '',
+                projectLeader: document.getElementById('projectLeader')?.value || '',
+                notifyMIL: document.getElementById('notifyMIL')?.checked || false,
+                noServiceGap: document.getElementById('noServiceGap')?.checked || false,
+                serviceCompany: document.getElementById('serviceCompany')?.value || '',
+                serviceDuration: document.getElementById('serviceDuration')?.value || '',
+                // Mazeret izni için saat bilgileri
+                startTime: document.getElementById('startTime')?.value || '',
+                endTime: document.getElementById('endTime')?.value || ''
+            };
+
+            // WorkflowEngine ile talep oluştur
+            const request = WorkflowEngine.createRequest(requestData);
+
+            if (request) {
+                // Talebi kaydet
+                WorkflowEngine.saveRequest(request);
+
+                // Console'a workflow bilgilerini yazdır
+                console.log('🚀 İZİN TALEBİ OLUŞTURULDU:');
+                console.log('Talep ID:', request.id);
+                console.log('Workflow Adımları:', request.workflow.steps);
+                console.log('Geçerli Adım:', request.workflow.currentStep);
+                console.log('---');
+
+                App.showNotification('İzin talebiniz başarıyla gönderildi! Onay sürecine alındı.', 'success');
+                setTimeout(() => window.location.href = 'izinlerim.html', 1500);
+            } else {
+                App.showNotification('Talep oluşturulamadı. Lütfen tekrar deneyin.', 'error');
+            }
+        });
+    </script>
+</body>
+</html>

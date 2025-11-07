@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Hızlı Giriş - Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 40px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        h1 { color: #1f2937; }
+        button {
+            padding: 12px 24px;
+            margin: 8px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        .btn-manager {
+            background: #3b82f6;
+            color: white;
+        }
+        .btn-hr {
+            background: #10b981;
+            color: white;
+        }
+        .btn-operation {
+            background: #f59e0b;
+            color: white;
+        }
+        .btn-employee {
+            background: #6b7280;
+            color: white;
+        }
+        button:hover {
+            opacity: 0.9;
+        }
+        .info {
+            background: #f3f4f6;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔐 Hızlı Test Girişi</h1>
+    <p>Test için kullanıcı rolü seçin:</p>
+
+    <button class="btn-manager" onclick="loginAs('manager')">
+        👔 Yönetici Olarak Giriş
+    </button>
+
+    <button class="btn-hr" onclick="loginAs('hr')">
+        👥 İnsan Kaynakları Olarak Giriş
+    </button>
+
+    <button class="btn-operation" onclick="loginAs('operation')">
+        ⚙️ Operasyon Olarak Giriş
+    </button>
+
+    <button class="btn-employee" onclick="loginAs('employee')">
+        👤 Çalışan Olarak Giriş
+    </button>
+
+    <div class="info">
+        <h3>ℹ️ Bilgi</h3>
+        <p>Bu sayfa sadece test amaçlıdır. Giriş yaptıktan sonra dashboard'a yönlendirileceksiniz.</p>
+        <p><strong>Yönetici, İK veya Operasyon</strong> rolü ile giriş yaparsanız "Demo Verileri Yükle" butonunu göreceksiniz.</p>
+    </div>
+
+    <script>
+        function loginAs(role) {
+            const users = {
+                manager: {
+                    id: 'mgr1',
+                    name: 'Test Yönetici',
+                    email: 'yonetici@tezmedical.com',
+                    role: 'manager',
+                    department: 'Yönetim'
+                },
+                hr: {
+                    id: 'hr1',
+                    name: 'Test İK Uzmanı',
+                    email: 'ik@tezmedical.com',
+                    role: 'hr',
+                    department: 'İnsan Kaynakları'
+                },
+                operation: {
+                    id: 'op1',
+                    name: 'Test Operasyon',
+                    email: 'operasyon@tezmedical.com',
+                    role: 'operation',
+                    department: 'Operasyon'
+                },
+                employee: {
+                    id: 'emp1',
+                    name: 'Test Çalışan',
+                    email: 'calisan@tezmedical.com',
+                    role: 'employee',
+                    department: 'IT Departmanı'
+                }
+            };
+
+            const user = users[role];
+
+            // localStorage'a kaydet
+            localStorage.setItem('currentUser', JSON.stringify(user));
+            localStorage.setItem('authToken', 'test-token-' + Date.now());
+
+            // Kullanıcıyı users listesine ekle (eğer yoksa)
+            const existingUsers = JSON.parse(localStorage.getItem('users') || '[]');
+            if (!existingUsers.find(u => u.id === user.id)) {
+                existingUsers.push(user);
+                localStorage.setItem('users', JSON.stringify(existingUsers));
+            }
+
+            alert(`✅ ${user.name} olarak giriş yapıldı!\n\nDashboard'a yönlendiriliyorsunuz...`);
+
+            // Dashboard'a yönlendir
+            window.location.href = 'dashboard.html';
+        }
+    </script>
+</body>
+</html>

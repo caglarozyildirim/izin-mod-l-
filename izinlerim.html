@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>İzinlerim - Tez Medikal</title>
+    <link rel="stylesheet" href="css/design-system.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-brand">
+            <div style="width: 40px; height: 40px; background: var(--primary); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">TM</div>
+            <span>Tez Medikal</span>
+        </div>
+        <div class="navbar-menu">
+            <a href="dashboard.html" class="nav-link">Dashboard</a>
+            <a href="izinlerim.html" class="nav-link active">İzinlerim</a>
+            <a href="yeni-talep.html" class="nav-link">Yeni Talep</a>
+        </div>
+        <div class="navbar-user">
+            <div class="user-info">
+                <div class="user-name" id="userName">-</div>
+                <div class="user-role">Personel</div>
+            </div>
+            <div class="user-avatar" id="userAvatar">-</div>
+            <button class="btn btn-ghost btn-sm" data-action="logout">Çıkış</button>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <div class="container-fluid">
+            <div class="page-header">
+                <h1 class="page-title">İzinlerim</h1>
+                <p class="page-subtitle">İzin taleplerinizi görüntüleyin ve yönetin</p>
+            </div>
+
+            <!-- Stats -->
+            <div class="grid grid-cols-4 mb-5">
+                <!-- Toplam Talep - Stacked Documents -->
+                <div class="stat-card" style="position: relative; overflow: visible;">
+                    <div style="display: flex; justify-content: space-between; align-items: start;">
+                        <div style="flex: 1;">
+                            <div class="stat-label">Toplam Talep</div>
+                            <div class="stat-value" id="totalRequests">0</div>
+                        </div>
+                        <div style="position: relative; width: 60px; height: 60px;">
+                            <svg width="60" height="60" viewBox="0 0 60 60">
+                                <!-- Layer 3 (back) -->
+                                <rect x="24" y="18" width="26" height="32" rx="3" fill="#e0e0e0" opacity="0.4"
+                                      style="animation: float-layer 3s ease-in-out infinite;"/>
+                                <!-- Layer 2 (middle) -->
+                                <rect x="20" y="14" width="26" height="32" rx="3" fill="#bdbdbd" opacity="0.6"
+                                      style="animation: float-layer 3s ease-in-out 0.2s infinite;"/>
+                                <!-- Layer 1 (front) -->
+                                <rect x="16" y="10" width="26" height="32" rx="3" fill="#6366f1" opacity="1"
+                                      style="animation: float-layer 3s ease-in-out 0.4s infinite;">
+                                    <animate attributeName="fill" values="#6366f1;#818cf8;#6366f1" dur="2s" repeatCount="indefinite"/>
+                                </rect>
+                                <!-- Document lines -->
+                                <line x1="20" y1="18" x2="34" y2="18" stroke="white" stroke-width="1.5" opacity="0.9"/>
+                                <line x1="20" y1="23" x2="38" y2="23" stroke="white" stroke-width="1.5" opacity="0.9"/>
+                                <line x1="20" y1="28" x2="36" y2="28" stroke="white" stroke-width="1.5" opacity="0.9"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Onaylanan - Donut Chart -->
+                <div class="stat-card success" style="position: relative; overflow: visible;">
+                    <div style="display: flex; justify-content: space-between; align-items: start;">
+                        <div style="flex: 1;">
+                            <div class="stat-label">Onaylanan</div>
+                            <div class="stat-value" id="approvedRequests">0</div>
+                        </div>
+                        <div style="position: relative;">
+                            <svg width="70" height="70" style="transform: rotate(-90deg);">
+                                <!-- Background -->
+                                <circle cx="35" cy="35" r="28" fill="none" stroke="#e8f5e9" stroke-width="8"/>
+                                <!-- Progress (will be updated dynamically) -->
+                                <circle id="approvedDonut" cx="35" cy="35" r="28" fill="none" stroke="url(#gradient-success)" stroke-width="8"
+                                        stroke-dasharray="176" stroke-dashoffset="176"
+                                        stroke-linecap="round"
+                                        style="filter: drop-shadow(0 0 6px rgba(76, 175, 80, 0.4)); animation: fill-donut 1.5s ease-out forwards;"/>
+                                <defs>
+                                    <linearGradient id="gradient-success" x1="0%" y1="0%" x2="100%" y2="100%">
+                                        <stop offset="0%" style="stop-color:#4CAF50;stop-opacity:1" />
+                                        <stop offset="100%" style="stop-color:#2E7D32;stop-opacity:1" />
+                                    </linearGradient>
+                                </defs>
+                            </svg>
+                            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center;">
+                                <div id="approvedPercentage" style="font-size: 15px; font-weight: 700; color: #2E7D32; line-height: 1;">0%</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Beklemede - Circular Progress Ring -->
+                <div class="stat-card warning" style="position: relative; overflow: visible;">
+                    <div style="display: flex; justify-content: space-between; align-items: start;">
+                        <div style="flex: 1;">
+                            <div class="stat-label">Beklemede</div>
+                            <div class="stat-value" id="pendingRequests">0</div>
+                        </div>
+                        <div style="position: relative;">
+                            <svg width="70" height="70" style="transform: rotate(-90deg);">
+                                <!-- Background circle -->
+                                <circle cx="35" cy="35" r="28" fill="none" stroke="#fff3cd" stroke-width="6" opacity="0.3"/>
+                                <!-- Progress circle -->
+                                <circle cx="35" cy="35" r="28" fill="none" stroke="#FFC107" stroke-width="6"
+                                        stroke-dasharray="176" stroke-dashoffset="110"
+                                        stroke-linecap="round"
+                                        style="filter: drop-shadow(0 0 6px rgba(255, 193, 7, 0.5)); animation: pulse-ring 2s ease-in-out infinite;"/>
+                            </svg>
+                            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 18px; font-weight: 700; color: #F57C00;">⏱</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Reddedilen - X Icon -->
+                <div class="stat-card danger" style="position: relative; overflow: visible;">
+                    <div style="display: flex; justify-content: space-between; align-items: start;">
+                        <div style="flex: 1;">
+                            <div class="stat-label">Reddedilen</div>
+                            <div class="stat-value" id="rejectedRequests">0</div>
+                        </div>
+                        <div style="position: relative; width: 60px; height: 60px;">
+                            <svg width="60" height="60" viewBox="0 0 60 60">
+                                <!-- Circle background -->
+                                <circle cx="30" cy="30" r="24" fill="#ffebee" opacity="0.5"
+                                        style="animation: pulse-icon 2s ease-in-out infinite;"/>
+                                <!-- X icon -->
+                                <line x1="20" y1="20" x2="40" y2="40" stroke="#ef4444" stroke-width="4" stroke-linecap="round"
+                                      style="filter: drop-shadow(0 2px 4px rgba(239, 68, 68, 0.3));"/>
+                                <line x1="40" y1="20" x2="20" y2="40" stroke="#ef4444" stroke-width="4" stroke-linecap="round"
+                                      style="filter: drop-shadow(0 2px 4px rgba(239, 68, 68, 0.3));"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filters -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="grid grid-cols-4">
+                        <div class="form-group m-0">
+                            <input type="text" class="form-control" placeholder="Ara..." id="searchInput">
+                        </div>
+                        <div class="form-group m-0">
+                            <select class="form-control form-select" id="statusFilter">
+                                <option value="">Tüm Durumlar</option>
+                                <option value="pending">Beklemede</option>
+                                <option value="approved">Onaylandı</option>
+                                <option value="rejected">Reddedildi</option>
+                            </select>
+                        </div>
+                        <div class="form-group m-0">
+                            <select class="form-control form-select" id="typeFilter">
+                                <option value="">Tüm Tipler</option>
+                                <option value="annual">Yıllık İzin</option>
+                                <option value="excuse">Mazeret İzni</option>
+                                <option value="sickness">Hastalık İzni</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-secondary" onclick="loadRequests()">Filtrele</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Requests Table -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">İzin Taleplerim</h3>
+                    <a href="yeni-talep.html" class="btn btn-sm btn-primary">Yeni Talep</a>
+                </div>
+                <div class="table-container">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Talep No</th>
+                                <th>İzin Tipi</th>
+                                <th>Başlangıç</th>
+                                <th>Bitiş</th>
+                                <th>Gün</th>
+                                <th>Durum</th>
+                                <th>Talep Tarihi</th>
+                                <th>İşlemler</th>
+                            </tr>
+                        </thead>
+                        <tbody id="requestsTable">
+                            <tr>
+                                <td colspan="8" class="text-center text-muted" style="padding: 40px;">
+                                    Henüz izin talebiniz bulunmuyor
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="js/app.js"></script>
+    <script>
+        const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+        const userData = JSON.parse(localStorage.getItem(`userData_${user.id}`) || '{}');
+
+        document.getElementById('userName').textContent = user.name || '-';
+        document.getElementById('userAvatar').textContent = (user.name || '-').split(' ').map(n => n[0]).join('');
+
+        const requests = userData.leaveRequests || [];
+
+        // Update stats
+        document.getElementById('totalRequests').textContent = requests.length;
+        document.getElementById('approvedRequests').textContent = requests.filter(r => r.status === 'approved').length;
+        document.getElementById('pendingRequests').textContent = requests.filter(r => r.status === 'pending').length;
+        document.getElementById('rejectedRequests').textContent = requests.filter(r => r.status === 'rejected').length;
+
+        // Load table
+        function loadRequests() {
+            const tbody = document.getElementById('requestsTable');
+            if (requests.length === 0) return;
+
+            const typeNames = {
+                annual: 'Yıllık İzin',
+                excuse: 'Mazeret İzni',
+                sickness: 'Hastalık İzni',
+                marriage: 'Evlilik İzni',
+                birth: 'Doğum İzni',
+                death: 'Ölüm İzni',
+                paternity: 'Babalık İzni',
+                unpaid: 'Ücretsiz İzin',
+                advance: 'Avans İzin',
+                education: 'Eğitim İzni',
+                adoption: 'Evlat Edinme İzni'
+            };
+
+            const statusNames = {
+                pending: 'Beklemede',
+                approved: 'Onaylandı',
+                rejected: 'Reddedildi'
+            };
+
+            const statusBadges = {
+                pending: 'warning',
+                approved: 'success',
+                rejected: 'danger'
+            };
+
+            tbody.innerHTML = requests.map(req => {
+                const reqType = typeNames[req.type] || req.type;
+                const reqStatus = statusNames[req.status] || req.status;
+                const badge = statusBadges[req.status] || 'secondary';
+
+                return `
+                    <tr>
+                        <td><strong>${req.id}</strong></td>
+                        <td>${reqType}</td>
+                        <td>${new Date(req.startDate).toLocaleDateString('tr-TR')}</td>
+                        <td>${new Date(req.endDate).toLocaleDateString('tr-TR')}</td>
+                        <td>${req.days}</td>
+                        <td><span class="badge badge-${badge}">${reqStatus}</span></td>
+                        <td>${new Date(req.createdAt).toLocaleDateString('tr-TR')}</td>
+                        <td>
+                            <div style="display: flex; gap: 8px;">
+                                <button class="btn btn-sm btn-secondary" onclick='showDetail(${JSON.stringify(req)})'>👁 Detay</button>
+                                ${req.status === 'approved' ? '<button class="btn btn-sm btn-success" onclick=\'confirmLeaveUsage("' + req.id + '")\'>✓ İzni Kullandım</button>' : ''}
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function confirmLeaveUsage(requestId) {
+            if (confirm('İzninizi kullandığınızı onaylıyor musunuz? Bu işlem geri alınamaz.')) {
+                // İzin kullanım onayı
+                const userData = JSON.parse(localStorage.getItem(`userData_${user.id}`) || '{}');
+                const request = userData.leaveRequests.find(r => r.id === requestId);
+
+                if (request) {
+                    request.usageConfirmed = true;
+                    request.usageDate = new Date().toISOString();
+                    localStorage.setItem(`userData_${user.id}`, JSON.stringify(userData));
+
+                    App.showNotification('İzin kullanımı onaylandı! Bakiyeniz güncellendi.', 'success');
+                    loadRequests();
+                }
+            }
+        }
+
+        // Show detail modal
+        function showDetail(request) {
+            const typeNames = {
+                annual: 'Yıllık İzin',
+                excuse: 'Mazeret İzni',
+                sickness: 'Hastalık İzni',
+                marriage: 'Evlilik İzni',
+                birth: 'Doğum İzni',
+                death: 'Ölüm İzni',
+                paternity: 'Babalık İzni',
+                unpaid: 'Ücretsiz İzin',
+                advance: 'Avans İzin',
+                education: 'Eğitim İzni',
+                adoption: 'Evlat Edinme İzni'
+            };
+
+            const statusNames = {
+                pending: 'Beklemede',
+                approved: 'Onaylandı',
+                rejected: 'Reddedildi',
+                revised: 'Revize İstendi'
+            };
+
+            const statusColors = {
+                pending: '#f59e0b',
+                approved: '#10b981',
+                rejected: '#ef4444',
+                revised: '#3b82f6'
+            };
+
+            const modal = document.createElement('div');
+            modal.className = 'modal-backdrop';
+            modal.style.cssText = 'position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 9999; animation: fadeIn 0.2s ease-out;';
+
+            modal.innerHTML = `
+                <div style="background: white; border-radius: 16px; max-width: 650px; width: 100%; max-height: 85vh; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3); animation: modalSlideIn 0.3s ease-out;">
+                    <!-- Header -->
+                    <div style="padding: 28px 32px; background: linear-gradient(135deg, ${statusColors[request.status]} 0%, ${statusColors[request.status]}dd 100%); position: relative;">
+                        <button onclick="this.closest('.modal-backdrop').remove()" style="position: absolute; top: 20px; right: 20px; background: rgba(255, 255, 255, 0.2); border: none; border-radius: 8px; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: white; font-size: 20px; transition: background 0.2s;" onmouseover="this.style.background='rgba(255, 255, 255, 0.3)'" onmouseout="this.style.background='rgba(255, 255, 255, 0.2)'">×</button>
+                        <h3 style="margin: 0; color: white; font-size: 22px; font-weight: 600;">İzin Talebi Detayı</h3>
+                        <p style="margin: 8px 0 0 0; color: rgba(255, 255, 255, 0.9); font-size: 14px;">Talep No: ${request.id}</p>
+                    </div>
+
+                    <!-- Body -->
+                    <div style="padding: 32px; overflow-y: auto; flex: 1; background: #f8f9fa;">
+                        <!-- İzin Detayları Card -->
+                        <div style="background: white; border-radius: 12px; padding: 24px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);">
+                            <h4 style="margin: 0 0 20px 0; color: #1f2937; font-size: 16px; font-weight: 600; display: flex; align-items: center; gap: 8px;">
+                                <span style="font-size: 20px;">📋</span> İzin Detayları
+                            </h4>
+                            <div style="display: grid; gap: 16px;">
+                                <div style="display: grid; grid-template-columns: 140px 1fr; gap: 12px; align-items: start;">
+                                    <span style="color: #6b7280; font-size: 14px; font-weight: 500;">İzin Tipi:</span>
+                                    <span style="color: #1f2937; font-size: 14px; font-weight: 600;">${typeNames[request.type] || request.type}</span>
+                                </div>
+                                <div style="display: grid; grid-template-columns: 140px 1fr; gap: 12px; align-items: start;">
+                                    <span style="color: #6b7280; font-size: 14px; font-weight: 500;">Durum:</span>
+                                    <span style="color: ${statusColors[request.status]}; font-size: 14px; font-weight: 600; background: ${statusColors[request.status]}15; padding: 4px 12px; border-radius: 6px; display: inline-block;">${statusNames[request.status] || request.status}</span>
+                                </div>
+                                <div style="display: grid; grid-template-columns: 140px 1fr; gap: 12px; align-items: start;">
+                                    <span style="color: #6b7280; font-size: 14px; font-weight: 500;">Başlangıç:</span>
+                                    <span style="color: #1f2937; font-size: 14px;">${new Date(request.startDate).toLocaleDateString('tr-TR')}</span>
+                                </div>
+                                <div style="display: grid; grid-template-columns: 140px 1fr; gap: 12px; align-items: start;">
+                                    <span style="color: #6b7280; font-size: 14px; font-weight: 500;">Bitiş:</span>
+                                    <span style="color: #1f2937; font-size: 14px;">${new Date(request.endDate).toLocaleDateString('tr-TR')}</span>
+                                </div>
+                                <div style="display: grid; grid-template-columns: 140px 1fr; gap: 12px; align-items: start;">
+                                    <span style="color: #6b7280; font-size: 14px; font-weight: 500;">Toplam Gün:</span>
+                                    <span style="color: #1f2937; font-size: 14px; font-weight: 600;">${request.days}</span>
+                                </div>
+                                <div style="display: grid; grid-template-columns: 140px 1fr; gap: 12px; align-items: start;">
+                                    <span style="color: #6b7280; font-size: 14px; font-weight: 500;">Talep Tarihi:</span>
+                                    <span style="color: #1f2937; font-size: 14px;">${new Date(request.createdAt).toLocaleDateString('tr-TR')}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        ${request.description ? `
+                        <!-- Açıklama Card -->
+                        <div style="background: white; border-radius: 12px; padding: 24px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);">
+                            <h4 style="margin: 0 0 16px 0; color: #1f2937; font-size: 16px; font-weight: 600; display: flex; align-items: center; gap: 8px;">
+                                <span style="font-size: 20px;">💬</span> Açıklama
+                            </h4>
+                            <div style="background: #f8f9fa; border-radius: 8px; padding: 20px; border-left: 3px solid ${statusColors[request.status]};">
+                                <p style="margin: 0; color: #374151; font-size: 15px; line-height: 1.8; white-space: pre-wrap;">${request.description}</p>
+                            </div>
+                        </div>
+                        ` : ''}
+
+                        <!-- İş Akışı Timeline -->
+                        <div style="background: white; border-radius: 12px; padding: 24px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);">
+                            <h4 style="margin: 0 0 20px 0; color: #1f2937; font-size: 16px; font-weight: 600; display: flex; align-items: center; gap: 8px;">
+                                <span style="font-size: 20px;">🔄</span> İş Akışı
+                            </h4>
+                            <div style="position: relative;">
+                                <!-- Timeline Line -->
+                                <div style="position: absolute; left: 20px; top: 0; bottom: 0; width: 2px; background: linear-gradient(180deg, #10b981 0%, ${request.status === 'approved' ? '#10b981 66%, #e5e7eb 100%' : request.status === 'pending' ? '#f59e0b 50%, #e5e7eb 100%' : '#ef4444 50%, #e5e7eb 100%'});"></div>
+
+                                <!-- Timeline Items -->
+                                <div style="position: relative; margin-bottom: 24px;">
+                                    <div style="display: flex; align-items: start; gap: 16px;">
+                                        <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3); z-index: 1;">✓</div>
+                                        <div style="flex: 1; padding-top: 4px;">
+                                            <div style="font-weight: 600; color: #1f2937; margin-bottom: 4px;">Talep Oluşturuldu</div>
+                                            <div style="font-size: 13px; color: #6b7280;">${user.name || 'Personel'} tarafından • ${new Date(request.createdAt).toLocaleDateString('tr-TR')} ${new Date(request.createdAt).toLocaleTimeString('tr-TR', {hour: '2-digit', minute: '2-digit'})}</div>
+                                            <div style="margin-top: 8px; padding: 12px; background: #f0fdf4; border-left: 3px solid #10b981; border-radius: 6px; font-size: 14px; color: #059669;">İzin talebi oluşturuldu</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div style="position: relative; margin-bottom: 24px;">
+                                    <div style="display: flex; align-items: start; gap: 16px;">
+                                        <div style="width: 40px; height: 40px; background: ${request.status === 'pending' ? 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)' : request.status === 'approved' ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)' : 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)'}; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; box-shadow: 0 4px 12px ${request.status === 'pending' ? 'rgba(245, 158, 11, 0.3)' : request.status === 'approved' ? 'rgba(16, 185, 129, 0.3)' : 'rgba(239, 68, 68, 0.3)'}; z-index: 1;">${request.status === 'pending' ? '⏱' : request.status === 'approved' ? '✓' : '✗'}</div>
+                                        <div style="flex: 1; padding-top: 4px;">
+                                            <div style="font-weight: 600; color: #1f2937; margin-bottom: 4px;">${request.status === 'pending' ? 'Onay Bekliyor' : request.status === 'approved' ? 'Yönetici Onaylandı' : 'Reddedildi'}</div>
+                                            <div style="font-size: 13px; color: #6b7280;">${request.status === 'pending' ? 'Yönetici onayı bekleniyor' : request.status === 'approved' ? 'Yönetici tarafından onaylandı' : 'Yönetici tarafından reddedildi'}</div>
+                                            <div style="margin-top: 8px; padding: 12px; background: ${request.status === 'pending' ? '#fff8e1' : request.status === 'approved' ? '#f0fdf4' : '#fef2f2'}; border-left: 3px solid ${request.status === 'pending' ? '#f59e0b' : request.status === 'approved' ? '#10b981' : '#ef4444'}; border-radius: 6px; font-size: 14px; color: ${request.status === 'pending' ? '#d97706' : request.status === 'approved' ? '#059669' : '#dc2626'};">${request.status === 'pending' ? 'Yönetici onayı bekleniyor' : request.status === 'approved' ? 'Yönetici onayladı' : request.rejectionReason || 'Talep reddedildi'}</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div style="position: relative; margin-bottom: 24px;">
+                                    <div style="display: flex; align-items: start; gap: 16px;">
+                                        <div style="width: 40px; height: 40px; background: ${request.status === 'approved' ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)' : '#e5e7eb'}; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: ${request.status === 'approved' ? 'white' : '#9ca3af'}; font-weight: bold; ${request.status === 'approved' ? 'box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);' : ''} z-index: 1;">${request.status === 'approved' ? '✓' : '3'}</div>
+                                        <div style="flex: 1; padding-top: 4px; ${request.status !== 'approved' ? 'opacity: 0.5;' : ''}">
+                                            <div style="font-weight: 600; color: ${request.status === 'approved' ? '#1f2937' : '#6b7280'}; margin-bottom: 4px;">İK Onayı</div>
+                                            <div style="font-size: 13px; color: ${request.status === 'approved' ? '#6b7280' : '#9ca3af'};">${request.status === 'approved' ? 'İK tarafından onaylandı' : 'Beklemede'}</div>
+                                            ${request.status === 'approved' ? `<div style="margin-top: 8px; padding: 12px; background: #f0fdf4; border-left: 3px solid #10b981; border-radius: 6px; font-size: 14px; color: #059669;">İK onayı tamamlandı</div>` : ''}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div style="position: relative;">
+                                    <div style="display: flex; align-items: start; gap: 16px;">
+                                        <div style="width: 40px; height: 40px; background: ${request.usageConfirmed ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)' : '#e5e7eb'}; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: ${request.usageConfirmed ? 'white' : '#9ca3af'}; font-weight: bold; ${request.usageConfirmed ? 'box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);' : ''} z-index: 1;">${request.usageConfirmed ? '✓' : '4'}</div>
+                                        <div style="flex: 1; padding-top: 4px; ${!request.usageConfirmed ? 'opacity: 0.5;' : ''}">
+                                            <div style="font-weight: 600; color: ${request.usageConfirmed ? '#1f2937' : '#6b7280'}; margin-bottom: 4px;">İzin Kullanımı</div>
+                                            <div style="font-size: 13px; color: ${request.usageConfirmed ? '#6b7280' : '#9ca3af'};">${request.usageConfirmed ? 'İzin kullanıldı • ' + new Date(request.usageDate).toLocaleDateString('tr-TR') : 'Beklemede'}</div>
+                                            ${request.usageConfirmed ? `<div style="margin-top: 8px; padding: 12px; background: #f0fdf4; border-left: 3px solid #10b981; border-radius: 6px; font-size: 14px; color: #059669;">İzin kullanımı tamamlandı</div>` : ''}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        ${request.rejectionReason ? `
+                        <!-- Red Nedeni Card -->
+                        <div style="background: white; border-radius: 12px; padding: 24px; margin-top: 20px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);">
+                            <h4 style="margin: 0 0 16px 0; color: #dc2626; font-size: 16px; font-weight: 600; display: flex; align-items: center; gap: 8px;">
+                                <span style="font-size: 20px;">⚠️</span> Red Nedeni
+                            </h4>
+                            <div style="background: #fef2f2; border-radius: 8px; padding: 20px; border-left: 3px solid #dc2626;">
+                                <p style="margin: 0; color: #991b1b; font-size: 15px; line-height: 1.8; white-space: pre-wrap;">${request.rejectionReason}</p>
+                            </div>
+                        </div>
+                        ` : ''}
+
+                        ${request.revisionNote ? `
+                        <!-- Revize Notu Card -->
+                        <div style="background: white; border-radius: 12px; padding: 24px; margin-top: 20px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);">
+                            <h4 style="margin: 0 0 16px 0; color: #2563eb; font-size: 16px; font-weight: 600; display: flex; align-items: center; gap: 8px;">
+                                <span style="font-size: 20px;">🔄</span> Revize Notu
+                            </h4>
+                            <div style="background: #eff6ff; border-radius: 8px; padding: 20px; border-left: 3px solid #2563eb;">
+                                <p style="margin: 0; color: #1e40af; font-size: 15px; line-height: 1.8; white-space: pre-wrap;">${request.revisionNote}</p>
+                            </div>
+                        </div>
+                        ` : ''}
+                    </div>
+
+                    <!-- Footer -->
+                    <div style="padding: 20px 32px; background: #f8f9fa; border-top: 1px solid #e5e7eb;">
+                        <button onclick="this.closest('.modal-backdrop').remove()" style="width: 100%; padding: 12px; background: #6b7280; color: white; border: none; border-radius: 8px; font-size: 15px; font-weight: 500; cursor: pointer; transition: background 0.2s;" onmouseover="this.style.background='#4b5563'" onmouseout="this.style.background='#6b7280'">Kapat</button>
+                    </div>
+                </div>
+            `;
+
+            document.body.appendChild(modal);
+
+            // Close on backdrop click
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.remove();
+                }
+            });
+        }
+
+        loadRequests();
+
+        // Update donut chart dynamically
+        function updateDonutChart() {
+            const total = requests.length;
+            const approved = requests.filter(r => r.status === 'approved').length;
+
+            if (total > 0) {
+                const percentage = Math.round((approved / total) * 100);
+                const circumference = 2 * Math.PI * 28; // radius = 28
+                const offset = circumference - (percentage / 100) * circumference;
+
+                // Update donut circle
+                const donutCircle = document.getElementById('approvedDonut');
+                if (donutCircle) {
+                    donutCircle.style.strokeDashoffset = offset;
+                    donutCircle.setAttribute('stroke-dashoffset', offset);
+                }
+
+                // Update percentage text
+                const percentageText = document.getElementById('approvedPercentage');
+                if (percentageText) {
+                    percentageText.textContent = percentage + '%';
+                }
+            }
+        }
+
+        // Call update function after stats are loaded
+        updateDonutChart();
+    </script>
+
+    <style>
+        /* Visual Graph Animations */
+        @keyframes float-layer {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-3px);
+            }
+        }
+
+        @keyframes pulse-ring {
+            0%, 100% {
+                stroke-dashoffset: 110;
+                opacity: 1;
+            }
+            50% {
+                stroke-dashoffset: 90;
+                opacity: 0.8;
+            }
+        }
+
+        @keyframes pulse-icon {
+            0%, 100% {
+                opacity: 0.5;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.7;
+                transform: scale(1.05);
+            }
+        }
+
+        @keyframes fill-donut {
+            from {
+                stroke-dashoffset: 176;
+            }
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+    </style>
+</body>
+</html>

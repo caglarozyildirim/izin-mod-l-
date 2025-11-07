@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>İzin Takvimi - TEZ MEDİKAL</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .calendar-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .calendar-header {
+            background: linear-gradient(135deg, #4B9F8E 0%, #3a8070 100%);
+            color: white;
+            padding: 24px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .calendar-header h2 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .calendar-controls {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .calendar-grid {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .calendar-weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .weekday {
+            padding: 12px;
+            text-align: center;
+            font-weight: 600;
+            color: #4B9F8E;
+            background: #f0fdf4;
+            border-radius: 8px;
+        }
+
+        .calendar-days {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+        }
+
+        .calendar-day {
+            min-height: 120px;
+            padding: 8px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .calendar-day:hover {
+            border-color: #4B9F8E;
+            box-shadow: 0 2px 8px rgba(75, 159, 142, 0.2);
+        }
+
+        .calendar-day.other-month {
+            background: #f9fafb;
+            opacity: 0.5;
+        }
+
+        .calendar-day.today {
+            border-color: #4B9F8E;
+            background: linear-gradient(135deg, rgba(75, 159, 142, 0.1) 0%, rgba(75, 159, 142, 0.05) 100%);
+        }
+
+        .day-number {
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 4px;
+            color: #1f2937;
+        }
+
+        .day-leaves {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            max-height: 80px;
+            overflow-y: auto;
+        }
+
+        .leave-item {
+            font-size: 11px;
+            padding: 4px 6px;
+            border-radius: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .leave-item:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .leave-item.approved {
+            background: #d1fae5;
+            color: #065f46;
+            border-left: 3px solid #10b981;
+        }
+
+        .leave-item.pending {
+            background: #fef3c7;
+            color: #92400e;
+            border-left: 3px solid #f59e0b;
+        }
+
+        .leave-item.rejected {
+            background: #fee2e2;
+            color: #991b1b;
+            border-left: 3px solid #ef4444;
+        }
+
+        .leave-item.revision {
+            background: #dbeafe;
+            color: #1e40af;
+            border-left: 3px solid #3b82f6;
+        }
+
+        .legend {
+            display: flex;
+            gap: 24px;
+            margin-top: 24px;
+            padding: 16px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .legend-color {
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+        }
+
+        .filters-section {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+
+        /* Modal Styles */
+        .modal-backdrop-custom {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+        .modal-backdrop-custom.show {
+            display: flex;
+        }
+
+        .modal-content-custom {
+            background: white;
+            border-radius: 16px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: modalSlideIn 0.3s ease-out;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header-custom {
+            background: linear-gradient(135deg, #4B9F8E 0%, #3a8070 100%);
+            color: white;
+            padding: 24px;
+            border-radius: 16px 16px 0 0;
+        }
+
+        .modal-body-custom {
+            padding: 24px;
+        }
+
+        .info-grid {
+            display: grid;
+            gap: 16px;
+        }
+
+        .info-row {
+            display: grid;
+            grid-template-columns: 140px 1fr;
+            gap: 12px;
+            padding: 12px;
+            background: #f9fafb;
+            border-radius: 8px;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: #4B9F8E;
+        }
+
+        .info-value {
+            color: #1f2937;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .status-badge.approved {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-badge.pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-badge.rejected {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .status-badge.revision {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        /* Scrollbar Styling */
+        .day-leaves::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .day-leaves::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 2px;
+        }
+
+        .day-leaves::-webkit-scrollbar-thumb {
+            background: #4B9F8E;
+            border-radius: 2px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark" style="background: linear-gradient(135deg, #4B9F8E 0%, #3a8070 100%);">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="dashboard.html">
+                <strong>TEZ MEDİKAL</strong> İzin Yönetimi
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="dashboard.html">🏠 Anasayfa</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="yeni-talep.html">➕ Yeni Talep</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="takvim.html">📅 Takvim</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="profil.html">👤 Profil</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-action="logout">🚪 Çıkış</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid mt-4 mb-4">
+        <div class="calendar-container">
+            <!-- Filters -->
+            <div class="filters-section">
+                <h5 style="margin-bottom: 16px; color: #4B9F8E; font-weight: 600;">🔍 Filtreler</h5>
+                <div class="filter-grid">
+                    <div>
+                        <label class="form-label">Durum</label>
+                        <select class="form-select" id="statusFilter" onchange="filterCalendar()">
+                            <option value="">Tümü</option>
+                            <option value="pending">Beklemede</option>
+                            <option value="approved">Onaylandı</option>
+                            <option value="rejected">Reddedildi</option>
+                            <option value="revision">Revizyon</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="form-label">İzin Türü</label>
+                        <select class="form-select" id="typeFilter" onchange="filterCalendar()">
+                            <option value="">Tümü</option>
+                            <option value="annual">Yıllık İzin</option>
+                            <option value="sick">Hastalık İzni</option>
+                            <option value="excuse">Mazeret İzni</option>
+                            <option value="unpaid">Ücretsiz İzin</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="form-label">Departman</label>
+                        <select class="form-select" id="departmentFilter" onchange="filterCalendar()">
+                            <option value="">Tümü</option>
+                            <option value="Üretim">Üretim</option>
+                            <option value="Satış">Satış</option>
+                            <option value="Teknik">Teknik Servis</option>
+                            <option value="Muhasebe">Muhasebe</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="form-label">Çalışan Ara</label>
+                        <input type="text" class="form-control" id="employeeSearch" placeholder="Ad veya sicil no..." onkeyup="filterCalendar()">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Calendar Header -->
+            <div class="calendar-header">
+                <div class="calendar-controls">
+                    <button class="btn btn-light" onclick="previousMonth()">◀ Önceki</button>
+                </div>
+                <h2 id="currentMonth">Kasım 2025</h2>
+                <div class="calendar-controls">
+                    <button class="btn btn-light" onclick="nextMonth()">Sonraki ▶</button>
+                    <button class="btn btn-outline-light" onclick="goToToday()">📅 Bugün</button>
+                </div>
+            </div>
+
+            <!-- Calendar Grid -->
+            <div class="calendar-grid">
+                <div class="calendar-weekdays">
+                    <div class="weekday">Pazartesi</div>
+                    <div class="weekday">Salı</div>
+                    <div class="weekday">Çarşamba</div>
+                    <div class="weekday">Perşembe</div>
+                    <div class="weekday">Cuma</div>
+                    <div class="weekday">Cumartesi</div>
+                    <div class="weekday">Pazar</div>
+                </div>
+                <div class="calendar-days" id="calendarDays">
+                    <!-- Days will be generated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Legend -->
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #d1fae5; border-left: 3px solid #10b981;"></div>
+                    <span>Onaylandı</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #fef3c7; border-left: 3px solid #f59e0b;"></div>
+                    <span>Beklemede</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #fee2e2; border-left: 3px solid #ef4444;"></div>
+                    <span>Reddedildi</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #dbeafe; border-left: 3px solid #3b82f6;"></div>
+                    <span>Revizyon</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detail Modal -->
+    <div class="modal-backdrop-custom" id="detailModal" onclick="closeModal(event)">
+        <div class="modal-content-custom" onclick="event.stopPropagation()">
+            <div class="modal-header-custom">
+                <h4 style="margin: 0;">📋 İzin Detayları</h4>
+            </div>
+            <div class="modal-body-custom">
+                <div class="info-grid" id="modalContent">
+                    <!-- Content will be filled by JavaScript -->
+                </div>
+                <div style="margin-top: 24px; text-align: right;">
+                    <button class="btn btn-secondary" onclick="closeModal()">Kapat</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+        let currentDate = new Date();
+        let allLeaves = [];
+        let filteredLeaves = [];
+
+        // Turkish month names
+        const monthNames = [
+            'Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran',
+            'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'
+        ];
+
+        // Leave type names
+        const leaveTypes = {
+            annual: 'Yıllık İzin',
+            sick: 'Hastalık İzni',
+            excuse: 'Mazeret İzni',
+            unpaid: 'Ücretsiz İzin'
+        };
+
+        // Status names
+        const statusNames = {
+            pending: 'Beklemede',
+            approved: 'Onaylandı',
+            rejected: 'Reddedildi',
+            revision: 'Revizyon'
+        };
+
+        // Initialize calendar
+        function initCalendar() {
+            loadLeaves();
+            renderCalendar();
+        }
+
+        // Load leaves from localStorage
+        function loadLeaves() {
+            const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+            const userRole = user.role || 'employee';
+
+            allLeaves = [];
+
+            if (userRole === 'employee') {
+                // Load only user's leaves
+                const userData = JSON.parse(localStorage.getItem(`userData_${user.id}`) || '{}');
+                allLeaves = userData.leaveRequests || [];
+            } else {
+                // Load all users' leaves for managers/HR
+                for (let i = 0; i < localStorage.length; i++) {
+                    const key = localStorage.key(i);
+                    if (key.startsWith('userData_')) {
+                        const userData = JSON.parse(localStorage.getItem(key) || '{}');
+                        if (userData.leaveRequests) {
+                            allLeaves = allLeaves.concat(userData.leaveRequests);
+                        }
+                    }
+                }
+            }
+
+            filteredLeaves = [...allLeaves];
+        }
+
+        // Render calendar
+        function renderCalendar() {
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+
+            // Update header
+            document.getElementById('currentMonth').textContent = `${monthNames[month]} ${year}`;
+
+            // Get first day of month (0 = Sunday, 1 = Monday, etc.)
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const daysInPrevMonth = new Date(year, month, 0).getDate();
+
+            // Adjust for Monday start (0 = Monday)
+            const startDay = firstDay === 0 ? 6 : firstDay - 1;
+
+            const calendarDays = document.getElementById('calendarDays');
+            calendarDays.innerHTML = '';
+
+            // Previous month days
+            for (let i = startDay - 1; i >= 0; i--) {
+                const day = daysInPrevMonth - i;
+                const dayElement = createDayElement(day, month - 1, year, true);
+                calendarDays.appendChild(dayElement);
+            }
+
+            // Current month days
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayElement = createDayElement(day, month, year, false);
+                calendarDays.appendChild(dayElement);
+            }
+
+            // Next month days
+            const remainingCells = 42 - (startDay + daysInMonth);
+            for (let day = 1; day <= remainingCells; day++) {
+                const dayElement = createDayElement(day, month + 1, year, true);
+                calendarDays.appendChild(dayElement);
+            }
+        }
+
+        // Create day element
+        function createDayElement(day, month, year, isOtherMonth) {
+            const dayElement = document.createElement('div');
+            dayElement.className = 'calendar-day';
+            if (isOtherMonth) dayElement.classList.add('other-month');
+
+            // Check if today
+            const today = new Date();
+            if (day === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
+                dayElement.classList.add('today');
+            }
+
+            // Day number
+            const dayNumber = document.createElement('div');
+            dayNumber.className = 'day-number';
+            dayNumber.textContent = day;
+            dayElement.appendChild(dayNumber);
+
+            // Leaves container
+            const leavesContainer = document.createElement('div');
+            leavesContainer.className = 'day-leaves';
+
+            // Find leaves for this day
+            const dayDate = new Date(year, month, day);
+            const dayLeaves = findLeavesForDay(dayDate);
+
+            dayLeaves.forEach(leave => {
+                const leaveItem = document.createElement('div');
+                leaveItem.className = `leave-item ${leave.status}`;
+                leaveItem.textContent = `${leave.employeeName}`;
+                leaveItem.onclick = (e) => {
+                    e.stopPropagation();
+                    showLeaveDetail(leave);
+                };
+                leavesContainer.appendChild(leaveItem);
+            });
+
+            dayElement.appendChild(leavesContainer);
+
+            return dayElement;
+        }
+
+        // Find leaves for specific day
+        function findLeavesForDay(date) {
+            return filteredLeaves.filter(leave => {
+                const startDate = new Date(leave.startDate);
+                const endDate = new Date(leave.endDate);
+                return date >= startDate && date <= endDate;
+            });
+        }
+
+        // Show leave detail
+        function showLeaveDetail(leave) {
+            const modal = document.getElementById('detailModal');
+            const content = document.getElementById('modalContent');
+
+            content.innerHTML = `
+                <div class="info-row">
+                    <div class="info-label">Çalışan</div>
+                    <div class="info-value">${leave.employeeName}</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Sicil No</div>
+                    <div class="info-value">${leave.employeeId}</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Departman</div>
+                    <div class="info-value">${leave.department}</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">İzin Türü</div>
+                    <div class="info-value">${leaveTypes[leave.type] || leave.type}</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Başlangıç</div>
+                    <div class="info-value">${App.formatDate(leave.startDate)}</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Bitiş</div>
+                    <div class="info-value">${App.formatDate(leave.endDate)}</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Süre</div>
+                    <div class="info-value">${App.calculateDays(leave.startDate, leave.endDate)} gün</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Durum</div>
+                    <div class="info-value">
+                        <span class="status-badge ${leave.status}">${statusNames[leave.status] || leave.status}</span>
+                    </div>
+                </div>
+                ${leave.description ? `
+                <div class="info-row">
+                    <div class="info-label">Açıklama</div>
+                    <div class="info-value">${leave.description}</div>
+                </div>
+                ` : ''}
+                ${leave.rejectionReason ? `
+                <div class="info-row">
+                    <div class="info-label">Red Nedeni</div>
+                    <div class="info-value" style="color: #dc3545;">${leave.rejectionReason}</div>
+                </div>
+                ` : ''}
+            `;
+
+            modal.classList.add('show');
+        }
+
+        // Close modal
+        function closeModal(event) {
+            if (!event || event.target.id === 'detailModal') {
+                document.getElementById('detailModal').classList.remove('show');
+            }
+        }
+
+        // Filter calendar
+        function filterCalendar() {
+            const statusFilter = document.getElementById('statusFilter').value;
+            const typeFilter = document.getElementById('typeFilter').value;
+            const departmentFilter = document.getElementById('departmentFilter').value;
+            const employeeSearch = document.getElementById('employeeSearch').value.toLowerCase();
+
+            filteredLeaves = allLeaves.filter(leave => {
+                if (statusFilter && leave.status !== statusFilter) return false;
+                if (typeFilter && leave.type !== typeFilter) return false;
+                if (departmentFilter && leave.department !== departmentFilter) return false;
+                if (employeeSearch) {
+                    const nameMatch = (leave.employeeName || '').toLowerCase().includes(employeeSearch);
+                    const idMatch = (leave.employeeId || '').toLowerCase().includes(employeeSearch);
+                    if (!nameMatch && !idMatch) return false;
+                }
+                return true;
+            });
+
+            renderCalendar();
+        }
+
+        // Navigation functions
+        function previousMonth() {
+            currentDate.setMonth(currentDate.getMonth() - 1);
+            renderCalendar();
+        }
+
+        function nextMonth() {
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            renderCalendar();
+        }
+
+        function goToToday() {
+            currentDate = new Date();
+            renderCalendar();
+        }
+
+        // Initialize on load
+        initCalendar();
+    </script>
+</body>
+</html>

@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Onay Yönetimi - Tez Medikal</title>
+    <link rel="stylesheet" href="css/design-system.css">
+    <style>
+        .workflow-steps {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 12px 0;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        .workflow-step {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .workflow-step.pending {
+            background: #fff3cd;
+            color: #856404;
+            border: 2px solid #ffc107;
+        }
+        .workflow-step.approved {
+            background: #d4edda;
+            color: #155724;
+        }
+        .workflow-step.waiting {
+            background: #e2e3e5;
+            color: #6c757d;
+        }
+        .workflow-step.rejected {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .workflow-arrow {
+            color: #6c757d;
+            font-size: 16px;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 10000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            align-items: center;
+            justify-content: center;
+        }
+        .modal.active {
+            display: flex;
+        }
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+        .modal-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #1f2937;
+        }
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #6b7280;
+            padding: 0;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+        .modal-close:hover {
+            background: #f3f4f6;
+            color: #1f2937;
+        }
+        .modal-body {
+            padding: 24px;
+        }
+        .history-item {
+            padding: 12px;
+            border-left: 3px solid #e5e7eb;
+            margin-bottom: 12px;
+            background: #f9fafb;
+            border-radius: 0 6px 6px 0;
+        }
+        .history-item.approved {
+            border-left-color: #10b981;
+        }
+        .history-item.rejected {
+            border-left-color: #ef4444;
+        }
+        .history-item.revised {
+            border-left-color: #f59e0b;
+        }
+        .request-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+            transition: all 0.2s;
+        }
+        .request-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-color: #3b82f6;
+        }
+        .request-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 16px;
+        }
+        .request-info {
+            flex: 1;
+        }
+        .request-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 4px;
+        }
+        .request-meta {
+            font-size: 13px;
+            color: #6b7280;
+        }
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+            margin-top: 12px;
+        }
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .detail-label {
+            font-size: 12px;
+            color: #6b7280;
+            font-weight: 500;
+        }
+        .detail-value {
+            font-size: 14px;
+            color: #1f2937;
+            font-weight: 600;
+        }
+        @keyframes modalSlideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-brand">
+            <div style="width: 40px; height: 40px; background: var(--primary); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">TM</div>
+            <span>Tez Medikal</span>
+        </div>
+        <div class="navbar-menu">
+            <a href="dashboard.html" class="nav-link">Dashboard</a>
+            <a href="onay-yonetimi.html" class="nav-link active">Onay Bekleyenler</a>
+            <a href="tum-izinler.html" class="nav-link">Tüm İzinler</a>
+            <a href="raporlar.html" class="nav-link">Raporlar</a>
+        </div>
+        <div class="navbar-user">
+            <div class="user-info">
+                <div class="user-name" id="userName">-</div>
+                <div class="user-role" id="userRole">-</div>
+            </div>
+            <div class="user-avatar" id="userAvatar">-</div>
+            <button class="btn btn-ghost btn-sm" data-action="logout">Çıkış</button>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <div class="container-fluid">
+            <div class="page-header">
+                <h1 class="page-title">Onay Bekleyen Talepler</h1>
+                <p class="page-subtitle" id="pageSubtitle">Onayınızı bekleyen izin talepleri</p>
+            </div>
+
+            <!-- Vekalet Bildirimi -->
+            <div id="delegationNotice" style="display: none; margin-bottom: 20px;"></div>
+
+            <!-- İstatistikler -->
+            <div class="grid grid-cols-4 mb-5">
+                <div class="stat-card warning">
+                    <div class="stat-label">Bekleyen Talepler</div>
+                    <div class="stat-value" id="pendingCount">0</div>
+                    <div class="stat-subtitle">Onay Gerekli</div>
+                </div>
+                <div class="stat-card success">
+                    <div class="stat-label">Bugün Onaylanan</div>
+                    <div class="stat-value" id="approvedTodayCount">0</div>
+                    <div class="stat-subtitle">Tamamlandı</div>
+                </div>
+                <div class="stat-card danger">
+                    <div class="stat-label">Bugün Reddedilen</div>
+                    <div class="stat-value" id="rejectedTodayCount">0</div>
+                    <div class="stat-subtitle">Red Edildi</div>
+                </div>
+                <div class="stat-card info">
+                    <div class="stat-label">Toplam İncelenen</div>
+                    <div class="stat-value" id="totalReviewedCount">0</div>
+                    <div class="stat-subtitle">Bu Ay</div>
+                </div>
+            </div>
+
+            <!-- Onay Bekleyen Talepler Tablosu -->
+            <div class="card mb-5">
+                <div class="card-header">
+                    <h3 class="card-title">Onay Bekleyen Talepler</h3>
+                    <span class="badge badge-warning" id="pendingBadge">0 Talep</span>
+                </div>
+                <div class="table-container">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Çalışan</th>
+                                <th>İzin Tipi</th>
+                                <th>Başlangıç</th>
+                                <th>Bitiş</th>
+                                <th>Gün</th>
+                                <th>Talep Tarihi</th>
+                                <th>İşlemler</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pendingRequestsTableBody">
+                            <!-- JavaScript tarafından doldurulacak -->
+                        </tbody>
+                    </table>
+                </div>
+                <div class="card-footer">
+                    <button class="btn btn-sm btn-secondary" onclick="window.location.reload()">🔄 Yenile</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Detay modalı JavaScript ile dinamik oluşturulacak -->
+
+    <!-- Onay Modal -->
+    <div id="approveModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); z-index: 9999; align-items: center; justify-content: center;">
+        <div style="background: white; border-radius: 16px; max-width: 600px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.3); animation: modalSlideIn 0.3s ease-out;" onclick="event.stopPropagation()">
+            <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 24px; border-radius: 16px 16px 0 0;">
+                <h4 style="margin: 0; font-size: 20px; font-weight: 600;">✓ İzin Talebini Onayla</h4>
+            </div>
+            <div style="padding: 24px;">
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; font-weight: 600; color: #1f2937; margin-bottom: 8px; font-size: 14px;">
+                        Onay Notu (Opsiyonel):
+                    </label>
+                    <textarea id="approveComment" rows="4" style="width: 100%; padding: 16px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 15px; font-family: inherit; resize: vertical; min-height: 100px; line-height: 1.6;" placeholder="İsterseniz onay notu ekleyebilirsiniz..."></textarea>
+                </div>
+                <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                    <button onclick="closeApproveModal()" style="padding: 12px 24px; border: none; border-radius: 8px; background: #e5e7eb; color: #1f2937; font-weight: 600; cursor: pointer; font-size: 14px;">İptal</button>
+                    <button onclick="confirmApprove()" style="padding: 12px 24px; border: none; border-radius: 8px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; font-weight: 600; cursor: pointer; font-size: 14px; box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);">Onayla</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reddet Modal -->
+    <div id="rejectModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); z-index: 9999; align-items: center; justify-content: center;">
+        <div style="background: white; border-radius: 16px; max-width: 600px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.3); animation: modalSlideIn 0.3s ease-out;" onclick="event.stopPropagation()">
+            <div style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; padding: 24px; border-radius: 16px 16px 0 0;">
+                <h4 style="margin: 0; font-size: 20px; font-weight: 600;">❌ İzin Talebini Reddet</h4>
+            </div>
+            <div style="padding: 24px;">
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; font-weight: 600; color: #1f2937; margin-bottom: 8px; font-size: 14px;">
+                        <span id="rejectEmployeeName"></span> için red sebebini girin:
+                    </label>
+                    <textarea id="rejectReason" rows="6" style="width: 100%; padding: 16px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 15px; font-family: inherit; resize: vertical; min-height: 120px; line-height: 1.6;" placeholder="Red sebebini detaylı olarak açıklayın..."></textarea>
+                </div>
+                <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                    <button onclick="closeRejectModal()" style="padding: 12px 24px; border: none; border-radius: 8px; background: #e5e7eb; color: #1f2937; font-weight: 600; cursor: pointer; font-size: 14px;">İptal</button>
+                    <button onclick="confirmReject()" style="padding: 12px 24px; border: none; border-radius: 8px; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; font-weight: 600; cursor: pointer; font-size: 14px; box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);">Tamam</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Revize Modal -->
+    <div id="reviseModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); z-index: 9999; align-items: center; justify-content: center;">
+        <div style="background: white; border-radius: 16px; max-width: 600px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.3); animation: modalSlideIn 0.3s ease-out;" onclick="event.stopPropagation()">
+            <div style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; padding: 24px; border-radius: 16px 16px 0 0;">
+                <h4 style="margin: 0; font-size: 20px; font-weight: 600;">🔄 Revizyon Talebi</h4>
+            </div>
+            <div style="padding: 24px;">
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; font-weight: 600; color: #1f2937; margin-bottom: 4px; font-size: 14px;">
+                        <span id="reviseEmployeeName"></span> için revize notunu girin:
+                    </label>
+                    <div style="font-size: 13px; color: #6b7280; margin-bottom: 12px;">(Örn: Tarih değişikliği, ek bilgi gerekli, vb.)</div>
+                    <textarea id="reviseNote" rows="6" style="width: 100%; padding: 16px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 15px; font-family: inherit; resize: vertical; min-height: 120px; line-height: 1.6;" placeholder="Revizyon gerektiren hususları detaylı olarak belirtin..."></textarea>
+                </div>
+                <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                    <button onclick="closeReviseModal()" style="padding: 12px 24px; border: none; border-radius: 8px; background: #e5e7eb; color: #1f2937; font-weight: 600; cursor: pointer; font-size: 14px;">İptal</button>
+                    <button onclick="confirmRevise()" style="padding: 12px 24px; border: none; border-radius: 8px; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; font-weight: 600; cursor: pointer; font-size: 14px; box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);">Tamam</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script>
+        const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+        const userRole = currentUser.role;
+
+        // Global değişkenler
+        let currentRequestId = null;
+        let pendingRequests = [];
+
+        // Sayfa yüklendiğinde
+        document.addEventListener('DOMContentLoaded', () => {
+            initPage();
+            loadPendingRequests();
+            checkDelegation();
+        });
+
+        function initPage() {
+            document.getElementById('userName').textContent = currentUser.name || '-';
+            const roleNames = {
+                'manager': 'Yönetici',
+                'hr': 'İnsan Kaynakları',
+                'operation': 'Operasyon'
+            };
+            document.getElementById('userRole').textContent = roleNames[userRole] || 'Yönetici';
+            document.getElementById('userAvatar').textContent = (currentUser.name || '-').split(' ').map(n => n[0]).join('');
+        }
+
+        // Vekalet kontrolü
+        function checkDelegation() {
+            const activeDelegation = DelegationEngine.getActiveDelegation(currentUser.id);
+            const noticeDiv = document.getElementById('delegationNotice');
+
+            if (activeDelegation) {
+                const delegateUser = getUserById(activeDelegation.toUserId);
+                noticeDiv.innerHTML = `
+                    <div class="alert alert-info">
+                        ℹ️ <strong>Aktif Vekalet:</strong> ${activeDelegation.startDate} - ${activeDelegation.endDate} tarihleri arasında
+                        onay yetkiniz <strong>${delegateUser?.name || 'Bilinmeyen Kullanıcı'}</strong> adlı kullanıcıya devredilmiştir.
+                    </div>
+                `;
+                noticeDiv.style.display = 'block';
+            }
+        }
+
+        // Bekleyen talepleri yükle
+        function loadPendingRequests() {
+            console.log('🔍 loadPendingRequests() başlatıldı');
+            console.log('   User Role:', userRole);
+            console.log('   WorkflowEngine tanımlı mı?', typeof WorkflowEngine);
+
+            pendingRequests = WorkflowEngine.getPendingRequestsForRole(userRole);
+
+            console.log('📋 Bekleyen Talepler:', pendingRequests);
+            console.log('   Bekleyen talep sayısı:', pendingRequests.length);
+
+            // Tüm talepleri de kontrol et
+            const allRequests = WorkflowEngine.getAllRequests();
+            console.log('   Toplam talep sayısı:', allRequests.length);
+
+            // İstatistikleri güncelle
+            updateStatistics();
+
+            // Talepleri render et
+            renderRequests();
+        }
+
+        // İstatistikleri güncelle
+        function updateStatistics() {
+            document.getElementById('pendingCount').textContent = pendingRequests.length;
+
+            // Bugün onaylanan ve reddedilen talepler
+            const allRequests = WorkflowEngine.getAllRequests();
+            const today = new Date().toDateString();
+
+            const approvedToday = allRequests.filter(r => {
+                if (!r.workflow || !r.workflow.history) return false;
+                return r.workflow.history.some(h => {
+                    return h.action === 'approved' &&
+                           h.by === currentUser.name &&
+                           new Date(h.timestamp).toDateString() === today;
+                });
+            });
+
+            const rejectedToday = allRequests.filter(r => {
+                if (!r.workflow || !r.workflow.history) return false;
+                return r.workflow.history.some(h => {
+                    return h.action === 'rejected' &&
+                           h.by === currentUser.name &&
+                           new Date(h.timestamp).toDateString() === today;
+                });
+            });
+
+            document.getElementById('approvedTodayCount').textContent = approvedToday.length;
+            document.getElementById('rejectedTodayCount').textContent = rejectedToday.length;
+
+            // Bu ay toplam incelenen
+            const thisMonth = new Date().getMonth();
+            const reviewedThisMonth = allRequests.filter(r => {
+                if (!r.workflow || !r.workflow.history) return false;
+                return r.workflow.history.some(h => {
+                    return (h.action === 'approved' || h.action === 'rejected') &&
+                           h.by === currentUser.name &&
+                           new Date(h.timestamp).getMonth() === thisMonth;
+                });
+            });
+
+            document.getElementById('totalReviewedCount').textContent = reviewedThisMonth.length;
+        }
+
+        // Talepleri render et (Tablo görünümü)
+        function renderRequests() {
+            const tableBody = document.getElementById('pendingRequestsTableBody');
+            const badge = document.getElementById('pendingBadge');
+
+            if (!tableBody) return;
+
+            if (pendingRequests.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="7" style="text-align: center; padding: 40px; color: #6b7280;">
+                            <div style="font-size: 32px; margin-bottom: 8px;">📭</div>
+                            <div>Onay bekleyen talep bulunmuyor</div>
+                        </td>
+                    </tr>
+                `;
+                if (badge) badge.textContent = '0 Talep';
+                return;
+            }
+
+            tableBody.innerHTML = pendingRequests.map(request => {
+                const leaveTypeName = getLeaveTypeName(request.type);
+                const createdDate = new Date(request.createdAt).toLocaleDateString('tr-TR');
+                const initials = request.userName.split(' ').map(n => n[0]).join('').toUpperCase();
+
+                return `
+                    <tr>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <div style="width: 32px; height: 32px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px; font-weight: 600;">${initials}</div>
+                                <div>
+                                    <div style="font-weight: 500;">${request.userName}</div>
+                                    <div style="font-size: 12px; color: #6b7280;">${request.userDepartment}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>${leaveTypeName}</td>
+                        <td>${new Date(request.startDate).toLocaleDateString('tr-TR')}</td>
+                        <td>${new Date(request.endDate).toLocaleDateString('tr-TR')}</td>
+                        <td><span class="badge badge-info">${request.days}</span></td>
+                        <td>${createdDate}</td>
+                        <td>
+                            <div style="display: flex; gap: 8px;">
+                                <button class="btn btn-sm btn-success" onclick="openApproveModal('${request.id}')">✓ Onayla</button>
+                                <button class="btn btn-sm btn-danger" onclick="openRejectModal('${request.id}')">✗ Reddet</button>
+                                <button class="btn btn-sm btn-warning" onclick="openReviseModal('${request.id}')">🔄 Revize</button>
+                                <button class="btn btn-sm btn-secondary" onclick="viewDetails('${request.id}')">📄 Detay</button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            // Badge sayısını güncelle
+            if (badge) {
+                badge.textContent = `${pendingRequests.length} Talep`;
+            }
+        }
+
+        // Workflow adımlarını render et
+        function renderWorkflowSteps(workflow) {
+            const steps = workflow.steps.map((step, index) => {
+                let statusClass = step.status;
+                let statusIcon = '';
+
+                if (step.status === 'pending') {
+                    statusIcon = '⏳';
+                } else if (step.status === 'approved') {
+                    statusIcon = '✓';
+                } else if (step.status === 'waiting') {
+                    statusIcon = '⏸';
+                } else if (step.status === 'rejected') {
+                    statusIcon = '✗';
+                }
+
+                return `
+                    <div class="workflow-step ${statusClass}">
+                        <span>${statusIcon}</span>
+                        <span>${step.label}</span>
+                    </div>
+                    ${index < workflow.steps.length - 1 ? '<div class="workflow-arrow">→</div>' : ''}
+                `;
+            }).join('');
+
+            return `<div class="workflow-steps">${steps}</div>`;
+        }
+
+        // İzin tipi adı
+        function getLeaveTypeName(type) {
+            const types = {
+                'annual': 'Yıllık İzin',
+                'marriage': 'Evlilik İzni',
+                'birth': 'Doğum İzni',
+                'death': 'Ölüm İzni',
+                'excuse': 'Mazeret İzni',
+                'paternity': 'Babalık İzni',
+                'unpaid': 'Ücretsiz İzin',
+                'advance': 'Avans İzin',
+                'education': 'Eğitim İzni',
+                'sickness': 'Hastalık İzni',
+                'adoption': 'Evlat Edinme İzni'
+            };
+            return types[type] || type;
+        }
+
+        // Detayları göster (Dashboard.html ile aynı - dinamik modal)
+        function viewDetails(requestId) {
+            // Get all requests and find the specific request
+            const allRequests = WorkflowEngine.getAllRequests();
+            const request = allRequests.find(r => r.id === requestId);
+
+            if (!request) {
+                App.showNotification('Talep bulunamadı!', 'error');
+                return;
+            }
+
+            const leaveTypeName = getLeaveTypeName(request.type);
+            const history = request.workflow.history || [];
+
+            // Render workflow steps
+            const workflowStepsHTML = request.workflow.steps.map((step, index) => {
+                const isCompleted = step.status === 'completed' || step.status === 'approved';
+                const isPending = step.status === 'pending';
+                const isWaiting = step.status === 'waiting';
+
+                let icon, bgColor, textColor, statusText;
+                if (isCompleted) {
+                    icon = '✓';
+                    bgColor = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+                    textColor = '#059669';
+                    statusText = 'Tamamlandı';
+                } else if (isPending) {
+                    icon = '⏱';
+                    bgColor = 'linear-gradient(135deg, #FFC107 0%, #F57C00 100%)';
+                    textColor = '#F57C00';
+                    statusText = 'İşlemde';
+                } else {
+                    icon = index + 1;
+                    bgColor = '#e5e7eb';
+                    textColor = '#9ca3af';
+                    statusText = 'Beklemede';
+                }
+
+                return `
+                    <div style="position: relative; margin-bottom: ${index < request.workflow.steps.length - 1 ? '24px' : '0'};">
+                        <div style="display: flex; align-items: start; gap: 16px;">
+                            <div style="width: 40px; height: 40px; background: ${bgColor}; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; box-shadow: ${isCompleted || isPending ? '0 4px 12px rgba(16, 185, 129, 0.3)' : 'none'}; z-index: 1; flex-shrink: 0;">${icon}</div>
+                            <div style="flex: 1; padding-top: 4px; opacity: ${isWaiting ? '0.5' : '1'};">
+                                <div style="font-weight: 600; color: ${isWaiting ? '#6b7280' : '#1f2937'}; margin-bottom: 4px;">${step.label}</div>
+                                <div style="font-size: 13px; color: #6b7280;">${statusText}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // Render history
+            const historyHTML = history.map(h => {
+                const timestamp = new Date(h.timestamp).toLocaleString('tr-TR');
+                let actionText = '', bgColor = '', borderColor = '';
+
+                if (h.action === 'created') {
+                    actionText = '📝 Talep Oluşturuldu';
+                    bgColor = '#f0fdf4';
+                    borderColor = '#10b981';
+                } else if (h.action === 'approved') {
+                    actionText = '✅ Onaylandı';
+                    bgColor = '#f0fdf4';
+                    borderColor = '#10b981';
+                } else if (h.action === 'rejected') {
+                    actionText = '❌ Reddedildi';
+                    bgColor = '#fee2e2';
+                    borderColor = '#ef4444';
+                } else if (h.action === 'revised') {
+                    actionText = '🔄 Revize İstendi';
+                    bgColor = '#fff8e1';
+                    borderColor = '#FFC107';
+                }
+
+                return `
+                    <div style="margin-bottom: 16px; padding: 12px; background: ${bgColor}; border-left: 3px solid ${borderColor}; border-radius: 6px;">
+                        <div style="font-weight: 600; margin-bottom: 4px;">${actionText}</div>
+                        <div style="font-size: 12px; color: #6b7280; margin-bottom: 6px;">
+                            ${h.by} • ${timestamp}
+                        </div>
+                        ${h.comment ? `<div style="font-size: 13px; padding: 8px; background: white; border-radius: 4px; margin-top: 6px;">${h.comment}</div>` : ''}
+                    </div>
+                `;
+            }).join('');
+
+            // Create detail modal
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0, 0, 0, 0.6);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 9999;
+                padding: 20px;
+                backdrop-filter: blur(4px);
+            `;
+
+            modal.innerHTML = `
+                <div style="background: white; border-radius: 16px; max-width: 650px; width: 100%; max-height: 85vh; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3); animation: modalSlideIn 0.3s ease-out;" onclick="event.stopPropagation()">
+                    <div style="padding: 28px 32px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); position: relative;">
+                        <button onclick="this.closest('[style*=fixed]').remove()" style="position: absolute; top: 20px; right: 20px; width: 36px; height: 36px; border: none; background: rgba(255, 255, 255, 0.2); border-radius: 50%; cursor: pointer; font-size: 24px; line-height: 1; color: white; transition: all 0.2s; backdrop-filter: blur(10px);">×</button>
+                        <h2 style="font-size: 24px; font-weight: 700; margin: 0; color: white;">📋 İzin Talebi Detayı</h2>
+                        <p style="font-size: 15px; color: rgba(255, 255, 255, 0.9); margin: 8px 0 0 0; font-weight: 500;">${request.userName} • ${request.userDepartment}</p>
+                    </div>
+
+                    <div style="padding: 32px; overflow-y: auto; flex: 1; background: #f8f9fa;">
+                        <!-- Talep Bilgileri -->
+                        <div style="background: white; border-radius: 12px; padding: 24px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);">
+                            <h3 style="font-size: 14px; font-weight: 700; color: #667eea; margin: 0 0 16px 0; text-transform: uppercase; letter-spacing: 0.5px;">📋 Talep Bilgileri</h3>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 16px;">
+                                <div>
+                                    <div style="font-size: 12px; color: #6c757d; margin-bottom: 6px; font-weight: 500;">Personel</div>
+                                    <div style="font-size: 15px; font-weight: 600; color: #212529;">${request.userName}</div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 12px; color: #6c757d; margin-bottom: 6px; font-weight: 500;">Departman</div>
+                                    <div style="font-size: 15px; font-weight: 600; color: #212529;">${request.userDepartment}</div>
+                                </div>
+                            </div>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                                <div style="background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%); padding: 16px; border-radius: 10px; border-left: 4px solid #667eea;">
+                                    <div style="font-size: 12px; color: #6c757d; margin-bottom: 6px; font-weight: 500;">İzin Tipi</div>
+                                    <div style="font-size: 16px; font-weight: 700; color: #667eea;">${leaveTypeName}</div>
+                                </div>
+                                <div style="background: linear-gradient(135deg, #20c99715 0%, #10b98115 100%); padding: 16px; border-radius: 10px; border-left: 4px solid #20c997;">
+                                    <div style="font-size: 12px; color: #6c757d; margin-bottom: 6px; font-weight: 500;">Toplam Süre</div>
+                                    <div style="font-size: 16px; font-weight: 700; color: #20c997;">${request.days}</div>
+                                </div>
+                            </div>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 16px;">
+                                <div>
+                                    <div style="font-size: 12px; color: #6c757d; margin-bottom: 6px; font-weight: 500;">Başlangıç</div>
+                                    <div style="font-size: 15px; font-weight: 600; color: #212529;">${new Date(request.startDate).toLocaleDateString('tr-TR')}</div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 12px; color: #6c757d; margin-bottom: 6px; font-weight: 500;">Bitiş</div>
+                                    <div style="font-size: 15px; font-weight: 600; color: #212529;">${new Date(request.endDate).toLocaleDateString('tr-TR')}</div>
+                                </div>
+                            </div>
+                            ${request.description ? `
+                            <div style="margin-top: 16px;">
+                                <div style="font-size: 12px; color: #6c757d; margin-bottom: 6px; font-weight: 500;">Açıklama</div>
+                                <div style="padding: 12px; background: #f8f9fa; border-radius: 8px; font-size: 14px; color: #495057;">${request.description}</div>
+                            </div>
+                            ` : ''}
+                        </div>
+
+                        ${request.workflow.isFieldWorker ? `
+                        <div style="background: white; border-radius: 12px; padding: 24px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);">
+                            <h3 style="font-size: 14px; font-weight: 700; color: #667eea; margin: 0 0 16px 0; text-transform: uppercase; letter-spacing: 0.5px;">🏗️ Saha Bilgileri</h3>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                                ${request.projectLocation ? `
+                                <div>
+                                    <div style="font-size: 12px; color: #6c757d; margin-bottom: 6px; font-weight: 500;">Proje/Lokasyon</div>
+                                    <div style="font-size: 15px; font-weight: 600; color: #212529;">${request.projectLocation}</div>
+                                </div>
+                                ` : ''}
+                                ${request.projectLeader ? `
+                                <div>
+                                    <div style="font-size: 12px; color: #6c757d; margin-bottom: 6px; font-weight: 500;">Proje Lideri</div>
+                                    <div style="font-size: 15px; font-weight: 600; color: #212529;">${request.projectLeader}</div>
+                                </div>
+                                ` : ''}
+                                <div>
+                                    <div style="font-size: 12px; color: #6c757d; margin-bottom: 6px; font-weight: 500;">Yerine Görevlendirme</div>
+                                    <div style="font-size: 15px; font-weight: 600; color: #212529;">${request.needReplacement ? 'Evet' : 'Hayır'}</div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 12px; color: #6c757d; margin-bottom: 6px; font-weight: 500;">MİL Bilgilendirilsin</div>
+                                    <div style="font-size: 15px; font-weight: 600; color: #212529;">${request.notifyMIL ? 'Evet' : 'Hayır'}</div>
+                                </div>
+                            </div>
+                        </div>
+                        ` : ''}
+
+                        <!-- İş Akışı -->
+                        <div style="background: white; border-radius: 12px; padding: 24px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);">
+                            <h3 style="font-size: 14px; font-weight: 700; color: #667eea; margin: 0 0 20px 0; text-transform: uppercase; letter-spacing: 0.5px;">🔄 Onay Süreci</h3>
+                            ${workflowStepsHTML}
+                        </div>
+
+                        <!-- Talep Geçmişi -->
+                        <div style="background: white; border-radius: 12px; padding: 24px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);">
+                            <h3 style="font-size: 14px; font-weight: 700; color: #667eea; margin: 0 0 16px 0; text-transform: uppercase; letter-spacing: 0.5px;">📜 Talep Geçmişi</h3>
+                            ${historyHTML || '<div style="text-align: center; color: #6b7280; padding: 20px;">Henüz geçmiş yok</div>'}
+                        </div>
+                    </div>
+
+                    <div style="padding: 20px 32px; background: white; border-top: 1px solid #e9ecef; display: flex; justify-content: flex-end; gap: 12px;">
+                        <button onclick="this.closest('[style*=fixed]').remove()" class="btn btn-secondary">Kapat</button>
+                    </div>
+                </div>
+            `;
+
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    modal.remove();
+                }
+            });
+
+            document.body.appendChild(modal);
+        }
+
+        // Onay Modal
+        function openApproveModal(requestId) {
+            currentRequestId = requestId;
+            document.getElementById('approveComment').value = '';
+            document.getElementById('approveModal').style.display = 'flex';
+        }
+
+        function closeApproveModal() {
+            currentRequestId = null;
+            document.getElementById('approveModal').style.display = 'none';
+        }
+
+        function confirmApprove() {
+            const comment = document.getElementById('approveComment').value;
+            const success = WorkflowEngine.approveRequest(
+                currentRequestId,
+                currentUser.name,
+                userRole,
+                comment
+            );
+
+            if (success) {
+                App.showNotification('Talep başarıyla onaylandı!', 'success');
+                closeApproveModal();
+                loadPendingRequests();
+            }
+        }
+
+        // Reddet Modal
+        function openRejectModal(requestId) {
+            currentRequestId = requestId;
+            const request = pendingRequests.find(r => r.id === requestId);
+            if (request) {
+                document.getElementById('rejectEmployeeName').textContent = request.userName;
+            }
+            document.getElementById('rejectReason').value = '';
+            document.getElementById('rejectModal').style.display = 'flex';
+            setTimeout(() => document.getElementById('rejectReason').focus(), 100);
+        }
+
+        function closeRejectModal() {
+            currentRequestId = null;
+            document.getElementById('rejectModal').style.display = 'none';
+        }
+
+        function confirmReject() {
+            const reason = document.getElementById('rejectReason').value.trim();
+
+            if (!reason) {
+                App.showNotification('Reddetme nedeni zorunludur!', 'error');
+                return;
+            }
+
+            const success = WorkflowEngine.rejectRequest(
+                currentRequestId,
+                currentUser.name,
+                userRole,
+                reason
+            );
+
+            if (success) {
+                App.showNotification('Talep reddedildi.', 'success');
+                closeRejectModal();
+                loadPendingRequests();
+            }
+        }
+
+        // Revize Modal
+        function openReviseModal(requestId) {
+            currentRequestId = requestId;
+            const request = pendingRequests.find(r => r.id === requestId);
+            if (request) {
+                document.getElementById('reviseEmployeeName').textContent = request.userName;
+            }
+            document.getElementById('reviseNote').value = '';
+            document.getElementById('reviseModal').style.display = 'flex';
+            setTimeout(() => document.getElementById('reviseNote').focus(), 100);
+        }
+
+        function closeReviseModal() {
+            currentRequestId = null;
+            document.getElementById('reviseModal').style.display = 'none';
+        }
+
+        function confirmRevise() {
+            const note = document.getElementById('reviseNote').value.trim();
+
+            if (!note) {
+                App.showNotification('Revize açıklaması zorunludur!', 'error');
+                return;
+            }
+
+            const success = WorkflowEngine.reviseRequest(
+                currentRequestId,
+                currentUser.name,
+                userRole,
+                note
+            );
+
+            if (success) {
+                App.showNotification('Talep revize için geri gönderildi.', 'success');
+                closeReviseModal();
+                loadPendingRequests();
+            }
+        }
+
+        // Helper: Kullanıcı getir
+        function getUserById(userId) {
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            return users.find(u => u.id === userId);
+        }
+
+        // Modal dışına tıklayınca kapat
+        window.addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal')) {
+                e.target.classList.remove('active');
+                currentRequestId = null;
+            }
+        });
+    </script>
+</body>
+</html>

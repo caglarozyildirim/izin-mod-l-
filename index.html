@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Giriş - Tez Medikal İzin Yönetimi</title>
+    <link rel="stylesheet" href="css/design-system.css">
+    <style>
+        .login-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            padding: var(--spacing-lg);
+        }
+
+        .login-card {
+            background: var(--white);
+            border-radius: var(--radius-2xl);
+            box-shadow: var(--shadow-2xl);
+            width: 100%;
+            max-width: 420px;
+            padding: var(--spacing-2xl);
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: var(--spacing-2xl);
+        }
+
+        .login-logo {
+            width: 80px;
+            height: 80px;
+            background: var(--primary);
+            border-radius: var(--radius-xl);
+            margin: 0 auto var(--spacing-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: var(--text-3xl);
+            font-weight: var(--font-bold);
+            color: var(--white);
+        }
+
+        .login-title {
+            font-size: var(--text-2xl);
+            font-weight: var(--font-bold);
+            color: var(--text-primary);
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .login-subtitle {
+            font-size: var(--text-sm);
+            color: var(--text-tertiary);
+        }
+
+        .demo-users {
+            background: var(--gray-50);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-md);
+            margin-top: var(--spacing-xl);
+        }
+
+        .demo-users-title {
+            font-size: var(--text-xs);
+            font-weight: var(--font-semibold);
+            color: var(--text-tertiary);
+            text-transform: uppercase;
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .demo-user {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--spacing-sm);
+            margin-bottom: var(--spacing-xs);
+            background: var(--white);
+            border-radius: var(--radius-md);
+            font-size: var(--text-xs);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+
+        .demo-user:hover {
+            background: var(--primary-50);
+            border-color: var(--primary);
+        }
+
+        .demo-user:last-child {
+            margin-bottom: 0;
+        }
+
+        .demo-user-email {
+            color: var(--text-secondary);
+            font-weight: var(--font-medium);
+        }
+
+        .demo-user-role {
+            color: var(--text-muted);
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <div class="login-logo">TM</div>
+                <h1 class="login-title">Tez Medikal</h1>
+                <p class="login-subtitle">İzin Yönetim Sistemi</p>
+            </div>
+
+            <form id="loginForm">
+                <div class="form-group">
+                    <label class="form-label form-label-required" for="email">E-posta</label>
+                    <input
+                        type="email"
+                        id="email"
+                        class="form-control"
+                        placeholder="ornek@tezmedikal.com"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label form-label-required" for="password">Şifre</label>
+                    <input
+                        type="password"
+                        id="password"
+                        class="form-control"
+                        placeholder="••••••••"
+                        required
+                    >
+                </div>
+
+                <div class="form-check" style="margin-bottom: var(--spacing-lg);">
+                    <input type="checkbox" id="remember" class="form-check-input">
+                    <label class="form-check-label" for="remember">Beni hatırla</label>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-lg w-full">
+                    Giriş Yap
+                </button>
+            </form>
+
+            <div class="demo-users">
+                <div class="demo-users-title">Demo Kullanıcılar</div>
+
+                <div class="demo-user" data-email="calisan@tezmedikal.com" data-password="123456" data-role="employee">
+                    <span class="demo-user-email">calisan@tezmedikal.com</span>
+                    <span class="demo-user-role">Çalışan</span>
+                </div>
+
+                <div class="demo-user" data-email="yonetici@tezmedikal.com" data-password="123456" data-role="manager">
+                    <span class="demo-user-email">yonetici@tezmedikal.com</span>
+                    <span class="demo-user-role">Yönetici</span>
+                </div>
+
+                <div class="demo-user" data-email="ik@tezmedikal.com" data-password="123456" data-role="hr">
+                    <span class="demo-user-email">ik@tezmedikal.com</span>
+                    <span class="demo-user-role">İnsan Kaynakları</span>
+                </div>
+
+                <div class="demo-user" data-email="operasyon@tezmedikal.com" data-password="123456" data-role="operation">
+                    <span class="demo-user-email">operasyon@tezmedikal.com</span>
+                    <span class="demo-user-role">Operasyon</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Handle demo user click
+        document.querySelectorAll('.demo-user').forEach(user => {
+            user.addEventListener('click', function() {
+                document.getElementById('email').value = this.dataset.email;
+                document.getElementById('password').value = this.dataset.password;
+            });
+        });
+
+        // Handle login form submit
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            // Mock authentication
+            const demoUsers = {
+                'calisan@tezmedikal.com': { role: 'employee', name: 'Ahmet Yılmaz', department: 'IT Departmanı' },
+                'yonetici@tezmedikal.com': { role: 'manager', name: 'Mehmet Demir', department: 'Yönetim' },
+                'ik@tezmedikal.com': { role: 'hr', name: 'Ayşe Kaya', department: 'İnsan Kaynakları' },
+                'operasyon@tezmedikal.com': { role: 'operation', name: 'Fatma Şahin', department: 'Operasyon' }
+            };
+
+            if (demoUsers[email] && password === '123456') {
+                // Create user object
+                const user = {
+                    id: email.split('@')[0],
+                    email: email,
+                    ...demoUsers[email]
+                };
+
+                // Save to localStorage
+                localStorage.setItem('authToken', 'demo-token-' + Date.now());
+                localStorage.setItem('currentUser', JSON.stringify(user));
+
+                // Mock leave balance and sample requests
+                const leaveBalance = {
+                    earned: 20,
+                    used: 5,
+                    remaining: 15,
+                    earnDate: '2025-01-01'
+                };
+
+                // Sample leave requests with different statuses
+                const sampleRequests = [
+                    {
+                        id: 'req_001',
+                        userId: user.id,
+                        type: 'annual',
+                        startDate: '2025-11-10',
+                        endDate: '2025-11-15',
+                        days: '5 gün',
+                        description: 'Aile ziyareti için yıllık izin',
+                        status: 'pending',
+                        createdAt: '2025-11-03T10:00:00',
+                        workLocation: 'genel'
+                    },
+                    {
+                        id: 'req_002',
+                        userId: user.id,
+                        type: 'sickness',
+                        startDate: '2025-10-28',
+                        endDate: '2025-10-30',
+                        days: '3 gün',
+                        description: 'Grip tedavisi',
+                        status: 'approved',
+                        createdAt: '2025-10-27T14:30:00',
+                        workLocation: 'genel',
+                        approvedBy: 'Yönetici',
+                        approvedAt: '2025-10-27T16:00:00'
+                    },
+                    {
+                        id: 'req_003',
+                        userId: user.id,
+                        type: 'excuse',
+                        startDate: '2025-10-20',
+                        endDate: '2025-10-20',
+                        days: '4 saat',
+                        description: 'Doktor randevusu',
+                        status: 'approved',
+                        createdAt: '2025-10-18T09:00:00',
+                        workLocation: 'genel',
+                        approvedBy: 'Yönetici',
+                        approvedAt: '2025-10-18T11:00:00'
+                    },
+                    {
+                        id: 'req_004',
+                        userId: user.id,
+                        type: 'annual',
+                        startDate: '2025-12-20',
+                        endDate: '2025-12-27',
+                        days: '7 gün',
+                        description: 'Yılbaşı tatili',
+                        status: 'pending',
+                        createdAt: '2025-11-02T15:00:00',
+                        workLocation: 'genel'
+                    },
+                    {
+                        id: 'req_005',
+                        userId: user.id,
+                        type: 'education',
+                        startDate: '2025-09-15',
+                        endDate: '2025-09-17',
+                        days: '3 gün',
+                        description: 'Mesleki gelişim semineri',
+                        status: 'approved',
+                        createdAt: '2025-09-10T10:00:00',
+                        workLocation: 'genel',
+                        approvedBy: 'Yönetici',
+                        approvedAt: '2025-09-10T14:00:00'
+                    },
+                    {
+                        id: 'req_006',
+                        userId: user.id,
+                        type: 'annual',
+                        startDate: '2025-08-05',
+                        endDate: '2025-08-09',
+                        days: '5 gün',
+                        description: 'Yaz tatili',
+                        status: 'rejected',
+                        createdAt: '2025-07-28T11:00:00',
+                        workLocation: 'genel',
+                        rejectedBy: 'Yönetici',
+                        rejectedAt: '2025-07-29T09:00:00',
+                        rejectionReason: 'Bu dönemde departmanda yoğunluk var'
+                    }
+                ];
+
+                localStorage.setItem(`userData_${user.id}`, JSON.stringify({
+                    leaveBalance,
+                    leaveRequests: sampleRequests
+                }));
+
+                // Redirect to dashboard
+                window.location.href = 'dashboard.html';
+            } else {
+                alert('E-posta veya şifre hatalı!');
+            }
+        });
+    </script>
+</body>
+</html>
