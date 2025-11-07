@@ -285,6 +285,21 @@
                 <h4 style="margin: 0; font-size: 20px; font-weight: 600;">✓ İzin Talebini Onayla</h4>
             </div>
             <div style="padding: 24px;">
+                <div id="approveFieldWorkerOptions" style="display: none; margin-bottom: 20px; padding: 16px; background: #f9fafb; border-radius: 8px; border: 2px solid #e5e7eb;">
+                    <div style="font-weight: 600; color: #1f2937; margin-bottom: 12px; font-size: 14px;">Saha Çalışanı Onay Seçenekleri:</div>
+                    <div style="margin-bottom: 10px;">
+                        <label style="display: flex; align-items: center; cursor: pointer;">
+                            <input type="checkbox" id="requiresAssignment" style="margin-right: 8px; width: 18px; height: 18px; cursor: pointer;">
+                            <span style="font-size: 14px; color: #374151;">Yerine görevlendirme yapılmalı</span>
+                        </label>
+                    </div>
+                    <div>
+                        <label style="display: flex; align-items: center; cursor: pointer;">
+                            <input type="checkbox" id="requiresCustomerNotification" style="margin-right: 8px; width: 18px; height: 18px; cursor: pointer;">
+                            <span style="font-size: 14px; color: #374151;">Müşteriye bilgilendirme gönderilmeli</span>
+                        </label>
+                    </div>
+                </div>
                 <div style="margin-bottom: 20px;">
                     <label style="display: block; font-weight: 600; color: #1f2937; margin-bottom: 8px; font-size: 14px;">
                         Onay Notu (Opsiyonel):
@@ -768,6 +783,20 @@
         function openApproveModal(requestId) {
             currentRequestId = requestId;
             document.getElementById('approveComment').value = '';
+
+            // Saha çalışanı talebi mi kontrol et
+            const request = WorkflowEngine.getRequest(requestId);
+            const approveFieldWorkerOptions = document.getElementById('approveFieldWorkerOptions');
+
+            if (request && request.workLocation === 'saha') {
+                approveFieldWorkerOptions.style.display = 'block';
+                // Checkboxları temizle
+                document.getElementById('requiresAssignment').checked = false;
+                document.getElementById('requiresCustomerNotification').checked = false;
+            } else {
+                approveFieldWorkerOptions.style.display = 'none';
+            }
+
             document.getElementById('approveModal').style.display = 'flex';
         }
 
@@ -778,6 +807,32 @@
 
         function confirmApprove() {
             const comment = document.getElementById('approveComment').value;
+            const request = WorkflowEngine.getRequest(currentRequestId);
+
+            // Saha çalışanı için checkbox değerlerini al
+            if (request && request.workLocation === 'saha') {
+                const requiresAssignment = document.getElementById('requiresAssignment').checked;
+                const requiresCustomerNotification = document.getElementById('requiresCustomerNotification').checked;
+
+                // Bu bilgileri request'e kaydet
+                const currentStepIndex = request.workflow.steps.findIndex(s => s.step === request.workflow.currentStep);
+                if (currentStepIndex >= 0) {
+                    request.workflow.steps[currentStepIndex].requiresAssignment = requiresAssignment;
+                    request.workflow.steps[currentStepIndex].requiresCustomerNotification = requiresCustomerNotification;
+                }
+
+                // Yerine görevlendirme gerekiyorsa ve yerine görevlendirme lokasyonu belirtilmişse
+                if (requiresAssignment && request.replacementLocation) {
+                    request.assignedToLocation = request.replacementLocation;
+                    console.log('Yerine görevlendirme:', request.replacementLocation);
+                }
+
+                // Müşteri bildirimi gerekiyorsa
+                if (requiresCustomerNotification) {
+                    console.log('Müşteri bildirimi gönderilecek:', request.employeeLocation);
+                }
+            }
+
             const success = WorkflowEngine.approveRequest(
                 currentRequestId,
                 currentUser.name,

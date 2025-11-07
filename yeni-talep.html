@@ -256,6 +256,13 @@
                             <label class="form-label">Açıklama</label>
                             <textarea class="form-control" id="description" rows="4" placeholder="İzin sebebinizi belirtiniz..."></textarea>
                         </div>
+
+                        <!-- Dosya Yükleme Alanı (Belirli İzin Tipleri İçin) -->
+                        <div class="form-group" id="documentUploadField" style="display: none;">
+                            <label class="form-label form-label-required">Belge Yükle</label>
+                            <input type="file" class="form-control" id="documentUpload" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" multiple>
+                            <small class="form-text text-muted" id="documentHint">Bu izin tipi için gerekli belgeleri yüklemeniz gerekmektedir.</small>
+                        </div>
                     </div>
                     </div>
                 </div>
@@ -267,13 +274,15 @@
                     </div>
                     <div class="card-body" style="padding: 24px;">
                         <div class="form-group">
-                            <label class="form-label">Proje / Lokasyon</label>
-                            <input type="text" class="form-control" id="projectLocation" placeholder="Örn: İstanbul Fabrika A">
+                            <label class="form-label">Lokasyon</label>
+                            <select class="form-control form-select" id="employeeLocation">
+                                <option value="">Seçiniz...</option>
+                            </select>
                         </div>
 
                         <div class="form-group">
-                            <label class="form-label">Proje Sorumlusu / Ekip Lideri</label>
-                            <input type="text" class="form-control" id="projectLeader" placeholder="Örn: Mehmet Yılmaz">
+                            <label class="form-label">Lokasyon Sorumlusu / Ekip Lideri</label>
+                            <input type="text" class="form-control" id="locationLeader" readonly placeholder="Lokasyon seçildikten sonra otomatik gelecek">
                         </div>
 
                         <div class="form-check mb-3">
@@ -281,6 +290,15 @@
                             <label class="form-check-label" for="needReplacement">
                                 Yerine görevlendirme talep ediyorum
                             </label>
+                        </div>
+
+                        <div id="replacementLocationField" style="display: none; margin-bottom: 16px;">
+                            <div class="form-group">
+                                <label class="form-label">Yerine Görevlendirme Yapılacak Lokasyon</label>
+                                <select class="form-control form-select" id="replacementLocation">
+                                    <option value="">Seçiniz...</option>
+                                </select>
+                            </div>
                         </div>
 
                         <div class="form-check mb-3">
@@ -298,15 +316,11 @@
                         </div>
 
                         <div id="serviceGapFields" style="margin-top: 16px;">
-                            <div class="grid grid-cols-2">
-                                <div class="form-group">
-                                    <label class="form-label">Eksik Hizmet Sağlayacak Firma</label>
-                                    <input type="text" class="form-control" id="serviceCompany">
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label">Eksik Hizmet Süresi</label>
-                                    <input type="text" class="form-control" id="serviceDuration" placeholder="Örn: 5 gün">
-                                </div>
+                            <div class="form-group">
+                                <label class="form-label">Eksik Hizmet Sağlayacak Firmalar (Çoklu Seçim)</label>
+                                <select class="form-control" id="serviceCompanies" multiple style="min-height: 120px;">
+                                </select>
+                                <small class="form-text text-muted">Ctrl/Cmd tuşu ile birden fazla firma seçebilirsiniz</small>
                             </div>
                         </div>
                     </div>
@@ -397,10 +411,76 @@
             document.getElementById('remainingPercentage').innerHTML = '<span style="font-size: 16px;">✓</span> %' + remainingPercentage + ' kalan';
         }
 
+        // Mock data: Lokasyonlar ve sorumluları
+        const locations = {
+            'ankara_proje': { name: 'Ankara Proje Sahası', leader: 'Mehmet Kaya', companies: ['ABC Güvenlik', 'Securitas', 'Koruma Ltd.'] },
+            'istanbul_fabrika': { name: 'İstanbul Fabrika A', leader: 'Ayşe Demir', companies: ['XYZ Temizlik', 'Lojistik A.Ş.', 'Koruma Ltd.'] },
+            'izmir_proje': { name: 'İzmir Proje Sahası', leader: 'Ali Yurt', companies: ['DEF Güvenlik', 'Koruma Ltd.', 'Güven Hizmetleri'] },
+            'bursa_proje': { name: 'Bursa Proje Sahası', leader: 'Kemal Acar', companies: ['Securitas', 'ABC Güvenlik', 'Temizlik Hizmetleri'] }
+        };
+
+        // Lokasyonları doldur
+        const locationSelect = document.getElementById('employeeLocation');
+        const replacementLocationSelect = document.getElementById('replacementLocation');
+        Object.keys(locations).forEach(key => {
+            const option = document.createElement('option');
+            option.value = key;
+            option.textContent = locations[key].name;
+            locationSelect.appendChild(option.cloneNode(true));
+            replacementLocationSelect.appendChild(option);
+        });
+
+        // Lokasyon seçildiğinde lider ve firmaları doldur
+        locationSelect.addEventListener('change', function() {
+            const selectedLocation = locations[this.value];
+            const leaderInput = document.getElementById('locationLeader');
+            const companiesSelect = document.getElementById('serviceCompanies');
+
+            if (selectedLocation) {
+                leaderInput.value = selectedLocation.leader;
+
+                // Firmaları doldur
+                companiesSelect.innerHTML = '';
+                selectedLocation.companies.forEach(company => {
+                    const option = document.createElement('option');
+                    option.value = company;
+                    option.textContent = company;
+                    companiesSelect.appendChild(option);
+                });
+            } else {
+                leaderInput.value = '';
+                companiesSelect.innerHTML = '';
+            }
+        });
+
+        // Yerine görevlendirme checkbox
+        document.getElementById('needReplacement').addEventListener('change', function() {
+            const replacementField = document.getElementById('replacementLocationField');
+            replacementField.style.display = this.checked ? 'block' : 'none';
+        });
+
         // İzin tipi değiştiğinde
+        const documentRequiredTypes = ['death', 'sickness', 'birth', 'marriage'];
         document.getElementById('leaveType').addEventListener('change', function() {
             const excuseFields = document.getElementById('excuseTimeFields');
+            const documentField = document.getElementById('documentUploadField');
+            const documentHint = document.getElementById('documentHint');
+
             excuseFields.style.display = this.value === 'excuse' ? 'block' : 'none';
+
+            // Belge gerekli mi kontrol et
+            if (documentRequiredTypes.includes(this.value)) {
+                documentField.style.display = 'block';
+                const hints = {
+                    'death': 'Ölüm belgesi yüklemeniz gerekmektedir.',
+                    'sickness': 'Sağlık raporu yüklemeniz gerekmektedir.',
+                    'birth': 'Doğum belgesi yüklemeniz gerekmektedir.',
+                    'marriage': 'Evlilik cüzdanı yüklemeniz gerekmektedir.'
+                };
+                documentHint.textContent = hints[this.value] || 'Gerekli belgeleri yüklemeniz gerekmektedir.';
+            } else {
+                documentField.style.display = 'none';
+            }
         });
 
         // Çalışma yeri değiştiğinde
@@ -456,21 +536,47 @@
         document.getElementById('leaveRequestForm').addEventListener('submit', function(e) {
             e.preventDefault();
 
+            // Dosya yükleme kontrolü
+            const documentUpload = document.getElementById('documentUpload');
+            const leaveType = document.getElementById('leaveType').value;
+            let uploadedDocuments = [];
+
+            if (documentRequiredTypes.includes(leaveType) && documentUpload.files.length > 0) {
+                // Dosya bilgilerini kaydet (gerçek uygulamada sunucuya yüklenecek)
+                for (let i = 0; i < documentUpload.files.length; i++) {
+                    const file = documentUpload.files[i];
+                    uploadedDocuments.push({
+                        name: file.name,
+                        size: file.size,
+                        type: file.type,
+                        uploadedAt: new Date().toISOString()
+                    });
+                }
+            }
+
+            // Seçili hizmet firmalarını al
+            const serviceCompaniesSelect = document.getElementById('serviceCompanies');
+            const selectedCompanies = Array.from(serviceCompaniesSelect.selectedOptions).map(opt => opt.value);
+
             const requestData = {
-                type: document.getElementById('leaveType').value,
+                type: leaveType,
                 startDate: document.getElementById('startDate').value,
                 endDate: document.getElementById('endDate').value,
                 days: document.getElementById('totalDays').value,
                 description: document.getElementById('description').value,
                 workLocation: document.getElementById('workLocation').value,
                 needReplacement: document.getElementById('needReplacement')?.checked || false,
-                // Saha workflow additional fields
-                projectLocation: document.getElementById('projectLocation')?.value || '',
-                projectLeader: document.getElementById('projectLeader')?.value || '',
+                // Yeni: Yerine görevlendirme lokasyonu
+                replacementLocation: document.getElementById('replacementLocation')?.value || '',
+                // Saha workflow additional fields - GÜNCELLENDİ
+                employeeLocation: document.getElementById('employeeLocation')?.value || '',
+                locationLeader: document.getElementById('locationLeader')?.value || '',
                 notifyMIL: document.getElementById('notifyMIL')?.checked || false,
                 noServiceGap: document.getElementById('noServiceGap')?.checked || false,
-                serviceCompany: document.getElementById('serviceCompany')?.value || '',
-                serviceDuration: document.getElementById('serviceDuration')?.value || '',
+                serviceCompanies: selectedCompanies, // Çoklu seçim
+                // Yeni: Yüklenen dosyalar
+                documents: uploadedDocuments,
+                hasDocuments: uploadedDocuments.length > 0,
                 // Mazeret izni için saat bilgileri
                 startTime: document.getElementById('startTime')?.value || '',
                 endTime: document.getElementById('endTime')?.value || ''
@@ -488,6 +594,7 @@
                 console.log('Talep ID:', request.id);
                 console.log('Workflow Adımları:', request.workflow.steps);
                 console.log('Geçerli Adım:', request.workflow.currentStep);
+                console.log('Yüklenen Belgeler:', uploadedDocuments.length);
                 console.log('---');
 
                 App.showNotification('İzin talebiniz başarıyla gönderildi! Onay sürecine alındı.', 'success');

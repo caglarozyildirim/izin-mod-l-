@@ -9,7 +9,7 @@ Ana Uygulama Mantığı v2.0
 const App = {
   state: {
     currentUser: null,
-    userRole: 'employee', // 'employee' | 'manager' | 'hr' | 'operation'
+    userRole: 'employee', // 'employee' | 'manager' | 'hr' | 'customerRelations'
     leaveBalance: {
       earned: 0,
       used: 0,
@@ -57,7 +57,7 @@ const App = {
       employee: ['dashboard.html', 'yeni-talep.html', 'izinlerim.html'],
       manager: ['dashboard.html', 'onay-yonetimi.html', 'tum-izinler.html', 'raporlar.html'],
       hr: ['dashboard.html', 'onay-yonetimi.html', 'tum-izinler.html', 'raporlar.html'],
-      operation: ['dashboard.html', 'onay-yonetimi.html', 'tum-izinler.html', 'raporlar.html', 'yerine-gorevlendirme.html']
+      customerRelations: ['dashboard.html', 'onay-yonetimi.html', 'tum-izinler.html', 'raporlar.html', 'yerine-gorevlendirme.html']
     };
 
     // Allow all to access common pages
@@ -660,8 +660,8 @@ const WorkflowEngine = {
     PENDING: 'pending',                  // Onay bekliyor
     MANAGER_APPROVED: 'manager_approved', // Yönetici onayladı
     MANAGER_REJECTED: 'manager_rejected', // Yönetici reddetti
-    OPERATION_APPROVED: 'operation_approved', // Operasyon onayladı
-    OPERATION_REJECTED: 'operation_rejected', // Operasyon reddetti
+    CUSTOMER_RELATIONS_APPROVED: 'customer_relations_approved', // Müşteri İlişkileri onayladı
+    CUSTOMER_RELATIONS_REJECTED: 'customer_relations_rejected', // Müşteri İlişkileri reddetti
     HR_APPROVED: 'approved',             // İK onayladı (Final)
     HR_REJECTED: 'rejected',             // İK reddetti (Final)
     REVISED: 'revised',                  // Revize edildi
@@ -719,23 +719,23 @@ const WorkflowEngine = {
     if (isFieldWorker) {
       // SAHA AKIŞI
 
-      // Eğer talep Mesul Müdür veya Bölge Müdürü tarafından açılıyorsa, direkt Operasyon'a gider
+      // Eğer talep Mesul Müdür veya Bölge Müdürü tarafından açılıyorsa, direkt Müşteri İlişkileri'ne gider
       if (isManagerRequest) {
         request.workflow.steps = [
-          { step: 'operation', role: 'operation', label: 'Operasyon', status: 'pending' }
+          { step: 'customerRelations', role: 'customerRelations', label: 'Müşteri İlişkileri', status: 'pending', requiresAssignment: false, requiresCustomerNotification: false }
         ];
-        request.workflow.currentStep = 'operation';
+        request.workflow.currentStep = 'customerRelations';
       } else {
-        // Normal saha çalışanı: Mesul Müdür → Operasyon
+        // Normal saha çalışanı: Mesul Müdür → Müşteri İlişkileri
         request.workflow.steps = [
-          { step: 'manager', role: 'manager', label: 'Mesul Müdür', status: 'pending' },
-          { step: 'operation', role: 'operation', label: 'Operasyon', status: 'waiting' }
+          { step: 'manager', role: 'manager', label: 'Mesul Müdür', status: 'pending', requiresAssignment: false, requiresCustomerNotification: false },
+          { step: 'customerRelations', role: 'customerRelations', label: 'Müşteri İlişkileri', status: 'waiting', requiresAssignment: false, requiresCustomerNotification: false }
         ];
       }
 
       if (requiresHR) {
         request.workflow.steps.push(
-          { step: 'hr', role: 'hr', label: 'İnsan Kaynakları', status: 'waiting' }
+          { step: 'hr', role: 'hr', label: 'İnsan Kaynakları', status: 'waiting', wetSignatureVerified: false }
         );
       }
     } else {
@@ -746,7 +746,7 @@ const WorkflowEngine = {
 
       if (requiresHR) {
         request.workflow.steps.push(
-          { step: 'hr', role: 'hr', label: 'İnsan Kaynakları', status: 'waiting' }
+          { step: 'hr', role: 'hr', label: 'İnsan Kaynakları', status: 'waiting', wetSignatureVerified: false }
         );
       }
     }
@@ -902,9 +902,9 @@ const WorkflowEngine = {
         'approved': this.statuses.MANAGER_APPROVED,
         'rejected': this.statuses.MANAGER_REJECTED
       },
-      'operation': {
-        'approved': this.statuses.OPERATION_APPROVED,
-        'rejected': this.statuses.OPERATION_REJECTED
+      'customerRelations': {
+        'approved': this.statuses.CUSTOMER_RELATIONS_APPROVED,
+        'rejected': this.statuses.CUSTOMER_RELATIONS_REJECTED
       },
       'hr': {
         'approved': this.statuses.HR_APPROVED,
@@ -976,9 +976,9 @@ const WorkflowEngine = {
       const currentStepObj = request.workflow.steps.find(s => s.step === request.workflow.currentStep);
       if (!currentStepObj || currentStepObj.status !== 'pending') return false;
 
-      // Operasyon rolü hem manager hem de kendi adımındaki talepleri görebilir
-      if (role === 'operation') {
-        return currentStepObj.role === 'operation' || currentStepObj.role === 'manager';
+      // Müşteri İlişkileri rolü hem manager hem de kendi adımındaki talepleri görebilir
+      if (role === 'customerRelations') {
+        return currentStepObj.role === 'customerRelations' || currentStepObj.role === 'manager';
       }
 
       return currentStepObj.role === role;
@@ -1151,7 +1151,7 @@ const NotificationEngine = {
   getApproverEmail(role, request) {
     const emails = {
       'manager': 'manager@tezmedical.com',
-      'operation': 'operasyon@tezmedical.com',
+      'customerRelations': 'musteriiliskileri@tezmedical.com',
       'hr': 'ik@tezmedical.com'
     };
     return emails[role] || 'admin@tezmedical.com';

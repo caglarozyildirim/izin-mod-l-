@@ -28,7 +28,7 @@
             background: #10b981;
             color: white;
         }
-        .btn-operation {
+        .btn-customerRelations {
             background: #f59e0b;
             color: white;
         }
@@ -59,8 +59,8 @@
         👥 İnsan Kaynakları Olarak Giriş
     </button>
 
-    <button class="btn-operation" onclick="loginAs('operation')">
-        ⚙️ Operasyon Olarak Giriş
+    <button class="btn-customerRelations" onclick="loginAs('customerRelations')">
+        🤝 Müşteri İlişkileri Olarak Giriş
     </button>
 
     <button class="btn-employee" onclick="loginAs('employee')">
@@ -70,7 +70,7 @@
     <div class="info">
         <h3>ℹ️ Bilgi</h3>
         <p>Bu sayfa sadece test amaçlıdır. Giriş yaptıktan sonra dashboard'a yönlendirileceksiniz.</p>
-        <p><strong>Yönetici, İK veya Operasyon</strong> rolü ile giriş yaparsanız "Demo Verileri Yükle" butonunu göreceksiniz.</p>
+        <p><strong>Yönetici, İK veya Müşteri İlişkileri</strong> rolü ile giriş yaparsanız "Demo Verileri Yükle" butonunu göreceksiniz.</p>
     </div>
 
     <script>
@@ -90,12 +90,12 @@
                     role: 'hr',
                     department: 'İnsan Kaynakları'
                 },
-                operation: {
-                    id: 'op1',
-                    name: 'Test Operasyon',
-                    email: 'operasyon@tezmedical.com',
-                    role: 'operation',
-                    department: 'Operasyon'
+                customerRelations: {
+                    id: 'cr1',
+                    name: 'Test Müşteri İlişkileri',
+                    email: 'musteriiliskileri@tezmedical.com',
+                    role: 'customerRelations',
+                    department: 'Müşteri İlişkileri'
                 },
                 employee: {
                     id: 'emp1',

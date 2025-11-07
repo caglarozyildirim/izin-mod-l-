@@ -265,29 +265,11 @@
                         <td>
                             <div style="display: flex; gap: 8px;">
                                 <button class="btn btn-sm btn-secondary" onclick='showDetail(${JSON.stringify(req)})'>👁 Detay</button>
-                                ${req.status === 'approved' ? '<button class="btn btn-sm btn-success" onclick=\'confirmLeaveUsage("' + req.id + '")\'>✓ İzni Kullandım</button>' : ''}
                             </div>
                         </td>
                     </tr>
                 `;
             }).join('');
-        }
-
-        function confirmLeaveUsage(requestId) {
-            if (confirm('İzninizi kullandığınızı onaylıyor musunuz? Bu işlem geri alınamaz.')) {
-                // İzin kullanım onayı
-                const userData = JSON.parse(localStorage.getItem(`userData_${user.id}`) || '{}');
-                const request = userData.leaveRequests.find(r => r.id === requestId);
-
-                if (request) {
-                    request.usageConfirmed = true;
-                    request.usageDate = new Date().toISOString();
-                    localStorage.setItem(`userData_${user.id}`, JSON.stringify(userData));
-
-                    App.showNotification('İzin kullanımı onaylandı! Bakiyeniz güncellendi.', 'success');
-                    loadRequests();
-                }
-            }
         }
 
         // Show detail modal
