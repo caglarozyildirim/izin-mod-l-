@@ -217,7 +217,7 @@ const App = {
   logout() {
     localStorage.removeItem('authToken');
     localStorage.removeItem('currentUser');
-    window.location.href = 'login.html';
+    window.location.href = 'index.html';
   },
 
   // Show notification
@@ -293,7 +293,7 @@ const App = {
                        'Erdoğan', 'Bozkurt', 'Tekin', 'Bulut', 'Doğan', 'Türk', 'Çetin', 'Taş', 'Ünal', 'Şen',
                        'Duman', 'Kara', 'Şimşek', 'Kılıç', 'Tunç', 'Demirci', 'Yaman', 'Çakır', 'Özer', 'Güneş'];
 
-    const departments = ['IT Departmanı', 'Saha Operasyonları', 'Muhasebe', 'Satış', 'Üretim', 'Pazarlama',
+    const departments = ['Yönetim', 'IT Departmanı', 'Saha Operasyonları', 'Muhasebe', 'Satış', 'Üretim', 'Pazarlama',
                          'İnsan Kaynakları', 'Lojistik', 'Kalite Kontrol', 'Ar-Ge'];
 
     const demoUsers = [];
@@ -352,7 +352,8 @@ const App = {
         needReplacement: true,
         userId: 'emp2',
         userName: demoUsers[1].name,
-        userDepartment: demoUsers[1].department
+        userDepartment: demoUsers[1].department,
+        _forceStatus: 'customer_relations_pending'
       },
       {
         type: 'excuse',
@@ -408,7 +409,8 @@ const App = {
         needReplacement: true,
         userId: 'emp6',
         userName: demoUsers[5].name,
-        userDepartment: demoUsers[5].department
+        userDepartment: demoUsers[5].department,
+        _forceStatus: 'customer_relations_pending'
       },
       {
         type: 'excuse',
@@ -464,7 +466,8 @@ const App = {
         needReplacement: true,
         userId: 'emp10',
         userName: demoUsers[9].name,
-        userDepartment: demoUsers[9].department
+        userDepartment: demoUsers[9].department,
+        _forceStatus: 'customer_relations_pending'
       },
 
       // Reddedilen talepler (16 adet)
@@ -501,6 +504,39 @@ const App = {
             request.workflow.steps[1].status = 'pending';
             request.workflow.currentStep = request.workflow.steps[1].step;
           }
+        } else if (reqData._forceStatus === 'customer_relations_pending') {
+          // Yönetici onaylandı ve görevlendirme gerekiyor - Müşteri İlişkileri adımında
+          request.workflow.steps[0].status = 'approved';
+          request.workflow.steps[0].approvedBy = 'Yönetici';
+          request.workflow.steps[0].approvedAt = new Date().toISOString();
+          request.workflow.steps[0].requiresAssignment = true;
+
+          // Müşteri İlişkileri adımını ekle
+          if (request.workflow.steps[1] && request.workflow.steps[1].step !== 'customerRelations') {
+            const customerRelationsStep = {
+              step: 'customerRelations',
+              role: 'customerRelations',
+              label: 'Müşteri İlişkileri',
+              status: 'pending',
+              requiresAssignment: true
+            };
+            request.workflow.steps.splice(1, 0, customerRelationsStep);
+          } else if (request.workflow.steps[1]) {
+            request.workflow.steps[1].status = 'pending';
+            request.workflow.steps[1].requiresAssignment = true;
+          }
+
+          request.workflow.currentStep = 'customerRelations';
+          request.status = 'manager_approved';
+
+          request.workflow.history.push({
+            action: 'approved',
+            step: 'manager',
+            by: 'Yönetici',
+            role: 'manager',
+            timestamp: new Date().toISOString(),
+            comment: 'Onaylandı - Yerine görevlendirme gerekli'
+          });
         } else if (reqData._forceStatus === 'operation_approved') {
           request.workflow.steps[0].status = 'approved';
           request.workflow.steps[0].approvedBy = 'Mesul Müdür';
@@ -634,6 +670,45 @@ const App = {
     }
 
     console.log('✅ 158 adet örnek izin talebi oluşturuldu!');
+
+    // Tüm demo kullanıcılar için izin bakiyelerini gerçek taleplere göre güncelle
+    console.log('🔄 İzin bakiyeleri güncelleniyor...');
+    demoUsers.forEach(user => {
+      const userData = JSON.parse(localStorage.getItem(`userData_${user.id}`) || '{}');
+
+      // Kullanıcının onaylanmış taleplerini al
+      const allRequests = WorkflowEngine.getAllRequests();
+      const userApprovedRequests = allRequests.filter(r =>
+        r.userId === user.id && r.status === 'approved'
+      );
+
+      // Kullanılan toplam gün sayısını hesapla
+      let totalUsedDays = 0;
+      userApprovedRequests.forEach(req => {
+        // "X iş günü" formatından sayıyı çıkar
+        const daysMatch = req.days.match(/(\d+)/);
+        if (daysMatch) {
+          totalUsedDays += parseInt(daysMatch[1]);
+        }
+      });
+
+      // İzin bakiyesini güncelle
+      const earnedDays = 20; // Her çalışana 20 gün
+      userData.leaveBalance = {
+        earned: earnedDays,
+        used: totalUsedDays,
+        remaining: Math.max(0, earnedDays - totalUsedDays)
+      };
+
+      // Eğer leaveRequests yoksa boş array oluştur
+      if (!userData.leaveRequests) {
+        userData.leaveRequests = [];
+      }
+
+      localStorage.setItem(`userData_${user.id}`, JSON.stringify(userData));
+    });
+
+    console.log('✅ İzin bakiyeleri güncellendi!');
     console.log('📊 Durum Dağılımı:');
     console.log('   - Bekleyen: 10 talep');
     console.log('   - Onaylandı: 132 talep');
@@ -651,8 +726,14 @@ const WorkflowEngine = {
 
   // İzin tipine göre İK onayı gerekli mi?
   requiresHRApproval(leaveType) {
-    const hrRequiredTypes = ['marriage', 'birth', 'death', 'paternity', 'unpaid', 'education', 'adoption'];
-    return hrRequiredTypes.includes(leaveType);
+    // TÜM izin tipleri İK onayından geçmeli
+    return true;
+  },
+
+  // İzin tipine göre belge yükleme gerekli mi?
+  requiresDocumentUpload(leaveType) {
+    const documentRequiredTypes = ['marriage', 'birth', 'death', 'sickness'];
+    return documentRequiredTypes.includes(leaveType);
   },
 
   // Workflow durumları
@@ -735,7 +816,7 @@ const WorkflowEngine = {
 
       if (requiresHR) {
         request.workflow.steps.push(
-          { step: 'hr', role: 'hr', label: 'İnsan Kaynakları', status: 'waiting', wetSignatureVerified: false }
+          { step: 'hr', role: 'hr', label: 'İnsan Kaynakları', status: 'waiting', wetSignatureVerified: false, requiresDocument: this.requiresDocumentUpload(request.type) }
         );
       }
     } else {
@@ -746,7 +827,7 @@ const WorkflowEngine = {
 
       if (requiresHR) {
         request.workflow.steps.push(
-          { step: 'hr', role: 'hr', label: 'İnsan Kaynakları', status: 'waiting', wetSignatureVerified: false }
+          { step: 'hr', role: 'hr', label: 'İnsan Kaynakları', status: 'waiting', wetSignatureVerified: false, requiresDocument: this.requiresDocumentUpload(request.type) }
         );
       }
     }
@@ -765,11 +846,22 @@ const WorkflowEngine = {
   },
 
   // Onay işlemi
-  approveRequest(requestId, approverId, approverRole, comment = '') {
+  approveRequest(requestId, approverId, approverRole, comment = '', wetSignatureVerified = false, requiresAssignment = false) {
     const request = this.getRequest(requestId);
     if (!request) return false;
 
     const currentStep = request.workflow.currentStep;
+
+    // İK adımındaysa ve evrak gerekiyorsa kontrol et
+    if (currentStep === 'hr') {
+      const stepIndex = request.workflow.steps.findIndex(s => s.step === currentStep);
+      if (stepIndex >= 0 && request.workflow.steps[stepIndex].requiresDocument) {
+        if (!request.documents || request.documents.length === 0) {
+          App.showNotification('Bu izin tipi için evrak yüklenmesi zorunludur!', 'error');
+          return false;
+        }
+      }
+    }
 
     // Mevcut adımı onayla
     const stepIndex = request.workflow.steps.findIndex(s => s.step === currentStep);
@@ -777,6 +869,23 @@ const WorkflowEngine = {
       request.workflow.steps[stepIndex].status = 'approved';
       request.workflow.steps[stepIndex].approvedBy = approverId;
       request.workflow.steps[stepIndex].approvedAt = new Date().toISOString();
+
+      // Evrak kontrolü yapıldıysa işaretle
+      if (currentStep === 'hr' && request.workflow.steps[stepIndex].requiresDocument) {
+        request.workflow.steps[stepIndex].documentVerified = true;
+      }
+
+      // İK adımındaysa ıslak imza kontrolü kaydet
+      if (currentStep === 'hr' && wetSignatureVerified) {
+        request.workflow.steps[stepIndex].wetSignatureVerified = true;
+        request.workflow.steps[stepIndex].wetSignatureVerifiedAt = new Date().toISOString();
+        request.workflow.steps[stepIndex].wetSignatureVerifiedBy = approverId;
+      }
+
+      // Yönetici adımında yerine görevlendirme gerekiyorsa
+      if (currentStep === 'manager' && requiresAssignment) {
+        request.workflow.steps[stepIndex].requiresAssignment = true;
+      }
     }
 
     // History'ye ekle
@@ -788,6 +897,28 @@ const WorkflowEngine = {
       timestamp: new Date().toISOString(),
       comment: comment || 'Onaylandı'
     });
+
+    // Yönetici onayladı ve görevlendirme gerekiyorsa, müşteri ilişkileri adımı ekle
+    if (currentStep === 'manager' && requiresAssignment) {
+      // Müşteri ilişkileri adımı zaten var mı kontrol et
+      const hasCustomerRelationsStep = request.workflow.steps.some(s => s.step === 'customerRelations');
+
+      if (!hasCustomerRelationsStep) {
+        // Müşteri ilişkileri adımını İK'dan önce ekle
+        const customerRelationsStep = {
+          step: 'customerRelations',
+          role: 'customerRelations',
+          label: 'Müşteri İlişkileri',
+          status: 'pending',
+          requiresAssignment: true
+        };
+
+        // Adımı manager'dan sonra, HR'dan önce ekle
+        request.workflow.steps.splice(stepIndex + 1, 0, customerRelationsStep);
+
+        console.log('✅ Müşteri İlişkileri adımı eklendi (yerine görevlendirme gerekiyor)');
+      }
+    }
 
     // Bir sonraki adıma geç
     if (stepIndex < request.workflow.steps.length - 1) {
@@ -806,6 +937,124 @@ const WorkflowEngine = {
       // Kullanıcıya bildirim
       NotificationEngine.sendApprovalNotification(request, 'requester', 'approved');
     }
+
+    this.saveRequest(request);
+    return true;
+  },
+
+  // Müşteri İlişkileri onay işlemi
+  approveCustomerRelationsRequest(requestId, approverId, comment = '', assignmentApproved = null, sendCustomerNotification = false) {
+    const request = this.getRequest(requestId);
+    if (!request) return false;
+
+    const currentStep = request.workflow.currentStep;
+
+    if (currentStep !== 'customerRelations') {
+      App.showNotification('Bu talep Müşteri İlişkileri adımında değil!', 'error');
+      return false;
+    }
+
+    // Mevcut adımı onayla
+    const stepIndex = request.workflow.steps.findIndex(s => s.step === currentStep);
+    if (stepIndex >= 0) {
+      request.workflow.steps[stepIndex].status = 'approved';
+      request.workflow.steps[stepIndex].approvedBy = approverId;
+      request.workflow.steps[stepIndex].approvedAt = new Date().toISOString();
+
+      // Görevlendirme onay durumunu kaydet
+      if (assignmentApproved !== null) {
+        request.workflow.steps[stepIndex].assignmentApproved = assignmentApproved;
+      }
+
+      // Müşteri bilgilendirme durumunu kaydet
+      if (sendCustomerNotification) {
+        request.workflow.steps[stepIndex].customerNotificationSent = true;
+        request.workflow.steps[stepIndex].customerNotificationSentAt = new Date().toISOString();
+      }
+    }
+
+    // History'ye ekle
+    let historyComment = comment || 'Onaylandı';
+    if (assignmentApproved === true) {
+      historyComment = (comment ? comment + ' - ' : '') + 'Görevlendirme onaylandı';
+    }
+    if (sendCustomerNotification) {
+      historyComment += ' (Müşteri bilgilendirildi)';
+    }
+
+    request.workflow.history.push({
+      action: 'approved',
+      step: currentStep,
+      by: approverId,
+      role: 'customerRelations',
+      timestamp: new Date().toISOString(),
+      comment: historyComment
+    });
+
+    // Bir sonraki adıma geç
+    if (stepIndex < request.workflow.steps.length - 1) {
+      // Daha adım var (İK adımı)
+      request.workflow.steps[stepIndex + 1].status = 'pending';
+      request.workflow.currentStep = request.workflow.steps[stepIndex + 1].step;
+      request.status = this.getStatusByStep(request.workflow.currentStep, 'approved');
+
+      // Bildirim gönder
+      NotificationEngine.sendApprovalNotification(request, 'next_approver');
+    } else {
+      // Son adım - talep tamamen onaylandı
+      request.status = this.statuses.HR_APPROVED;
+      request.workflow.currentStep = 'completed';
+
+      // Kullanıcıya bildirim
+      NotificationEngine.sendApprovalNotification(request, 'requester', 'approved');
+    }
+
+    this.saveRequest(request);
+    return true;
+  },
+
+  // Müşteri İlişkileri reddetme işlemi
+  rejectCustomerRelationsRequest(requestId, rejecterId, reason, assignmentApproved = false) {
+    if (!reason || reason.trim() === '') {
+      App.showNotification('Reddetme nedeni zorunludur!', 'error');
+      return false;
+    }
+
+    const request = this.getRequest(requestId);
+    if (!request) return false;
+
+    const currentStep = request.workflow.currentStep;
+
+    if (currentStep !== 'customerRelations') {
+      App.showNotification('Bu talep Müşteri İlişkileri adımında değil!', 'error');
+      return false;
+    }
+
+    // Mevcut adımı reddet
+    const stepIndex = request.workflow.steps.findIndex(s => s.step === currentStep);
+    if (stepIndex >= 0) {
+      request.workflow.steps[stepIndex].status = 'rejected';
+      request.workflow.steps[stepIndex].rejectedBy = rejecterId;
+      request.workflow.steps[stepIndex].rejectedAt = new Date().toISOString();
+      request.workflow.steps[stepIndex].assignmentApproved = assignmentApproved;
+    }
+
+    // History'ye ekle
+    request.workflow.history.push({
+      action: 'rejected',
+      step: currentStep,
+      by: rejecterId,
+      role: 'customerRelations',
+      timestamp: new Date().toISOString(),
+      comment: 'Görevlendirme reddedildi - ' + reason
+    });
+
+    // Talebi reddet ve bitir
+    request.status = this.statuses.CUSTOMER_RELATIONS_REJECTED;
+    request.workflow.currentStep = 'rejected';
+
+    // Kullanıcıya bildirim
+    NotificationEngine.sendApprovalNotification(request, 'requester', 'rejected', reason);
 
     this.saveRequest(request);
     return true;
@@ -970,19 +1219,37 @@ const WorkflowEngine = {
   getPendingRequestsForRole(role) {
     const allRequests = this.getAllRequests();
 
-    return allRequests.filter(request => {
+    const filtered = allRequests.filter(request => {
       if (!request.workflow) return false;
 
       const currentStepObj = request.workflow.steps.find(s => s.step === request.workflow.currentStep);
       if (!currentStepObj || currentStepObj.status !== 'pending') return false;
 
-      // Müşteri İlişkileri rolü hem manager hem de kendi adımındaki talepleri görebilir
+      // Müşteri İlişkileri rolü sadece customerRelations adımındaki talepleri görür
       if (role === 'customerRelations') {
-        return currentStepObj.role === 'customerRelations' || currentStepObj.role === 'manager';
+        const isCustomerRelationsStep = currentStepObj.role === 'customerRelations';
+        if (isCustomerRelationsStep) {
+          console.log('🔵 Müşteri İlişkileri talebi:', {
+            id: request.id,
+            user: request.userName,
+            currentStep: request.workflow.currentStep,
+            requiresAssignment: currentStepObj.requiresAssignment,
+            noServiceGap: request.noServiceGap
+          });
+        }
+        return isCustomerRelationsStep;
+      }
+
+      // İnsan Kaynakları rolü tüm rollerin adımlarındaki talepleri görebilir
+      if (role === 'hr') {
+        return currentStepObj.role === 'hr' || currentStepObj.role === 'manager' || currentStepObj.role === 'customerRelations';
       }
 
       return currentStepObj.role === role;
     });
+
+    console.log(`📊 ${role} rolü için ${filtered.length} talep filtrelendi`);
+    return filtered;
   }
 };
 

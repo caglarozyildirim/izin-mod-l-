@@ -34,15 +34,10 @@
     <main class="main-content">
         <div class="container-fluid">
             <!-- Page Header -->
-            <div class="page-header" style="display: flex; justify-content: space-between; align-items: center;">
+            <div class="page-header">
                 <div>
                     <h1 class="page-title" id="pageTitle">Dashboard</h1>
                     <p class="page-subtitle" id="pageSubtitle">İzin bilgilerinizi takip edin</p>
-                </div>
-                <div id="managerActions" style="display: none;">
-                    <button class="btn btn-primary" onclick="loadDemoData()" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 12px 24px;">
-                        🎲 Demo Verileri Yükle (158 Talep)
-                    </button>
                 </div>
             </div>
 
@@ -391,41 +386,44 @@
                     </div>
                 </div>
 
+                <!-- Çalışanların Kalan İzinleri (Yönetici için) -->
+                <div class="card" id="employeeLeaveBalanceCard" style="display: none;">
+                    <div class="card-header">
+                        <h3 class="card-title">Departman İzin Durumu</h3>
+                        <p id="departmentName" style="margin: 4px 0 0 0; font-size: 13px; color: #6b7280; font-weight: 500;"></p>
+                    </div>
+                    <div class="card-body" style="padding: 0;">
+                        <div style="overflow-x: auto;">
+                            <table style="width: 100%; border-collapse: collapse;">
+                                <thead>
+                                    <tr style="background: #f9fafb; border-bottom: 2px solid #e5e7eb;">
+                                        <th style="padding: 12px; text-align: left; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase;">#</th>
+                                        <th style="padding: 12px; text-align: left; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase;">Çalışan</th>
+                                        <th style="padding: 12px; text-align: left; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase;">Departman</th>
+                                        <th style="padding: 12px; text-align: center; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase;">Hak Edilen</th>
+                                        <th style="padding: 12px; text-align: center; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase;">Kullanılan</th>
+                                        <th style="padding: 12px; text-align: center; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase;">Kalan</th>
+                                        <th style="padding: 12px; text-align: left; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase;">Durum</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="employeeLeaveBalanceList">
+                                    <!-- JavaScript ile doldurulacak -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Team Overview -->
                 <div class="grid grid-cols-2">
-                    <div class="card">
+                    <!-- En Çok Birikmiş İzni Olanlar (İK için) -->
+                    <div class="card" id="topAccumulatedLeaveCard" style="display: none;">
                         <div class="card-header">
-                            <h3 class="card-title">Departman İzin Durumu</h3>
+                            <h3 class="card-title">📊 En Çok Birikmiş İzin (Top 10)</h3>
                         </div>
-                        <div class="card-body">
-                            <div style="display: flex; flex-direction: column; gap: 16px;">
-                                <div>
-                                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                                        <span style="font-size: 14px; font-weight: 500;">Üretim</span>
-                                        <span style="font-size: 14px; color: var(--text-tertiary);">60% kullanım</span>
-                                    </div>
-                                    <div style="height: 8px; background: var(--gray-200); border-radius: 4px; overflow: hidden;">
-                                        <div style="height: 100%; width: 60%; background: var(--primary);"></div>
-                                    </div>
-                                </div>
-                                <div>
-                                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                                        <span style="font-size: 14px; font-weight: 500;">Muhasebe</span>
-                                        <span style="font-size: 14px; color: var(--text-tertiary);">45% kullanım</span>
-                                    </div>
-                                    <div style="height: 8px; background: var(--gray-200); border-radius: 4px; overflow: hidden;">
-                                        <div style="height: 100%; width: 45%; background: var(--success);"></div>
-                                    </div>
-                                </div>
-                                <div>
-                                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                                        <span style="font-size: 14px; font-weight: 500;">IT</span>
-                                        <span style="font-size: 14px; color: var(--text-tertiary);">30% kullanım</span>
-                                    </div>
-                                    <div style="height: 8px; background: var(--gray-200); border-radius: 4px; overflow: hidden;">
-                                        <div style="height: 100%; width: 30%; background: var(--info);"></div>
-                                    </div>
-                                </div>
+                        <div class="card-body" style="max-height: 400px; overflow-y: auto;">
+                            <div id="topAccumulatedLeaveList" style="display: flex; flex-direction: column; gap: 12px;">
+                                <!-- JavaScript ile doldurulacak -->
                             </div>
                         </div>
                     </div>
@@ -481,6 +479,18 @@
                 <h4 style="margin: 0; font-size: 20px; font-weight: 600;">✓ İzin Talebini Onayla</h4>
             </div>
             <div style="padding: 24px;">
+                <div id="managerAssignmentOptions" style="display: none; margin-bottom: 20px; padding: 16px; background: #eff6ff; border-radius: 8px; border: 2px solid #3b82f6;">
+                    <div style="font-weight: 600; color: #1e40af; margin-bottom: 12px; font-size: 14px;">Yönetici Onay Seçenekleri:</div>
+                    <div>
+                        <label style="display: flex; align-items: center; cursor: pointer;">
+                            <input type="checkbox" id="requiresAssignment" style="margin-right: 8px; width: 18px; height: 18px; cursor: pointer;">
+                            <span style="font-size: 14px; color: #1e3a8a; font-weight: 500;">Yerine görevlendirme yapılmalı</span>
+                        </label>
+                        <div style="margin-top: 6px; margin-left: 26px; font-size: 12px; color: #1e40af;">
+                            Bu seçenek işaretlenirse, talep Müşteri İlişkileri onayına gönderilir.
+                        </div>
+                    </div>
+                </div>
                 <div style="margin-bottom: 20px;">
                     <label style="display: block; font-weight: 600; color: #1f2937; margin-bottom: 8px; font-size: 14px;">
                         Onay Notu (Opsiyonel):
@@ -605,6 +615,12 @@
             }
         }
 
+        /* Tablo satır hover efekti */
+        #employeeLeaveBalanceList tr:hover {
+            background: #f9fafb;
+            cursor: pointer;
+        }
+
         @keyframes fade-in-up {
             from {
                 opacity: 0;
@@ -617,7 +633,7 @@
         }
     </style>
 
-    <script src="js/app.js"></script>
+    <script src="js/app.js?v=3.6"></script>
     <script>
         // Load user data and show appropriate view
         const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
@@ -631,20 +647,22 @@
             // Update navbar based on role
             updateNavbarForRole(currentUser.role);
 
-            // Show demo data button for managers
-            if (currentUser.role === 'manager' || currentUser.role === 'hr' || currentUser.role === 'operation') {
-                document.getElementById('managerActions').style.display = 'block';
-            }
-
             // Show appropriate dashboard view
             if (currentUser.role === 'employee') {
                 document.getElementById('pageTitle').textContent = 'Dashboard - Personel';
                 document.getElementById('pageSubtitle').textContent = 'İzin bilgilerinizi ve taleplerini takip edin';
                 document.getElementById('employeeView').style.display = 'block';
                 loadEmployeeDashboard(userData);
-            } else if (currentUser.role === 'manager' || currentUser.role === 'hr' || currentUser.role === 'operation') {
-                document.getElementById('pageTitle').textContent = 'Dashboard - Yönetici';
-                document.getElementById('pageSubtitle').textContent = 'Ekibinizin izin durumlarını ve bekleyen talepleri görüntüleyin';
+            } else if (currentUser.role === 'manager' || currentUser.role === 'hr' || currentUser.role === 'operation' || currentUser.role === 'customerRelations') {
+                // Rol bazlı başlık
+                if (currentUser.role === 'customerRelations') {
+                    document.getElementById('pageTitle').textContent = 'Dashboard - Müşteri İlişkileri';
+                    document.getElementById('pageSubtitle').textContent = 'Görevlendirme onayları ve müşteri bilgilendirmelerini yönetin';
+                } else {
+                    document.getElementById('pageTitle').textContent = 'Dashboard - Yönetici';
+                    document.getElementById('pageSubtitle').textContent = 'Ekibinizin izin durumlarını ve bekleyen talepleri görüntüleyin';
+                }
+
                 document.getElementById('managerView').style.display = 'block';
 
                 // Generate people grid
@@ -664,9 +682,15 @@
             console.log('🔍 loadManagerDashboard() başlatıldı');
             console.log('   User Role:', userRole);
 
+            // Demo verileri otomatik yükle (sadece ilk seferinde)
+            const allRequests = WorkflowEngine.getAllRequests();
+            if (allRequests.length === 0) {
+                console.log('📦 Demo verileri yükleniyor (ilk giriş)...');
+                App.generateSampleData();
+            }
+
             // WorkflowEngine'den bekleyen talepleri al
             const pendingRequests = WorkflowEngine.getPendingRequestsForRole(userRole);
-            const allRequests = WorkflowEngine.getAllRequests();
 
             console.log('   Tüm talepler:', allRequests.length);
             console.log('   Bekleyen talepler:', pendingRequests.length);
@@ -702,8 +726,40 @@
             const onLeaveStats = document.querySelectorAll('#managerView .stat-card.info .stat-value');
             if (onLeaveStats[0]) onLeaveStats[0].textContent = employeesOnLeave.length;
 
+            // İzinli çalışan yüzdesini ve açıklamayı güncelle
+            const totalEmployees = JSON.parse(localStorage.getItem('users') || '[]').filter(u => u.role === 'employee').length;
+            const onLeavePercentage = totalEmployees > 0 ? Math.round((employeesOnLeave.length / totalEmployees) * 100) : 0;
+            const activeEmployees = totalEmployees - employeesOnLeave.length;
+
+            // Yüzdeyi güncelle
+            const percentageElement = document.querySelector('#managerView .stat-card.info div[style*="font-size: 16px"]');
+            if (percentageElement) {
+                percentageElement.textContent = onLeavePercentage + '%';
+            }
+
+            // Aktif çalışan sayısını güncelle
+            const activeEmployeesElement = document.querySelector('#managerView .stat-card.info div[style*="margin-top: 12px"] span');
+            if (activeEmployeesElement) {
+                activeEmployeesElement.textContent = activeEmployees;
+            }
+
+            // Progress bar'ı güncelle
+            const progressCircle = document.querySelector('#managerView .stat-card.info circle[stroke-dashoffset]');
+            if (progressCircle) {
+                const circumference = 201;
+                const offset = circumference - (circumference * onLeavePercentage / 100);
+                progressCircle.setAttribute('stroke-dashoffset', offset);
+            }
+
             // Onay bekleyen talepler tablosunu doldur
             loadPendingApprovalsTable(pendingRequests);
+
+            // Role göre özel kartları göster
+            if (userRole === 'manager') {
+                loadEmployeeLeaveBalance();
+            } else if (userRole === 'hr') {
+                loadTopAccumulatedLeave();
+            }
         }
 
         function loadPendingApprovalsTable(pendingRequests) {
@@ -730,6 +786,61 @@
                 // Get initials from name
                 const initials = request.userName.split(' ').map(n => n[0]).join('').toUpperCase();
 
+                // Müşteri İlişkileri için özel render
+                if (currentUser.role === 'customerRelations') {
+                    const currentStepObj = request.workflow.steps.find(s => s.step === request.workflow.currentStep);
+                    const requiresAssignment = currentStepObj?.requiresAssignment || false;
+                    const hasServiceGap = request.noServiceGap || false;
+
+                    // Firma bilgileri varsa göster
+                    let companyInfo = '';
+                    if (hasServiceGap && request.serviceCompany) {
+                        companyInfo = `
+                            <div style="font-size: 12px; color: #0ea5e9; margin-top: 4px;">
+                                🏢 ${request.serviceCompany} (${request.serviceDuration})
+                            </div>
+                        `;
+                    }
+
+                    return `
+                        <tr style="background: ${hasServiceGap ? '#f0f9ff' : 'white'};">
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <div style="width: 32px; height: 32px; background: #0ea5e9; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px; font-weight: 600;">${initials}</div>
+                                    <div>
+                                        <div style="font-weight: 500;">${request.userName}</div>
+                                        <div style="font-size: 12px; color: #6b7280;">${request.userDepartment}</div>
+                                        ${request.projectLocation ? `<div style="font-size: 11px; color: #0ea5e9;">📍 ${request.projectLocation}</div>` : ''}
+                                        ${companyInfo}
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                ${leaveTypeName}
+                                ${hasServiceGap ? '<div style="font-size: 11px; color: #0ea5e9; margin-top: 4px;">⚠️ Eksik Hizmet</div>' : ''}
+                            </td>
+                            <td>${new Date(request.startDate).toLocaleDateString('tr-TR')}</td>
+                            <td>${new Date(request.endDate).toLocaleDateString('tr-TR')}</td>
+                            <td><span class="badge badge-info">${request.days}</span></td>
+                            <td>${createdDate}</td>
+                            <td>
+                                <div style="display: flex; flex-direction: column; gap: 6px;">
+                                    ${requiresAssignment ? `
+                                        <button class="btn btn-sm btn-success" onclick="handleCustomerRelationsApprove('${request.id}', true)" style="white-space: nowrap;">✓ Görevlendirmeyi Onayla</button>
+                                        <button class="btn btn-sm btn-danger" onclick="handleCustomerRelationsReject('${request.id}')" style="white-space: nowrap;">✗ Görevlendirmeyi Reddet</button>
+                                    ` : `
+                                        <button class="btn btn-sm btn-success" onclick="handleCustomerRelationsApprove('${request.id}', false)">✓ Onayla</button>
+                                        <button class="btn btn-sm btn-danger" onclick="openRejectModal('${request.id}')">✗ Reddet</button>
+                                    `}
+                                    ${hasServiceGap ? `<button class="btn btn-sm" onclick="openCustomerSelectionModal('${request.id}')" style="background: #0ea5e9; color: white; white-space: nowrap; font-size: 10px; padding: 6px 10px;">📧 Bilgilendirme Yapılacak Müşterileri Seç</button>` : ''}
+                                    <button class="btn btn-sm btn-secondary" onclick="viewDetails('${request.id}')" style="white-space: nowrap;">📄 Detay</button>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                }
+
+                // Diğer roller için standart render
                 return `
                     <tr>
                         <td>
@@ -813,7 +924,8 @@
                 'employee': 'Personel',
                 'manager': 'Yönetici',
                 'hr': 'İnsan Kaynakları',
-                'operation': 'Operasyon'
+                'operation': 'Operasyon',
+                'customerRelations': 'Müşteri İlişkileri'
             };
             return roles[role] || 'Kullanıcı';
         }
@@ -1171,6 +1283,17 @@
         function openApproveModal(requestId) {
             currentRequestId = requestId;
             document.getElementById('approveComment').value = '';
+
+            // Yönetici ise ve SAHA çalışanı için görevlendirme seçeneğini göster
+            const request = WorkflowEngine.getRequest(requestId);
+            const managerAssignmentOptions = document.getElementById('managerAssignmentOptions');
+            if (currentUser.role === 'manager' && request && request.workLocation === 'saha') {
+                managerAssignmentOptions.style.display = 'block';
+                document.getElementById('requiresAssignment').checked = false;
+            } else {
+                managerAssignmentOptions.style.display = 'none';
+            }
+
             document.getElementById('approveModal').style.display = 'flex';
         }
 
@@ -1181,11 +1304,15 @@
 
         function confirmApprove() {
             const comment = document.getElementById('approveComment').value;
+            const requiresAssignment = currentUser.role === 'manager' ? document.getElementById('requiresAssignment').checked : false;
+
             const success = WorkflowEngine.approveRequest(
                 currentRequestId,
                 currentUser.name,
                 currentUser.role,
-                comment
+                comment,
+                false, // wetSignatureVerified (sadece İK için)
+                requiresAssignment // Yönetici görevlendirme gerektiriyor mu?
             );
 
             if (success) {
@@ -1303,13 +1430,43 @@
                     statusText = 'Beklemede';
                 }
 
+                // Evrak kontrolü durumu
+                let documentInfo = '';
+                if (step.requiresDocument && step.step === 'hr') {
+                    if (request.documents && request.documents.length > 0) {
+                        if (step.documentVerified) {
+                            documentInfo = `<div style="margin-top: 6px; font-size: 12px; color: #10b981;">✓ Evrak kontrol edildi (${request.documents.length} dosya)</div>`;
+                        } else if (isPending) {
+                            documentInfo = `<div style="margin-top: 6px; font-size: 12px; color: #FFC107;">📄 Evrak kontrolü bekleniyor (${request.documents.length} dosya)</div>`;
+                        }
+                    } else if (isPending) {
+                        documentInfo = `<div style="margin-top: 6px; font-size: 12px; color: #ef4444;">⚠️ Evrak yüklenmemiş!</div>`;
+                    }
+                }
+
+                // Islak imza kontrolü durumu (sadece İK adımı için)
+                let wetSignatureInfo = '';
+                if (step.step === 'hr') {
+                    if (step.wetSignatureVerified) {
+                        const verifiedAt = step.wetSignatureVerifiedAt ? new Date(step.wetSignatureVerifiedAt).toLocaleString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '';
+                        wetSignatureInfo = `<div style="margin-top: 6px; font-size: 12px; color: #10b981;">✓ Islak imza kontrol edildi${verifiedAt ? ' (' + verifiedAt + ')' : ''}</div>`;
+                    } else if (isPending) {
+                        wetSignatureInfo = `<div style="margin-top: 6px; font-size: 12px; color: #FFC107;">✍️ Islak imza kontrolü bekleniyor</div>`;
+                    }
+                }
+
                 return `
                     <div style="position: relative; margin-bottom: ${index < request.workflow.steps.length - 1 ? '24px' : '0'};">
+                        ${index < request.workflow.steps.length - 1 ? `
+                            <div style="position: absolute; left: 19px; top: 40px; bottom: -24px; width: 2px; background: ${isCompleted ? '#10b981' : '#e5e7eb'}; z-index: 0;"></div>
+                        ` : ''}
                         <div style="display: flex; align-items: start; gap: 16px;">
                             <div style="width: 40px; height: 40px; background: ${bgColor}; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; box-shadow: ${isCompleted || isPending ? '0 4px 12px rgba(16, 185, 129, 0.3)' : 'none'}; z-index: 1; flex-shrink: 0;">${icon}</div>
                             <div style="flex: 1; padding-top: 4px; opacity: ${isWaiting ? '0.5' : '1'};">
                                 <div style="font-weight: 600; color: ${isWaiting ? '#6b7280' : '#1f2937'}; margin-bottom: 4px;">${step.label}</div>
                                 <div style="font-size: 13px; color: #6b7280;">${statusText}</div>
+                                ${documentInfo}
+                                ${wetSignatureInfo}
                             </div>
                         </div>
                     </div>
@@ -1389,6 +1546,33 @@
                                     <div style="font-size: 15px; font-weight: 600; color: #212529;">${request.userDepartment}</div>
                                 </div>
                             </div>
+                            ${(() => {
+                                // Çalışanın kalan izin bilgisini al
+                                const userData = JSON.parse(localStorage.getItem('userData_' + request.userId) || '{}');
+                                const leaveBalance = userData.leaveBalance || null;
+                                if (leaveBalance) {
+                                    return `
+                                    <div style="background: linear-gradient(135deg, #10b98115 0%, #059f6915 100%); padding: 16px; border-radius: 10px; border-left: 4px solid #10b981; margin-bottom: 16px;">
+                                        <div style="font-size: 12px; color: #6c757d; margin-bottom: 8px; font-weight: 600;">Çalışanın İzin Durumu</div>
+                                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;">
+                                            <div style="text-align: center;">
+                                                <div style="font-size: 11px; color: #6c757d; margin-bottom: 4px;">Hak Edilen</div>
+                                                <div style="font-size: 18px; font-weight: 700; color: #2196F3;">${leaveBalance.earned || 0}</div>
+                                            </div>
+                                            <div style="text-align: center;">
+                                                <div style="font-size: 11px; color: #6c757d; margin-bottom: 4px;">Kullanılan</div>
+                                                <div style="font-size: 18px; font-weight: 700; color: #FFC107;">${leaveBalance.used || 0}</div>
+                                            </div>
+                                            <div style="text-align: center;">
+                                                <div style="font-size: 11px; color: #6c757d; margin-bottom: 4px;">Kalan</div>
+                                                <div style="font-size: 18px; font-weight: 700; color: #10b981;">${leaveBalance.remaining || 0}</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    `;
+                                }
+                                return '';
+                            })()}
                             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
                                 <div style="background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%); padding: 16px; border-radius: 10px; border-left: 4px solid #667eea;">
                                     <div style="font-size: 12px; color: #6c757d; margin-bottom: 6px; font-weight: 500;">İzin Tipi</div>
@@ -1413,6 +1597,25 @@
                             <div style="margin-top: 16px;">
                                 <div style="font-size: 12px; color: #6c757d; margin-bottom: 6px; font-weight: 500;">Açıklama</div>
                                 <div style="padding: 12px; background: #f8f9fa; border-radius: 8px; font-size: 14px; color: #495057;">${request.description}</div>
+                            </div>
+                            ` : ''}
+                            ${request.documents && request.documents.length > 0 ? `
+                            <div style="margin-top: 16px;">
+                                <div style="font-size: 12px; color: #6c757d; margin-bottom: 8px; font-weight: 500;">Yüklenen Belgeler</div>
+                                <div style="display: flex; flex-direction: column; gap: 8px;">
+                                    ${request.documents.map((doc, idx) => `
+                                        <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px; background: #f8f9fa; border-radius: 8px; border: 1px solid #e5e7eb;">
+                                            <div style="display: flex; align-items: center; gap: 10px; flex: 1;">
+                                                <div style="width: 36px; height: 36px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-size: 16px;">📄</div>
+                                                <div>
+                                                    <div style="font-size: 14px; font-weight: 600; color: #212529;">${doc.name}</div>
+                                                    <div style="font-size: 12px; color: #6c757d;">${(doc.size / 1024).toFixed(2)} KB</div>
+                                                </div>
+                                            </div>
+                                            <a href="${doc.data}" download="${doc.name}" style="padding: 8px 16px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: 600; transition: all 0.2s;">İndir</a>
+                                        </div>
+                                    `).join('')}
+                                </div>
                             </div>
                             ` : ''}
                         </div>
@@ -1653,40 +1856,398 @@
             document.body.appendChild(modal);
         }
 
-        // Demo Data Loader Function
-        function loadDemoData() {
-            console.log('🎲 Demo verileri yükleniyor...');
-            console.log('App tanımlı mı?', typeof App);
-            console.log('WorkflowEngine tanımlı mı?', typeof WorkflowEngine);
+        // Yönetici için: Ekip üyelerinin kalan izinlerini göster
+        function loadEmployeeLeaveBalance() {
+            console.log('🔍 loadEmployeeLeaveBalance() çağrıldı');
+            const card = document.getElementById('employeeLeaveBalanceCard');
+            const list = document.getElementById('employeeLeaveBalanceList');
+            const departmentNameEl = document.getElementById('departmentName');
 
-            // Generate sample data
-            App.generateSampleData();
+            console.log('   Card element:', card);
+            console.log('   List element:', list);
 
-            console.log('✅ generateSampleData() tamamlandı');
-
-            // localStorage'daki users sayısını kontrol et
-            const users = JSON.parse(localStorage.getItem('users') || '[]');
-            console.log('💾 localStorage users sayısı:', users.length);
-
-            // İlk birkaç kullanıcının verilerini kontrol et
-            for (let i = 0; i < Math.min(5, users.length); i++) {
-                const user = users[i];
-                const userData = JSON.parse(localStorage.getItem(`userData_${user.id}`) || '{}');
-                console.log(`💾 ${user.id}: ${userData.leaveRequests?.length || 0} talep`);
+            if (!card || !list) {
+                console.log('❌ Card veya list bulunamadı!');
+                return;
             }
 
-            // Show success message
-            App.showNotification('✅ 158 adet örnek izin talebi başarıyla yüklendi! (10 Bekleyen, 132 Onaylandı, 16 Reddedildi)', 'success');
+            // currentUser'ı global scope'tan al
+            console.log('   Global currentUser:', currentUser);
+            console.log('   currentUser.department:', currentUser.department);
 
-            // Refresh the dashboard to show new data
-            setTimeout(() => {
-                console.log('⏰ Timeout sonrası, dashboard yenileniyor...');
-                if (currentUser.role === 'manager' || currentUser.role === 'hr' || currentUser.role === 'operation') {
-                    loadManagerDashboard();
-                } else {
-                    loadDashboard();
+            // Mevcut kullanıcının departmanını al
+            const currentUserId = localStorage.getItem('currentUserId');
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            const userFromUsers = users.find(u => u.id === currentUserId);
+
+            console.log('   Current User ID:', currentUserId);
+            console.log('   User from users array:', userFromUsers);
+
+            if (!currentUser) {
+                console.log('❌ Current user bulunamadı!');
+                return;
+            }
+
+            // Departman adını göster
+            if (departmentNameEl) {
+                departmentNameEl.textContent = `${currentUser.department} - Tüm Çalışanlar`;
+            }
+
+            // Sadece aynı departmandaki çalışanları al
+            const employees = users.filter(u => u.role === 'employee' && u.department === currentUser.department);
+            console.log('   Departman:', currentUser.department);
+            console.log('   Aynı departmandaki çalışanlar:', employees.length);
+
+            // Her çalışan için izin bakiyesini al
+            const employeesWithBalance = employees.map(emp => {
+                const userData = JSON.parse(localStorage.getItem(`userData_${emp.id}`) || '{}');
+                return {
+                    ...emp,
+                    leaveBalance: userData.leaveBalance || { earned: 0, used: 0, remaining: 0 }
+                };
+            });
+
+            // Kalan izine göre sırala (azdan çoğa) - TÜM çalışanları göster
+            employeesWithBalance.sort((a, b) => a.leaveBalance.remaining - b.leaveBalance.remaining);
+
+            console.log('   İzin bakiyesi olan çalışanlar:', employeesWithBalance.length);
+
+            if (employeesWithBalance.length === 0) {
+                console.log('⚠️ Gösterilecek çalışan yok');
+                list.innerHTML = '<tr><td colspan="7" style="text-align: center; color: #6b7280; padding: 40px;">Bu departmanda çalışan bulunamadı</td></tr>';
+                card.style.display = 'block';
+                return;
+            }
+
+            console.log('✅ Tablo oluşturuluyor...');
+
+            list.innerHTML = employeesWithBalance.map((emp, index) => {
+                const initials = emp.name.split(' ').map(n => n[0]).join('');
+                const percentage = (emp.leaveBalance.used / emp.leaveBalance.earned) * 100;
+                const remainingPercentage = (emp.leaveBalance.remaining / emp.leaveBalance.earned) * 100;
+
+                // Renk ve durum belirleme (kalan izne göre)
+                let statusColor = '#10b981'; // yeşil
+                let statusBg = '#d1fae5';
+                let statusText = 'İyi';
+                if (remainingPercentage < 25) {
+                    statusColor = '#ef4444'; // kırmızı
+                    statusBg = '#fee2e2';
+                    statusText = 'Kritik';
+                } else if (remainingPercentage < 50) {
+                    statusColor = '#f59e0b'; // turuncu
+                    statusBg = '#fef3c7';
+                    statusText = 'Dikkat';
                 }
-            }, 1000);
+
+                return `
+                    <tr style="border-bottom: 1px solid #e5e7eb; transition: background 0.2s;">
+                        <td style="padding: 16px; font-weight: 600; color: #6b7280;">${index + 1}</td>
+                        <td style="padding: 16px;">
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 13px; font-weight: 600;">${initials}</div>
+                                <div>
+                                    <div style="font-weight: 600; font-size: 14px; color: #1f2937;">${emp.name}</div>
+                                    <div style="font-size: 12px; color: #6b7280;">${emp.email || ''}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td style="padding: 16px; font-weight: 500; font-size: 13px; color: #4b5563;">
+                            <div style="background: #f3f4f6; padding: 6px 12px; border-radius: 6px; display: inline-block;">${emp.department}</div>
+                        </td>
+                        <td style="padding: 16px; text-align: center; font-weight: 600; font-size: 14px; color: #2196F3;">${emp.leaveBalance.earned}</td>
+                        <td style="padding: 16px; text-align: center; font-weight: 600; font-size: 14px; color: #f59e0b;">${emp.leaveBalance.used}</td>
+                        <td style="padding: 16px; text-align: center; font-weight: 700; font-size: 16px; color: ${statusColor};">${emp.leaveBalance.remaining}</td>
+                        <td style="padding: 16px;">
+                            <div style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; background: ${statusBg}; border-radius: 6px;">
+                                <div style="width: 8px; height: 8px; background: ${statusColor}; border-radius: 50%;"></div>
+                                <span style="font-size: 12px; font-weight: 600; color: ${statusColor};">${statusText}</span>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            console.log('✅ Tablo HTML oluşturuldu, kart gösteriliyor');
+            card.style.display = 'block';
+        }
+
+        // İK için: En çok birikmiş izni olan top 10 çalışanı göster
+        function loadTopAccumulatedLeave() {
+            const card = document.getElementById('topAccumulatedLeaveCard');
+            const list = document.getElementById('topAccumulatedLeaveList');
+
+            if (!card || !list) return;
+
+            // Tüm kullanıcıları al
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            const employees = users.filter(u => u.role === 'employee');
+
+            // Her çalışan için izin bakiyesini al
+            const employeesWithBalance = employees.map(emp => {
+                const userData = JSON.parse(localStorage.getItem(`userData_${emp.id}`) || '{}');
+                return {
+                    ...emp,
+                    leaveBalance: userData.leaveBalance || { earned: 0, used: 0, remaining: 0 }
+                };
+            }).filter(emp => emp.leaveBalance.remaining > 0);
+
+            // Kalan izine göre sırala (çoktan aza) ve ilk 10'u al
+            employeesWithBalance.sort((a, b) => b.leaveBalance.remaining - a.leaveBalance.remaining);
+            const top10 = employeesWithBalance.slice(0, 10);
+
+            if (top10.length === 0) {
+                list.innerHTML = '<div style="text-align: center; color: #6b7280; padding: 20px;">Veri bulunamadı</div>';
+                card.style.display = 'block';
+                return;
+            }
+
+            list.innerHTML = top10.map((emp, index) => {
+                const initials = emp.name.split(' ').map(n => n[0]).join('');
+                const percentage = (emp.leaveBalance.used / emp.leaveBalance.earned) * 100;
+                const remainingPercentage = (emp.leaveBalance.remaining / emp.leaveBalance.earned) * 100;
+
+                // Sıralama rengi
+                let rankBg = '#ef4444';
+                let rankBorder = '#dc2626';
+                if (index < 3) {
+                    rankBg = '#ef4444'; // Top 3 kırmızı
+                    rankBorder = '#dc2626';
+                } else if (index < 7) {
+                    rankBg = '#f59e0b'; // 4-7 turuncu
+                    rankBorder = '#d97706';
+                } else {
+                    rankBg = '#FFC107'; // 8-10 sarı
+                    rankBorder = '#F57C00';
+                }
+
+                return `
+                    <div style="padding: 12px; background: white; border-radius: 8px; border: 2px solid ${rankBorder}; position: relative; overflow: hidden;">
+                        <div style="position: absolute; top: 0; right: 0; background: ${rankBg}; color: white; padding: 4px 12px; border-bottom-left-radius: 8px; font-size: 12px; font-weight: 700;">
+                            #${index + 1}
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; padding-right: 40px;">
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <div style="width: 40px; height: 40px; background: ${rankBg}; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 13px; font-weight: 700; border: 2px solid ${rankBorder};">${initials}</div>
+                                <div>
+                                    <div style="font-weight: 600; font-size: 14px; color: #1f2937;">${emp.name}</div>
+                                    <div style="font-size: 12px; color: #6b7280;">${emp.department}</div>
+                                </div>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-weight: 700; font-size: 20px; color: ${rankBg};">${emp.leaveBalance.remaining}</div>
+                                <div style="font-size: 11px; color: #6b7280; font-weight: 600;">GÜN KALDI</div>
+                            </div>
+                        </div>
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 10px;">
+                            <div style="text-align: center; padding: 8px; background: rgba(33, 150, 243, 0.1); border-radius: 6px; border: 1px solid rgba(33, 150, 243, 0.2);">
+                                <div style="font-size: 10px; color: #6b7280; margin-bottom: 2px; font-weight: 600;">HAK EDİLEN</div>
+                                <div style="font-size: 16px; font-weight: 700; color: #2196F3;">${emp.leaveBalance.earned}</div>
+                            </div>
+                            <div style="text-align: center; padding: 8px; background: rgba(245, 158, 11, 0.1); border-radius: 6px; border: 1px solid rgba(245, 158, 11, 0.2);">
+                                <div style="font-size: 10px; color: #6b7280; margin-bottom: 2px; font-weight: 600;">KULLANILAN</div>
+                                <div style="font-size: 16px; font-weight: 700; color: #f59e0b;">${emp.leaveBalance.used}</div>
+                            </div>
+                            <div style="text-align: center; padding: 8px; background: rgba(239, 68, 68, 0.1); border-radius: 6px; border: 1px solid rgba(239, 68, 68, 0.2);">
+                                <div style="font-size: 10px; color: #6b7280; margin-bottom: 2px; font-weight: 600;">BİRİKMİŞ</div>
+                                <div style="font-size: 16px; font-weight: 700; color: ${rankBg};">${emp.leaveBalance.remaining}</div>
+                            </div>
+                        </div>
+                        <div style="height: 8px; background: #e5e7eb; border-radius: 4px; overflow: hidden; margin-top: 10px;">
+                            <div style="height: 100%; width: ${percentage}%; background: linear-gradient(90deg, ${rankBg}, ${rankBorder}); transition: width 0.3s ease;"></div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            card.style.display = 'block';
+        }
+
+        // Müşteri İlişkileri hızlı onay/red fonksiyonları
+        let currentCustomerRequestId = null;
+        let selectedCustomers = [];
+
+        function handleCustomerRelationsApprove(requestId, isAssignment) {
+            const request = WorkflowEngine.getRequest(requestId);
+            if (!request) return;
+
+            // Seçili müşteriler varsa kullan
+            const sendCustomerNotification = selectedCustomers.length > 0;
+
+            const success = WorkflowEngine.approveCustomerRelationsRequest(
+                requestId,
+                currentUser.name,
+                isAssignment ? 'Görevlendirme onaylandı' : 'Onaylandı',
+                isAssignment ? true : null,
+                sendCustomerNotification
+            );
+
+            if (success) {
+                // Seçili müşterileri talep nesnesine kaydet
+                if (sendCustomerNotification && selectedCustomers.length > 0) {
+                    const updatedRequest = WorkflowEngine.getRequest(requestId);
+                    updatedRequest.notifiedCustomers = selectedCustomers;
+                    WorkflowEngine.saveRequest(updatedRequest);
+                }
+
+                const message = isAssignment ?
+                    'Görevlendirme onaylandı ve talep İK\'ya gönderildi!' :
+                    'Talep başarıyla onaylandı!';
+
+                if (sendCustomerNotification) {
+                    App.showNotification(message + ` (${selectedCustomers.length} müşteri bilgilendirildi)`, 'success');
+                } else {
+                    App.showNotification(message, 'success');
+                }
+
+                selectedCustomers = [];
+                loadManagerDashboard();
+            }
+        }
+
+        function handleCustomerRelationsReject(requestId) {
+            const reason = prompt('Görevlendirme red sebebini girin:');
+            if (!reason || reason.trim() === '') {
+                App.showNotification('Red sebebi zorunludur!', 'error');
+                return;
+            }
+
+            const success = WorkflowEngine.rejectCustomerRelationsRequest(
+                requestId,
+                currentUser.name,
+                reason,
+                false
+            );
+
+            if (success) {
+                App.showNotification('Görevlendirme reddedildi, talep iptal edildi!', 'error');
+                selectedCustomers = [];
+                loadManagerDashboard();
+            }
+        }
+
+        function openCustomerSelectionModal(requestId) {
+            currentCustomerRequestId = requestId;
+            const request = WorkflowEngine.getRequest(requestId);
+            if (!request) return;
+
+            // Modal oluştur
+            const modal = document.createElement('div');
+            modal.id = 'customerSelectionModal';
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.5);
+                backdrop-filter: blur(4px);
+                z-index: 10000;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                animation: fadeIn 0.3s ease-out;
+            `;
+
+            // Müşteri listesi (örnek)
+            const customers = [
+                { id: 'cust1', name: 'Ankara Üniversitesi Hastanesi', contact: 'info@ankara.edu.tr' },
+                { id: 'cust2', name: 'İstanbul Sağlık Merkezi', contact: 'info@istanbulsm.com.tr' },
+                { id: 'cust3', name: 'İzmir Devlet Hastanesi', contact: 'iletisim@izmirdh.gov.tr' },
+                { id: 'cust4', name: 'Bursa Özel Hastane', contact: 'info@bursaozel.com.tr' },
+                { id: 'cust5', name: 'Antalya Medikal Center', contact: 'info@antalyamc.com' }
+            ];
+
+            modal.innerHTML = `
+                <div style="background: white; border-radius: 16px; max-width: 600px; width: 90%; max-height: 85vh; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.3); animation: modalSlideIn 0.3s ease-out;" onclick="event.stopPropagation()">
+                    <div style="background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%); color: white; padding: 24px; border-radius: 16px 16px 0 0;">
+                        <h4 style="margin: 0; font-size: 20px; font-weight: 600;">📧 Müşteri Seçimi</h4>
+                        <p style="margin: 8px 0 0 0; font-size: 14px; opacity: 0.9;">${request.userName} - ${request.projectLocation}</p>
+                    </div>
+                    <div style="padding: 24px; max-height: 60vh; overflow-y: auto;">
+                        <div style="background: #f0f9ff; padding: 16px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #0ea5e9;">
+                            <div style="font-weight: 600; color: #0c4a6e; margin-bottom: 4px;">Bilgilendirme yapılacak müşterileri seçin</div>
+                            <div style="font-size: 13px; color: #075985;">Seçili müşterilere izin bildirimi gönderilecektir.</div>
+                        </div>
+                        <div id="customerList">
+                            ${customers.map(customer => `
+                                <label style="display: flex; align-items: start; gap: 12px; padding: 16px; border: 2px solid #e5e7eb; border-radius: 8px; margin-bottom: 12px; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.borderColor='#0ea5e9'; this.style.background='#f0f9ff'" onmouseout="this.style.borderColor='#e5e7eb'; this.style.background='white'">
+                                    <input type="checkbox" value="${customer.id}" style="margin-top: 4px; width: 18px; height: 18px; cursor: pointer;" onchange="updateCustomerSelection()">
+                                    <div style="flex: 1;">
+                                        <div style="font-weight: 600; color: #1f2937; margin-bottom: 4px;">${customer.name}</div>
+                                        <div style="font-size: 13px; color: #6b7280;">📧 ${customer.contact}</div>
+                                    </div>
+                                </label>
+                            `).join('')}
+                        </div>
+                        <div id="selectionSummary" style="margin-top: 16px; padding: 12px; background: #ecfdf5; border-radius: 8px; border-left: 4px solid #10b981; display: none;">
+                            <span style="font-weight: 600; color: #065f46;">Seçili: <span id="selectedCount">0</span> müşteri</span>
+                        </div>
+                    </div>
+                    <div style="padding: 20px 24px; background: #f9fafb; border-top: 1px solid #e5e7eb; display: flex; justify-content: space-between; gap: 12px;">
+                        <button onclick="closeCustomerSelectionModal()" style="flex: 1; padding: 12px 24px; border: none; border-radius: 8px; background: #e5e7eb; color: #1f2937; font-weight: 600; cursor: pointer; font-size: 14px;">İptal</button>
+                        <button onclick="confirmCustomerSelection()" style="flex: 1; padding: 12px 24px; border: none; border-radius: 8px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; font-weight: 600; cursor: pointer; font-size: 14px; box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);">Onayla ve Bildir</button>
+                    </div>
+                </div>
+            `;
+
+            document.body.appendChild(modal);
+
+            // Modal dışına tıklayınca kapat
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    closeCustomerSelectionModal();
+                }
+            });
+        }
+
+        function updateCustomerSelection() {
+            const checkboxes = document.querySelectorAll('#customerList input[type="checkbox"]:checked');
+            const count = checkboxes.length;
+            const summary = document.getElementById('selectionSummary');
+            const countSpan = document.getElementById('selectedCount');
+
+            if (count > 0) {
+                summary.style.display = 'block';
+                countSpan.textContent = count;
+            } else {
+                summary.style.display = 'none';
+            }
+        }
+
+        function closeCustomerSelectionModal() {
+            const modal = document.getElementById('customerSelectionModal');
+            if (modal) {
+                modal.style.animation = 'fadeOut 0.3s ease-out';
+                setTimeout(() => modal.remove(), 300);
+            }
+            currentCustomerRequestId = null;
+        }
+
+        function confirmCustomerSelection() {
+            const checkboxes = document.querySelectorAll('#customerList input[type="checkbox"]:checked');
+            selectedCustomers = Array.from(checkboxes).map(cb => {
+                const label = cb.closest('label');
+                const name = label.querySelector('div > div:first-child').textContent;
+                const email = label.querySelector('div > div:last-child').textContent.replace('📧 ', '');
+                return { id: cb.value, name, email };
+            });
+
+            if (selectedCustomers.length === 0) {
+                App.showNotification('Lütfen en az bir müşteri seçin!', 'warning');
+                return;
+            }
+
+            closeCustomerSelectionModal();
+
+            // Onay butonuna otomatik bas
+            if (currentCustomerRequestId) {
+                const request = WorkflowEngine.getRequest(currentCustomerRequestId);
+                const currentStepObj = request?.workflow?.steps.find(s => s.step === request.workflow.currentStep);
+                const requiresAssignment = currentStepObj?.requiresAssignment || false;
+
+                handleCustomerRelationsApprove(currentCustomerRequestId, requiresAssignment);
+            }
         }
     </script>
 </body>

@@ -201,6 +201,7 @@
                                 <th>Bitiş</th>
                                 <th>Gün</th>
                                 <th>Durum</th>
+                                <th id="documentColumn" style="display: none;">Evrak</th>
                                 <th>Talep Tarihi</th>
                                 <th>İşlemler</th>
                             </tr>
@@ -549,13 +550,21 @@
         }
     </style>
 
-    <script src="js/app.js"></script>
+    <script src="js/app.js?v=3.6"></script>
     <script>
         const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
 
         document.getElementById('userName').textContent = user.name || '-';
-        document.getElementById('userRole').textContent = user.role === 'manager' ? 'Yönetici' : user.role === 'hr' ? 'İnsan Kaynakları' : 'Operasyon';
+        document.getElementById('userRole').textContent = user.role === 'manager' ? 'Yönetici' : user.role === 'hr' ? 'İnsan Kaynakları' : user.role === 'customerRelations' ? 'Müşteri İlişkileri' : 'Çalışan';
         document.getElementById('userAvatar').textContent = (user.name || '-').split(' ').map(n => n[0]).join('');
+
+        // İK kullanıcısı ise evrak sütununu göster
+        if (user.role === 'hr') {
+            const documentColumn = document.getElementById('documentColumn');
+            if (documentColumn) {
+                documentColumn.style.display = 'table-cell';
+            }
+        }
 
         // Sayfa yüklendiğinde tüm talepleri WorkflowEngine'den yükle
         let allRequests = [];
@@ -610,7 +619,7 @@
                         <td><span class="badge badge-${statusBadge}">${statusText}</span></td>
                         <td>${createdDate}</td>
                         <td>
-                            <button class="btn btn-sm btn-secondary" onclick="window.location.href='onay-yonetimi.html'">Detay</button>
+                            <button class="btn btn-sm btn-secondary" onclick="viewRequestDetail('${req.id}')">👁 Detay</button>
                         </td>
                     </tr>
                 `;
@@ -705,6 +714,265 @@
 
             document.getElementById('resultCount').textContent = `${visibleCount} talep gösteriliyor`;
             document.getElementById('filterResultCount').textContent = `${visibleCount} talep`;
+        }
+
+        // WorkflowEngine verilerinden detay göster
+        function viewRequestDetail(requestId) {
+            const request = WorkflowEngine.getRequest(requestId);
+
+            if (!request) {
+                App.showNotification('Talep bulunamadı!', 'error');
+                return;
+            }
+
+            const leaveTypeName = getLeaveTypeName(request.type);
+            const history = request.workflow.history || [];
+
+            // Render workflow steps
+            const workflowStepsHTML = request.workflow.steps.map((step, index) => {
+                const isCompleted = step.status === 'completed' || step.status === 'approved';
+                const isPending = step.status === 'pending';
+                const isRejected = step.status === 'rejected';
+
+                let icon, bgColor, textColor, statusText;
+                if (isCompleted) {
+                    icon = '✓';
+                    bgColor = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+                    textColor = '#059669';
+                    statusText = 'Tamamlandı';
+                } else if (isPending) {
+                    icon = '⏱';
+                    bgColor = 'linear-gradient(135deg, #FFC107 0%, #F57C00 100%)';
+                    textColor = '#F57C00';
+                    statusText = 'İşlemde';
+                } else if (isRejected) {
+                    icon = '✗';
+                    bgColor = 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)';
+                    textColor = '#dc2626';
+                    statusText = 'Reddedildi';
+                } else {
+                    icon = index + 1;
+                    bgColor = '#e5e7eb';
+                    textColor = '#9ca3af';
+                    statusText = 'Beklemede';
+                }
+
+                // Evrak kontrolü durumu
+                let documentInfo = '';
+                if (step.requiresDocument && step.step === 'hr') {
+                    if (request.documents && request.documents.length > 0) {
+                        if (step.documentVerified) {
+                            documentInfo = `<div style="margin-top: 6px; font-size: 12px; color: #10b981;">✓ Evrak kontrol edildi (${request.documents.length} dosya)</div>`;
+                        } else if (isPending) {
+                            documentInfo = `<div style="margin-top: 6px; font-size: 12px; color: #FFC107;">📄 Evrak kontrolü bekleniyor (${request.documents.length} dosya)</div>`;
+                        }
+                    } else if (isPending) {
+                        documentInfo = `<div style="margin-top: 6px; font-size: 12px; color: #ef4444;">⚠️ Evrak yüklenmemiş!</div>`;
+                    }
+                }
+
+                // Islak imza kontrolü durumu (sadece İK adımı için)
+                let wetSignatureInfo = '';
+                if (step.step === 'hr') {
+                    if (step.wetSignatureVerified) {
+                        const verifiedAt = step.wetSignatureVerifiedAt ? new Date(step.wetSignatureVerifiedAt).toLocaleString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '';
+                        wetSignatureInfo = `<div style="margin-top: 6px; font-size: 12px; color: #10b981;">✓ Islak imza kontrol edildi${verifiedAt ? ' (' + verifiedAt + ')' : ''}</div>`;
+                    } else if (isPending) {
+                        wetSignatureInfo = `<div style="margin-top: 6px; font-size: 12px; color: #FFC107;">✍️ Islak imza kontrolü bekleniyor</div>`;
+                    }
+                }
+
+                return `
+                    <div style="position: relative; margin-bottom: ${index < request.workflow.steps.length - 1 ? '24px' : '0'};">
+                        ${index < request.workflow.steps.length - 1 ? `
+                            <div style="position: absolute; left: 19px; top: 40px; bottom: -24px; width: 2px; background: ${isCompleted ? '#10b981' : '#e5e7eb'}; z-index: 0;"></div>
+                        ` : ''}
+                        <div style="display: flex; align-items: start; gap: 16px;">
+                            <div style="width: 40px; height: 40px; background: ${bgColor}; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; box-shadow: ${isCompleted || isPending ? '0 4px 12px rgba(16, 185, 129, 0.3)' : 'none'}; z-index: 1; flex-shrink: 0;">${icon}</div>
+                            <div style="flex: 1; padding-top: 4px;">
+                                <div style="font-weight: 600; color: #1f2937; margin-bottom: 4px;">${step.label}</div>
+                                <div style="font-size: 13px; color: #6b7280;">${statusText}</div>
+                                ${documentInfo}
+                                ${wetSignatureInfo}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // Render history
+            const historyHTML = history.map(h => {
+                const timestamp = new Date(h.timestamp).toLocaleString('tr-TR');
+                let actionText = '', bgColor = '', borderColor = '';
+
+                if (h.action === 'created') {
+                    actionText = '📝 Talep Oluşturuldu';
+                    bgColor = '#f0fdf4';
+                    borderColor = '#10b981';
+                } else if (h.action === 'approved') {
+                    actionText = '✅ Onaylandı';
+                    bgColor = '#f0fdf4';
+                    borderColor = '#10b981';
+                } else if (h.action === 'rejected') {
+                    actionText = '❌ Reddedildi';
+                    bgColor = '#fee2e2';
+                    borderColor = '#ef4444';
+                } else if (h.action === 'revised') {
+                    actionText = '🔄 Revize İstendi';
+                    bgColor = '#fff8e1';
+                    borderColor = '#FFC107';
+                }
+
+                return `
+                    <div style="margin-bottom: 16px; padding: 12px; background: ${bgColor}; border-left: 3px solid ${borderColor}; border-radius: 6px;">
+                        <div style="font-weight: 600; margin-bottom: 4px;">${actionText}</div>
+                        <div style="font-size: 12px; color: #6b7280; margin-bottom: 6px;">
+                            ${h.by} • ${timestamp}
+                        </div>
+                        ${h.comment ? `<div style="font-size: 13px; padding: 8px; background: white; border-radius: 4px; margin-top: 6px;">${h.comment}</div>` : ''}
+                    </div>
+                `;
+            }).join('');
+
+            // Create detail modal
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0, 0, 0, 0.6);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 9999;
+                padding: 20px;
+                backdrop-filter: blur(4px);
+            `;
+
+            modal.innerHTML = `
+                <div style="background: white; border-radius: 16px; max-width: 650px; width: 100%; max-height: 85vh; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3); animation: modalSlideIn 0.3s ease-out;" onclick="event.stopPropagation()">
+                    <div style="padding: 28px 32px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); position: relative;">
+                        <button onclick="this.closest('[style*=fixed]').remove()" style="position: absolute; top: 20px; right: 20px; width: 36px; height: 36px; border: none; background: rgba(255, 255, 255, 0.2); border-radius: 50%; cursor: pointer; font-size: 24px; line-height: 1; color: white; transition: all 0.2s; backdrop-filter: blur(10px);">×</button>
+                        <h2 style="font-size: 24px; font-weight: 700; margin: 0; color: white;">📋 İzin Talebi Detayı</h2>
+                        <p style="font-size: 15px; color: rgba(255, 255, 255, 0.9); margin: 8px 0 0 0; font-weight: 500;">${request.userName} • ${request.userDepartment}</p>
+                    </div>
+
+                    <div style="padding: 32px; overflow-y: auto; flex: 1; background: #f8f9fa;">
+                        <!-- Talep Bilgileri -->
+                        <div style="background: white; border-radius: 12px; padding: 24px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);">
+                            <h3 style="font-size: 14px; font-weight: 700; color: #667eea; margin: 0 0 16px 0; text-transform: uppercase; letter-spacing: 0.5px;">📋 Talep Bilgileri</h3>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 16px;">
+                                <div>
+                                    <div style="font-size: 12px; color: #6c757d; margin-bottom: 6px; font-weight: 500;">Personel</div>
+                                    <div style="font-size: 15px; font-weight: 600; color: #212529;">${request.userName}</div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 12px; color: #6c757d; margin-bottom: 6px; font-weight: 500;">Departman</div>
+                                    <div style="font-size: 15px; font-weight: 600; color: #212529;">${request.userDepartment}</div>
+                                </div>
+                            </div>
+                            ${(() => {
+                                // Çalışanın kalan izin bilgisini al
+                                const userData = JSON.parse(localStorage.getItem('userData_' + request.userId) || '{}');
+                                const leaveBalance = userData.leaveBalance || null;
+                                if (leaveBalance) {
+                                    return `
+                                    <div style="background: linear-gradient(135deg, #10b98115 0%, #059f6915 100%); padding: 16px; border-radius: 10px; border-left: 4px solid #10b981; margin-bottom: 16px;">
+                                        <div style="font-size: 12px; color: #6c757d; margin-bottom: 8px; font-weight: 600;">Çalışanın İzin Durumu</div>
+                                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;">
+                                            <div style="text-align: center;">
+                                                <div style="font-size: 11px; color: #6c757d; margin-bottom: 4px;">Hak Edilen</div>
+                                                <div style="font-size: 18px; font-weight: 700; color: #2196F3;">${leaveBalance.earned || 0}</div>
+                                            </div>
+                                            <div style="text-align: center;">
+                                                <div style="font-size: 11px; color: #6c757d; margin-bottom: 4px;">Kullanılan</div>
+                                                <div style="font-size: 18px; font-weight: 700; color: #FFC107;">${leaveBalance.used || 0}</div>
+                                            </div>
+                                            <div style="text-align: center;">
+                                                <div style="font-size: 11px; color: #6c757d; margin-bottom: 4px;">Kalan</div>
+                                                <div style="font-size: 18px; font-weight: 700; color: #10b981;">${leaveBalance.remaining || 0}</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    `;
+                                }
+                                return '';
+                            })()}
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                                <div style="background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%); padding: 16px; border-radius: 10px; border-left: 4px solid #667eea;">
+                                    <div style="font-size: 12px; color: #6c757d; margin-bottom: 6px; font-weight: 500;">İzin Tipi</div>
+                                    <div style="font-size: 16px; font-weight: 700; color: #667eea;">${leaveTypeName}</div>
+                                </div>
+                                <div style="background: linear-gradient(135deg, #20c99715 0%, #10b98115 100%); padding: 16px; border-radius: 10px; border-left: 4px solid #20c997;">
+                                    <div style="font-size: 12px; color: #6c757d; margin-bottom: 6px; font-weight: 500;">Toplam Süre</div>
+                                    <div style="font-size: 16px; font-weight: 700; color: #20c997;">${request.days}</div>
+                                </div>
+                            </div>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 16px;">
+                                <div>
+                                    <div style="font-size: 12px; color: #6c757d; margin-bottom: 6px; font-weight: 500;">Başlangıç</div>
+                                    <div style="font-size: 15px; font-weight: 600; color: #212529;">${new Date(request.startDate).toLocaleDateString('tr-TR')}</div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 12px; color: #6c757d; margin-bottom: 6px; font-weight: 500;">Bitiş</div>
+                                    <div style="font-size: 15px; font-weight: 600; color: #212529;">${new Date(request.endDate).toLocaleDateString('tr-TR')}</div>
+                                </div>
+                            </div>
+                            ${request.description ? `
+                            <div style="margin-top: 16px;">
+                                <div style="font-size: 12px; color: #6c757d; margin-bottom: 6px; font-weight: 500;">Açıklama</div>
+                                <div style="padding: 12px; background: #f8f9fa; border-radius: 8px; font-size: 14px; color: #495057;">${request.description}</div>
+                            </div>
+                            ` : ''}
+                            ${request.documents && request.documents.length > 0 ? `
+                            <div style="margin-top: 16px;">
+                                <div style="font-size: 12px; color: #6c757d; margin-bottom: 8px; font-weight: 500;">Yüklenen Belgeler</div>
+                                <div style="display: flex; flex-direction: column; gap: 8px;">
+                                    ${request.documents.map((doc, idx) => `
+                                        <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px; background: #f8f9fa; border-radius: 8px; border: 1px solid #e5e7eb;">
+                                            <div style="display: flex; align-items: center; gap: 10px; flex: 1;">
+                                                <div style="width: 36px; height: 36px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-size: 16px;">📄</div>
+                                                <div>
+                                                    <div style="font-size: 14px; font-weight: 600; color: #212529;">${doc.name}</div>
+                                                    <div style="font-size: 12px; color: #6c757d;">${(doc.size / 1024).toFixed(2)} KB</div>
+                                                </div>
+                                            </div>
+                                            <a href="${doc.data}" download="${doc.name}" style="padding: 8px 16px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: 600; transition: all 0.2s;">İndir</a>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                            ` : ''}
+                        </div>
+
+                        <!-- İş Akışı -->
+                        <div style="background: white; border-radius: 12px; padding: 24px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);">
+                            <h3 style="font-size: 14px; font-weight: 700; color: #667eea; margin: 0 0 20px 0; text-transform: uppercase; letter-spacing: 0.5px;">🔄 Onay Süreci</h3>
+                            ${workflowStepsHTML}
+                        </div>
+
+                        <!-- Talep Geçmişi -->
+                        <div style="background: white; border-radius: 12px; padding: 24px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);">
+                            <h3 style="font-size: 14px; font-weight: 700; color: #667eea; margin: 0 0 16px 0; text-transform: uppercase; letter-spacing: 0.5px;">📜 Talep Geçmişi</h3>
+                            ${historyHTML || '<div style="text-align: center; color: #6b7280; padding: 20px;">Henüz geçmiş yok</div>'}
+                        </div>
+                    </div>
+
+                    <div style="padding: 20px 32px; background: white; border-top: 1px solid #e9ecef; display: flex; justify-content: flex-end; gap: 12px;">
+                        <button onclick="this.closest('[style*=fixed]').remove()" class="btn btn-secondary">Kapat</button>
+                    </div>
+                </div>
+            `;
+
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    modal.remove();
+                }
+            });
+
+            document.body.appendChild(modal);
         }
 
         function showDetail(reqNo, employee, department, leaveType, startDate, endDate, days, status, description, rejectionReason = '') {

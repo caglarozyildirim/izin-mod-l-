@@ -74,6 +74,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            gap: var(--spacing-sm);
             padding: var(--spacing-sm);
             margin-bottom: var(--spacing-xs);
             background: var(--white);
@@ -95,10 +96,16 @@
         .demo-user-email {
             color: var(--text-secondary);
             font-weight: var(--font-medium);
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
         .demo-user-role {
             color: var(--text-muted);
+            flex-shrink: 0;
+            white-space: nowrap;
         }
     </style>
 </head>
@@ -162,9 +169,9 @@
                     <span class="demo-user-role">İnsan Kaynakları</span>
                 </div>
 
-                <div class="demo-user" data-email="operasyon@tezmedikal.com" data-password="123456" data-role="operation">
-                    <span class="demo-user-email">operasyon@tezmedikal.com</span>
-                    <span class="demo-user-role">Operasyon</span>
+                <div class="demo-user" data-email="musteriiliskileri@tezmedikal.com" data-password="123456" data-role="customerRelations">
+                    <span class="demo-user-email">musteriiliskileri@tezmedikal.com</span>
+                    <span class="demo-user-role">Müşteri İlişkileri</span>
                 </div>
             </div>
         </div>
@@ -189,9 +196,9 @@
             // Mock authentication
             const demoUsers = {
                 'calisan@tezmedikal.com': { role: 'employee', name: 'Ahmet Yılmaz', department: 'IT Departmanı' },
-                'yonetici@tezmedikal.com': { role: 'manager', name: 'Mehmet Demir', department: 'Yönetim' },
+                'yonetici@tezmedikal.com': { role: 'manager', name: 'Mehmet Demir', department: 'IT Departmanı' },
                 'ik@tezmedikal.com': { role: 'hr', name: 'Ayşe Kaya', department: 'İnsan Kaynakları' },
-                'operasyon@tezmedikal.com': { role: 'operation', name: 'Fatma Şahin', department: 'Operasyon' }
+                'musteriiliskileri@tezmedikal.com': { role: 'customerRelations', name: 'Fatma Şahin', department: 'Müşteri İlişkileri' }
             };
 
             if (demoUsers[email] && password === '123456') {
@@ -205,6 +212,7 @@
                 // Save to localStorage
                 localStorage.setItem('authToken', 'demo-token-' + Date.now());
                 localStorage.setItem('currentUser', JSON.stringify(user));
+                localStorage.setItem('currentUserId', user.id);
 
                 // Mock leave balance and sample requests
                 const leaveBalance = {

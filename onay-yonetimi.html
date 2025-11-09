@@ -285,19 +285,47 @@
                 <h4 style="margin: 0; font-size: 20px; font-weight: 600;">✓ İzin Talebini Onayla</h4>
             </div>
             <div style="padding: 24px;">
-                <div id="approveFieldWorkerOptions" style="display: none; margin-bottom: 20px; padding: 16px; background: #f9fafb; border-radius: 8px; border: 2px solid #e5e7eb;">
-                    <div style="font-weight: 600; color: #1f2937; margin-bottom: 12px; font-size: 14px;">Saha Çalışanı Onay Seçenekleri:</div>
-                    <div style="margin-bottom: 10px;">
-                        <label style="display: flex; align-items: center; cursor: pointer;">
-                            <input type="checkbox" id="requiresAssignment" style="margin-right: 8px; width: 18px; height: 18px; cursor: pointer;">
-                            <span style="font-size: 14px; color: #374151;">Yerine görevlendirme yapılmalı</span>
-                        </label>
-                    </div>
+                <div id="approveManagerOptions" style="display: none; margin-bottom: 20px; padding: 16px; background: #eff6ff; border-radius: 8px; border: 2px solid #3b82f6;">
+                    <div style="font-weight: 600; color: #1e40af; margin-bottom: 12px; font-size: 14px;">Yönetici Onay Seçenekleri:</div>
                     <div>
                         <label style="display: flex; align-items: center; cursor: pointer;">
-                            <input type="checkbox" id="requiresCustomerNotification" style="margin-right: 8px; width: 18px; height: 18px; cursor: pointer;">
-                            <span style="font-size: 14px; color: #374151;">Müşteriye bilgilendirme gönderilmeli</span>
+                            <input type="checkbox" id="requiresAssignment" style="margin-right: 8px; width: 18px; height: 18px; cursor: pointer;">
+                            <span style="font-size: 14px; color: #1e3a8a; font-weight: 500;">Yerine görevlendirme yapılmalı</span>
                         </label>
+                        <div style="margin-top: 6px; margin-left: 26px; font-size: 12px; color: #1e40af;">
+                            Bu seçenek işaretlenirse, talep Müşteri İlişkileri onayına gönderilir.
+                        </div>
+                    </div>
+                </div>
+                <div id="approveHROptions" style="display: none; margin-bottom: 20px; padding: 16px; background: #fef3c7; border-radius: 8px; border: 2px solid #fbbf24;">
+                    <div style="font-weight: 600; color: #92400e; margin-bottom: 12px; font-size: 14px;">İnsan Kaynakları Onay Kontrolü:</div>
+                    <div>
+                        <label style="display: flex; align-items: center; cursor: pointer;">
+                            <input type="checkbox" id="wetSignatureVerified" style="margin-right: 8px; width: 18px; height: 18px; cursor: pointer;">
+                            <span style="font-size: 14px; color: #78350f; font-weight: 500;">Islak imza kontrolü yapıldı</span>
+                        </label>
+                        <div style="margin-top: 6px; margin-left: 26px; font-size: 12px; color: #92400e;">
+                            İzin formunun ıslak imzalı kağıt versiyonunun teslim alındığını onaylıyorum.
+                        </div>
+                    </div>
+                </div>
+                <div id="approveCustomerRelationsOptions" style="display: none; margin-bottom: 20px; padding: 16px; background: #f0f9ff; border-radius: 8px; border: 2px solid #0ea5e9;">
+                    <div style="font-weight: 600; color: #0c4a6e; margin-bottom: 12px; font-size: 14px;">Müşteri İlişkileri Onay Seçenekleri:</div>
+                    <div id="customerNotificationOption" style="display: none; margin-bottom: 10px;">
+                        <label style="display: flex; align-items: center; cursor: pointer;">
+                            <input type="checkbox" id="sendCustomerNotification" style="margin-right: 8px; width: 18px; height: 18px; cursor: pointer;">
+                            <span style="font-size: 14px; color: #0c4a6e; font-weight: 500;">Müşteriye bilgilendirme gönder</span>
+                        </label>
+                        <div style="margin-top: 6px; margin-left: 26px; font-size: 12px; color: #075985;">
+                            Eksik hizmet tespit edildi - müşteriye bilgilendirme gönderilecek.
+                        </div>
+                    </div>
+                    <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid #bae6fd;">
+                        <div style="font-size: 13px; color: #075985; margin-bottom: 8px; font-weight: 500;">Yerine Görevlendirme Onayı:</div>
+                        <div style="display: flex; gap: 8px;">
+                            <button type="button" onclick="approveAssignment()" style="flex: 1; padding: 10px 16px; border: none; border-radius: 6px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; font-weight: 600; cursor: pointer; font-size: 13px;">✓ Görevlendirmeyi Onayla</button>
+                            <button type="button" onclick="rejectAssignment()" style="flex: 1; padding: 10px 16px; border: none; border-radius: 6px; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; font-weight: 600; cursor: pointer; font-size: 13px;">✗ Görevlendirmeyi Reddet</button>
+                        </div>
                     </div>
                 </div>
                 <div style="margin-bottom: 20px;">
@@ -357,7 +385,7 @@
         </div>
     </div>
 
-    <script src="js/app.js"></script>
+    <script src="js/app.js?v=3.6"></script>
     <script>
         const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
         const userRole = currentUser.role;
@@ -378,7 +406,7 @@
             const roleNames = {
                 'manager': 'Yönetici',
                 'hr': 'İnsan Kaynakları',
-                'operation': 'Operasyon'
+                'customerRelations': 'Müşteri İlişkileri'
             };
             document.getElementById('userRole').textContent = roleNames[userRole] || 'Yönetici';
             document.getElementById('userAvatar').textContent = (currentUser.name || '-').split(' ').map(n => n[0]).join('');
@@ -491,6 +519,61 @@
                 const createdDate = new Date(request.createdAt).toLocaleDateString('tr-TR');
                 const initials = request.userName.split(' ').map(n => n[0]).join('').toUpperCase();
 
+                // Müşteri İlişkileri için özel render
+                if (userRole === 'customerRelations') {
+                    const currentStepObj = request.workflow.steps.find(s => s.step === request.workflow.currentStep);
+                    const requiresAssignment = currentStepObj?.requiresAssignment || false;
+                    const hasServiceGap = request.noServiceGap || false;
+
+                    // Firma bilgileri varsa göster
+                    let companyInfo = '';
+                    if (hasServiceGap && request.serviceCompany) {
+                        companyInfo = `
+                            <div style="font-size: 12px; color: #0ea5e9; margin-top: 4px;">
+                                🏢 ${request.serviceCompany} (${request.serviceDuration})
+                            </div>
+                        `;
+                    }
+
+                    return `
+                        <tr style="background: ${hasServiceGap ? '#f0f9ff' : 'white'};">
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <div style="width: 32px; height: 32px; background: #0ea5e9; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px; font-weight: 600;">${initials}</div>
+                                    <div>
+                                        <div style="font-weight: 500;">${request.userName}</div>
+                                        <div style="font-size: 12px; color: #6b7280;">${request.userDepartment}</div>
+                                        ${request.projectLocation ? `<div style="font-size: 11px; color: #0ea5e9;">📍 ${request.projectLocation}</div>` : ''}
+                                        ${companyInfo}
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                ${leaveTypeName}
+                                ${hasServiceGap ? '<div style="font-size: 11px; color: #0ea5e9; margin-top: 4px;">⚠️ Eksik Hizmet</div>' : ''}
+                            </td>
+                            <td>${new Date(request.startDate).toLocaleDateString('tr-TR')}</td>
+                            <td>${new Date(request.endDate).toLocaleDateString('tr-TR')}</td>
+                            <td><span class="badge badge-info">${request.days}</span></td>
+                            <td>${createdDate}</td>
+                            <td>
+                                <div style="display: flex; flex-direction: column; gap: 6px;">
+                                    ${requiresAssignment ? `
+                                        <button class="btn btn-sm btn-success" onclick="handleCustomerRelationsApprove('${request.id}', true)" style="white-space: nowrap;">✓ Görevlendirmeyi Onayla</button>
+                                        <button class="btn btn-sm btn-danger" onclick="handleCustomerRelationsReject('${request.id}')" style="white-space: nowrap;">✗ Görevlendirmeyi Reddet</button>
+                                    ` : `
+                                        <button class="btn btn-sm btn-success" onclick="handleCustomerRelationsApprove('${request.id}', false)">✓ Onayla</button>
+                                        <button class="btn btn-sm btn-danger" onclick="openRejectModal('${request.id}')">✗ Reddet</button>
+                                    `}
+                                    ${hasServiceGap ? `<label style="font-size: 11px; display: flex; align-items: center; gap: 4px; cursor: pointer; color: #0ea5e9;"><input type="checkbox" id="quickNotify_${request.id}" style="cursor: pointer;"><span>Müşteri Bildirimi</span></label>` : ''}
+                                    <button class="btn btn-sm btn-secondary" onclick="viewDetails('${request.id}')" style="white-space: nowrap;">📄 Detay</button>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                }
+
+                // Diğer roller için standart render
                 return `
                     <tr>
                         <td>
@@ -585,6 +668,11 @@
             const leaveTypeName = getLeaveTypeName(request.type);
             const history = request.workflow.history || [];
 
+            console.log('🔍 viewDetails - Request ID:', requestId);
+            console.log('   Workflow steps:', request.workflow.steps);
+            console.log('   Steps count:', request.workflow.steps.length);
+            console.log('   Is field worker:', request.workflow.isFieldWorker);
+
             // Render workflow steps
             const workflowStepsHTML = request.workflow.steps.map((step, index) => {
                 const isCompleted = step.status === 'completed' || step.status === 'approved';
@@ -609,13 +697,43 @@
                     statusText = 'Beklemede';
                 }
 
+                // Evrak kontrolü durumu
+                let documentInfo = '';
+                if (step.requiresDocument && step.step === 'hr') {
+                    if (request.documents && request.documents.length > 0) {
+                        if (step.documentVerified) {
+                            documentInfo = `<div style="margin-top: 6px; font-size: 12px; color: #10b981;">✓ Evrak kontrol edildi (${request.documents.length} dosya)</div>`;
+                        } else if (isPending) {
+                            documentInfo = `<div style="margin-top: 6px; font-size: 12px; color: #FFC107;">📄 Evrak kontrolü bekleniyor (${request.documents.length} dosya)</div>`;
+                        }
+                    } else if (isPending) {
+                        documentInfo = `<div style="margin-top: 6px; font-size: 12px; color: #ef4444;">⚠️ Evrak yüklenmemiş!</div>`;
+                    }
+                }
+
+                // Islak imza kontrolü durumu (sadece İK adımı için)
+                let wetSignatureInfo = '';
+                if (step.step === 'hr') {
+                    if (step.wetSignatureVerified) {
+                        const verifiedAt = step.wetSignatureVerifiedAt ? new Date(step.wetSignatureVerifiedAt).toLocaleString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '';
+                        wetSignatureInfo = `<div style="margin-top: 6px; font-size: 12px; color: #10b981;">✓ Islak imza kontrol edildi${verifiedAt ? ' (' + verifiedAt + ')' : ''}</div>`;
+                    } else if (isPending) {
+                        wetSignatureInfo = `<div style="margin-top: 6px; font-size: 12px; color: #FFC107;">✍️ Islak imza kontrolü bekleniyor</div>`;
+                    }
+                }
+
                 return `
                     <div style="position: relative; margin-bottom: ${index < request.workflow.steps.length - 1 ? '24px' : '0'};">
+                        ${index < request.workflow.steps.length - 1 ? `
+                            <div style="position: absolute; left: 19px; top: 40px; bottom: -24px; width: 2px; background: ${isCompleted ? '#10b981' : '#e5e7eb'}; z-index: 0;"></div>
+                        ` : ''}
                         <div style="display: flex; align-items: start; gap: 16px;">
                             <div style="width: 40px; height: 40px; background: ${bgColor}; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; box-shadow: ${isCompleted || isPending ? '0 4px 12px rgba(16, 185, 129, 0.3)' : 'none'}; z-index: 1; flex-shrink: 0;">${icon}</div>
                             <div style="flex: 1; padding-top: 4px; opacity: ${isWaiting ? '0.5' : '1'};">
                                 <div style="font-weight: 600; color: ${isWaiting ? '#6b7280' : '#1f2937'}; margin-bottom: 4px;">${step.label}</div>
                                 <div style="font-size: 13px; color: #6b7280;">${statusText}</div>
+                                ${documentInfo}
+                                ${wetSignatureInfo}
                             </div>
                         </div>
                     </div>
@@ -695,6 +813,33 @@
                                     <div style="font-size: 15px; font-weight: 600; color: #212529;">${request.userDepartment}</div>
                                 </div>
                             </div>
+                            ${(() => {
+                                // Çalışanın kalan izin bilgisini al
+                                const userData = JSON.parse(localStorage.getItem('userData_' + request.userId) || '{}');
+                                const leaveBalance = userData.leaveBalance || null;
+                                if (leaveBalance) {
+                                    return `
+                                    <div style="background: linear-gradient(135deg, #10b98115 0%, #059f6915 100%); padding: 16px; border-radius: 10px; border-left: 4px solid #10b981; margin-bottom: 16px;">
+                                        <div style="font-size: 12px; color: #6c757d; margin-bottom: 8px; font-weight: 600;">Çalışanın İzin Durumu</div>
+                                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;">
+                                            <div style="text-align: center;">
+                                                <div style="font-size: 11px; color: #6c757d; margin-bottom: 4px;">Hak Edilen</div>
+                                                <div style="font-size: 18px; font-weight: 700; color: #2196F3;">${leaveBalance.earned || 0}</div>
+                                            </div>
+                                            <div style="text-align: center;">
+                                                <div style="font-size: 11px; color: #6c757d; margin-bottom: 4px;">Kullanılan</div>
+                                                <div style="font-size: 18px; font-weight: 700; color: #FFC107;">${leaveBalance.used || 0}</div>
+                                            </div>
+                                            <div style="text-align: center;">
+                                                <div style="font-size: 11px; color: #6c757d; margin-bottom: 4px;">Kalan</div>
+                                                <div style="font-size: 18px; font-weight: 700; color: #10b981;">${leaveBalance.remaining || 0}</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    `;
+                                }
+                                return '';
+                            })()}
                             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
                                 <div style="background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%); padding: 16px; border-radius: 10px; border-left: 4px solid #667eea;">
                                     <div style="font-size: 12px; color: #6c757d; margin-bottom: 6px; font-weight: 500;">İzin Tipi</div>
@@ -719,6 +864,25 @@
                             <div style="margin-top: 16px;">
                                 <div style="font-size: 12px; color: #6c757d; margin-bottom: 6px; font-weight: 500;">Açıklama</div>
                                 <div style="padding: 12px; background: #f8f9fa; border-radius: 8px; font-size: 14px; color: #495057;">${request.description}</div>
+                            </div>
+                            ` : ''}
+                            ${request.documents && request.documents.length > 0 ? `
+                            <div style="margin-top: 16px;">
+                                <div style="font-size: 12px; color: #6c757d; margin-bottom: 8px; font-weight: 500;">Yüklenen Belgeler</div>
+                                <div style="display: flex; flex-direction: column; gap: 8px;">
+                                    ${request.documents.map((doc, idx) => `
+                                        <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px; background: #f8f9fa; border-radius: 8px; border: 1px solid #e5e7eb;">
+                                            <div style="display: flex; align-items: center; gap: 10px; flex: 1;">
+                                                <div style="width: 36px; height: 36px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-size: 16px;">📄</div>
+                                                <div>
+                                                    <div style="font-size: 14px; font-weight: 600; color: #212529;">${doc.name}</div>
+                                                    <div style="font-size: 12px; color: #6c757d;">${(doc.size / 1024).toFixed(2)} KB</div>
+                                                </div>
+                                            </div>
+                                            <a href="${doc.data}" download="${doc.name}" style="padding: 8px 16px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: 600; transition: all 0.2s;">İndir</a>
+                                        </div>
+                                    `).join('')}
+                                </div>
                             </div>
                             ` : ''}
                         </div>
@@ -784,17 +948,41 @@
             currentRequestId = requestId;
             document.getElementById('approveComment').value = '';
 
-            // Saha çalışanı talebi mi kontrol et
             const request = WorkflowEngine.getRequest(requestId);
-            const approveFieldWorkerOptions = document.getElementById('approveFieldWorkerOptions');
+            const approveManagerOptions = document.getElementById('approveManagerOptions');
+            const approveHROptions = document.getElementById('approveHROptions');
+            const approveCustomerRelationsOptions = document.getElementById('approveCustomerRelationsOptions');
 
-            if (request && request.workLocation === 'saha') {
-                approveFieldWorkerOptions.style.display = 'block';
-                // Checkboxları temizle
+            // Yönetici ise ve SAHA çalışanı için görevlendirme seçeneğini göster
+            if (userRole === 'manager' && request && request.workLocation === 'saha') {
+                approveManagerOptions.style.display = 'block';
                 document.getElementById('requiresAssignment').checked = false;
-                document.getElementById('requiresCustomerNotification').checked = false;
             } else {
-                approveFieldWorkerOptions.style.display = 'none';
+                approveManagerOptions.style.display = 'none';
+            }
+
+            // İK kullanıcısı ise ıslak imza kontrolü göster
+            if (userRole === 'hr') {
+                approveHROptions.style.display = 'block';
+                document.getElementById('wetSignatureVerified').checked = false;
+            } else {
+                approveHROptions.style.display = 'none';
+            }
+
+            // Müşteri İlişkileri ise özel seçenekleri göster
+            if (userRole === 'customerRelations') {
+                approveCustomerRelationsOptions.style.display = 'block';
+
+                // Eksik hizmet var mı kontrol et (noServiceGap)
+                const customerNotificationOption = document.getElementById('customerNotificationOption');
+                if (request && request.noServiceGap) {
+                    customerNotificationOption.style.display = 'block';
+                    document.getElementById('sendCustomerNotification').checked = false;
+                } else {
+                    customerNotificationOption.style.display = 'none';
+                }
+            } else {
+                approveCustomerRelationsOptions.style.display = 'none';
             }
 
             document.getElementById('approveModal').style.display = 'flex';
@@ -805,39 +993,162 @@
             document.getElementById('approveModal').style.display = 'none';
         }
 
+        // Görevlendirmeyi onayla (Müşteri İlişkileri)
+        function approveAssignment() {
+            if (!currentRequestId) return;
+
+            const comment = document.getElementById('approveComment').value;
+            const request = WorkflowEngine.getRequest(currentRequestId);
+
+            // Müşteri bilgilendirme checkbox değerini al
+            const sendCustomerNotification = document.getElementById('sendCustomerNotification')?.checked || false;
+
+            const success = WorkflowEngine.approveCustomerRelationsRequest(
+                currentRequestId,
+                currentUser.name,
+                comment,
+                true, // assignmentApproved
+                sendCustomerNotification
+            );
+
+            if (success) {
+                App.showNotification('Görevlendirme onaylandı ve talep İK\'ya gönderildi!', 'success');
+                closeApproveModal();
+                loadPendingRequests();
+            }
+        }
+
+        // Görevlendirmeyi reddet (Müşteri İlişkileri)
+        function rejectAssignment() {
+            if (!currentRequestId) return;
+
+            const comment = document.getElementById('approveComment').value;
+
+            if (!comment || comment.trim() === '') {
+                App.showNotification('Görevlendirme reddi için açıklama gereklidir!', 'error');
+                return;
+            }
+
+            const success = WorkflowEngine.rejectCustomerRelationsRequest(
+                currentRequestId,
+                currentUser.name,
+                comment,
+                false // assignmentApproved
+            );
+
+            if (success) {
+                App.showNotification('Görevlendirme reddedildi, talep iptal edildi!', 'error');
+                closeApproveModal();
+                loadPendingRequests();
+            }
+        }
+
+        // Müşteri İlişkileri hızlı onay (Tablo butonlarından)
+        function handleCustomerRelationsApprove(requestId, isAssignment) {
+            const request = WorkflowEngine.getRequest(requestId);
+            if (!request) return;
+
+            // Müşteri bilgilendirme checkbox durumunu al
+            const quickNotifyCheckbox = document.getElementById(`quickNotify_${requestId}`);
+            const sendCustomerNotification = quickNotifyCheckbox ? quickNotifyCheckbox.checked : false;
+
+            const success = WorkflowEngine.approveCustomerRelationsRequest(
+                requestId,
+                currentUser.name,
+                isAssignment ? 'Görevlendirme onaylandı' : 'Onaylandı',
+                isAssignment ? true : null,
+                sendCustomerNotification
+            );
+
+            if (success) {
+                const message = isAssignment ?
+                    'Görevlendirme onaylandı ve talep İK\'ya gönderildi!' :
+                    'Talep başarıyla onaylandı!';
+                App.showNotification(message, 'success');
+                loadPendingRequests();
+            }
+        }
+
+        // Müşteri İlişkileri hızlı red (Tablo butonlarından)
+        function handleCustomerRelationsReject(requestId) {
+            const reason = prompt('Görevlendirme red sebebini girin:');
+            if (!reason || reason.trim() === '') {
+                App.showNotification('Red sebebi zorunludur!', 'error');
+                return;
+            }
+
+            const success = WorkflowEngine.rejectCustomerRelationsRequest(
+                requestId,
+                currentUser.name,
+                reason,
+                false
+            );
+
+            if (success) {
+                App.showNotification('Görevlendirme reddedildi, talep iptal edildi!', 'error');
+                loadPendingRequests();
+            }
+        }
+
         function confirmApprove() {
             const comment = document.getElementById('approveComment').value;
             const request = WorkflowEngine.getRequest(currentRequestId);
 
-            // Saha çalışanı için checkbox değerlerini al
-            if (request && request.workLocation === 'saha') {
-                const requiresAssignment = document.getElementById('requiresAssignment').checked;
-                const requiresCustomerNotification = document.getElementById('requiresCustomerNotification').checked;
+            // Müşteri İlişkileri ise özel onay fonksiyonunu kullan
+            if (userRole === 'customerRelations') {
+                // Mevcut adımda görevlendirme gerekiyor mu kontrol et
+                const currentStepObj = request.workflow.steps.find(s => s.step === request.workflow.currentStep);
+                const requiresAssignment = currentStepObj?.requiresAssignment || false;
 
-                // Bu bilgileri request'e kaydet
-                const currentStepIndex = request.workflow.steps.findIndex(s => s.step === request.workflow.currentStep);
-                if (currentStepIndex >= 0) {
-                    request.workflow.steps[currentStepIndex].requiresAssignment = requiresAssignment;
-                    request.workflow.steps[currentStepIndex].requiresCustomerNotification = requiresCustomerNotification;
+                // Görevlendirme varsa, onayla/reddet butonlarını kullanması gerekiyor
+                if (requiresAssignment) {
+                    App.showNotification('Lütfen görevlendirme onay/red butonlarını kullanın!', 'warning');
+                    return;
                 }
 
-                // Yerine görevlendirme gerekiyorsa ve yerine görevlendirme lokasyonu belirtilmişse
-                if (requiresAssignment && request.replacementLocation) {
-                    request.assignedToLocation = request.replacementLocation;
-                    console.log('Yerine görevlendirme:', request.replacementLocation);
-                }
+                // Normal müşteri ilişkileri onayı (görevlendirme yok)
+                const sendCustomerNotification = document.getElementById('sendCustomerNotification')?.checked || false;
 
-                // Müşteri bildirimi gerekiyorsa
-                if (requiresCustomerNotification) {
-                    console.log('Müşteri bildirimi gönderilecek:', request.employeeLocation);
+                const success = WorkflowEngine.approveCustomerRelationsRequest(
+                    currentRequestId,
+                    currentUser.name,
+                    comment,
+                    null, // assignmentApproved (görevlendirme yok)
+                    sendCustomerNotification
+                );
+
+                if (success) {
+                    App.showNotification('Talep başarıyla onaylandı!', 'success');
+                    closeApproveModal();
+                    loadPendingRequests();
                 }
+                return;
+            }
+
+            // İK kullanıcısı ise ıslak imza kontrolü yap
+            let wetSignatureVerified = false;
+            if (userRole === 'hr') {
+                wetSignatureVerified = document.getElementById('wetSignatureVerified').checked;
+
+                if (!wetSignatureVerified) {
+                    App.showNotification('Islak imza kontrolü yapılmadan onaylama yapılamaz!', 'error');
+                    return;
+                }
+            }
+
+            // Yönetici ise görevlendirme gereksinimini al
+            let requiresAssignment = false;
+            if (userRole === 'manager') {
+                requiresAssignment = document.getElementById('requiresAssignment').checked;
             }
 
             const success = WorkflowEngine.approveRequest(
                 currentRequestId,
                 currentUser.name,
                 userRole,
-                comment
+                comment,
+                wetSignatureVerified,
+                requiresAssignment
             );
 
             if (success) {

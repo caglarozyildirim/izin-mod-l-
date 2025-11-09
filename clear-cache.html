@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cache Temizleme</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            max-width: 500px;
+        }
+        h1 {
+            margin: 0 0 20px 0;
+            color: #1f2937;
+            font-size: 28px;
+        }
+        p {
+            color: #6b7280;
+            margin-bottom: 30px;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+        .btn {
+            padding: 14px 32px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin: 8px;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+        .btn-secondary {
+            background: #e5e7eb;
+            color: #1f2937;
+        }
+        .btn-secondary:hover {
+            background: #d1d5db;
+        }
+        .status {
+            margin-top: 20px;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: 600;
+            display: none;
+        }
+        .status.success {
+            background: #d1fae5;
+            color: #065f46;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧹 Cache Temizleme</h1>
+        <p>
+            localStorage'daki tüm veriler temizlenecek ve sistem yeniden başlatılacak.
+            Bu işlem geri alınamaz!
+        </p>
+        <button class="btn btn-primary" onclick="clearAndReload()">
+            🗑️ Temizle ve Yeniden Başlat
+        </button>
+        <button class="btn btn-secondary" onclick="window.location.href='index.html'">
+            ❌ İptal
+        </button>
+        <div id="status" class="status"></div>
+    </div>
+
+    <script>
+        function clearAndReload() {
+            const btn = document.querySelector('.btn-primary');
+            btn.disabled = true;
+            btn.textContent = '⏳ Temizleniyor...';
+
+            setTimeout(() => {
+                // localStorage'ı temizle
+                localStorage.clear();
+
+                // Başarı mesajı göster
+                const status = document.getElementById('status');
+                status.className = 'status success';
+                status.textContent = '✅ Cache temizlendi! Yönlendiriliyorsunuz...';
+
+                // 1 saniye sonra ana sayfaya yönlendir
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1000);
+            }, 500);
+        }
+    </script>
+</body>
+</html>

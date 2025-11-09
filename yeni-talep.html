@@ -274,38 +274,11 @@
                     </div>
                     <div class="card-body" style="padding: 24px;">
                         <div class="form-group">
-                            <label class="form-label">Lokasyon</label>
-                            <select class="form-control form-select" id="employeeLocation">
-                                <option value="">Seçiniz...</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label">Lokasyon Sorumlusu / Ekip Lideri</label>
-                            <input type="text" class="form-control" id="locationLeader" readonly placeholder="Lokasyon seçildikten sonra otomatik gelecek">
-                        </div>
-
-                        <div class="form-check mb-3">
-                            <input type="checkbox" id="needReplacement" class="form-check-input">
-                            <label class="form-check-label" for="needReplacement">
-                                Yerine görevlendirme talep ediyorum
-                            </label>
-                        </div>
-
-                        <div id="replacementLocationField" style="display: none; margin-bottom: 16px;">
-                            <div class="form-group">
-                                <label class="form-label">Yerine Görevlendirme Yapılacak Lokasyon</label>
-                                <select class="form-control form-select" id="replacementLocation">
-                                    <option value="">Seçiniz...</option>
-                                </select>
+                            <label class="form-label">Çalışan Atandığı Lokasyonlar</label>
+                            <div id="employeeLocationsContainer" style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; background: #f9fafb; max-height: 400px; overflow-y: auto;">
+                                <!-- Lokasyonlar liste formatında JavaScript ile doldurulacak -->
                             </div>
-                        </div>
-
-                        <div class="form-check mb-3">
-                            <input type="checkbox" id="notifyMIL" class="form-check-input">
-                            <label class="form-check-label" for="notifyMIL">
-                                Müşteri İlişkileri (MİL) bilgilendirilsin
-                            </label>
+                            <small class="form-text text-muted">İzine çıkacak olan çalışanın atandığı lokasyonlar ve proje liderleri listelenmektedir.</small>
                         </div>
 
                         <div class="form-check">
@@ -320,7 +293,7 @@
                                 <label class="form-label">Eksik Hizmet Sağlayacak Firmalar (Çoklu Seçim)</label>
                                 <select class="form-control" id="serviceCompanies" multiple style="min-height: 120px;">
                                 </select>
-                                <small class="form-text text-muted">Ctrl/Cmd tuşu ile birden fazla firma seçebilirsiniz</small>
+                                <small class="form-text text-muted">Tüm lokasyonlarda bulunan şirketler listelenmektedir. Ctrl/Cmd tuşu ile birden fazla firma seçebilirsiniz</small>
                             </div>
                         </div>
                     </div>
@@ -411,53 +384,259 @@
             document.getElementById('remainingPercentage').innerHTML = '<span style="font-size: 16px;">✓</span> %' + remainingPercentage + ' kalan';
         }
 
-        // Mock data: Lokasyonlar ve sorumluları
+        // Mock data: Lokasyonlar (Her lokasyon = 1 proje + 1 lider)
         const locations = {
-            'ankara_proje': { name: 'Ankara Proje Sahası', leader: 'Mehmet Kaya', companies: ['ABC Güvenlik', 'Securitas', 'Koruma Ltd.'] },
-            'istanbul_fabrika': { name: 'İstanbul Fabrika A', leader: 'Ayşe Demir', companies: ['XYZ Temizlik', 'Lojistik A.Ş.', 'Koruma Ltd.'] },
-            'izmir_proje': { name: 'İzmir Proje Sahası', leader: 'Ali Yurt', companies: ['DEF Güvenlik', 'Koruma Ltd.', 'Güven Hizmetleri'] },
-            'bursa_proje': { name: 'Bursa Proje Sahası', leader: 'Kemal Acar', companies: ['Securitas', 'ABC Güvenlik', 'Temizlik Hizmetleri'] }
+            'ankara_proje_1': {
+                name: 'Ankara Proje Sahası - Proje A',
+                code: 'ANK-001-A',
+                projectName: 'Ankara Proje A',
+                leader: 'Mehmet Kaya',
+                companies: ['ABC Güvenlik', 'Securitas', 'Koruma Ltd.']
+            },
+            'ankara_proje_2': {
+                name: 'Ankara Proje Sahası - Proje B',
+                code: 'ANK-001-B',
+                projectName: 'Ankara Proje B',
+                leader: 'Ahmet Yılmaz',
+                companies: ['ABC Güvenlik', 'Securitas', 'Koruma Ltd.']
+            },
+            'istanbul_fabrika_1': {
+                name: 'İstanbul Fabrika A - Üretim Hattı 1',
+                code: 'IST-002-1',
+                projectName: 'İstanbul Üretim 1',
+                leader: 'Ayşe Demir',
+                companies: ['XYZ Temizlik', 'Lojistik A.Ş.', 'Koruma Ltd.']
+            },
+            'istanbul_fabrika_2': {
+                name: 'İstanbul Fabrika A - Üretim Hattı 2',
+                code: 'IST-002-2',
+                projectName: 'İstanbul Üretim 2',
+                leader: 'Can Öztürk',
+                companies: ['XYZ Temizlik', 'Lojistik A.Ş.', 'Koruma Ltd.']
+            },
+            'izmir_proje': {
+                name: 'İzmir Proje Sahası',
+                code: 'IZM-003',
+                projectName: 'İzmir Ana Proje',
+                leader: 'Ali Yurt',
+                companies: ['DEF Güvenlik', 'Koruma Ltd.', 'Güven Hizmetleri']
+            },
+            'bursa_proje': {
+                name: 'Bursa Proje Sahası',
+                code: 'BUR-004',
+                projectName: 'Bursa Tesis Projesi',
+                leader: 'Kemal Acar',
+                companies: ['Securitas', 'ABC Güvenlik', 'Temizlik Hizmetleri']
+            }
         };
 
-        // Lokasyonları doldur
-        const locationSelect = document.getElementById('employeeLocation');
-        const replacementLocationSelect = document.getElementById('replacementLocation');
-        Object.keys(locations).forEach(key => {
-            const option = document.createElement('option');
-            option.value = key;
-            option.textContent = locations[key].name;
-            locationSelect.appendChild(option.cloneNode(true));
-            replacementLocationSelect.appendChild(option);
-        });
-
-        // Lokasyon seçildiğinde lider ve firmaları doldur
-        locationSelect.addEventListener('change', function() {
-            const selectedLocation = locations[this.value];
-            const leaderInput = document.getElementById('locationLeader');
-            const companiesSelect = document.getElementById('serviceCompanies');
-
-            if (selectedLocation) {
-                leaderInput.value = selectedLocation.leader;
-
-                // Firmaları doldur
-                companiesSelect.innerHTML = '';
-                selectedLocation.companies.forEach(company => {
-                    const option = document.createElement('option');
-                    option.value = company;
-                    option.textContent = company;
-                    companiesSelect.appendChild(option);
-                });
-            } else {
-                leaderInput.value = '';
-                companiesSelect.innerHTML = '';
+        // Çalışanın lokasyon görevlendirmeleri (tarih aralıkları ile)
+        const employeeLocationAssignments = [
+            {
+                locationKey: 'ankara_proje_1',
+                startDate: '2025-01-01',
+                endDate: '2025-11-15'
+            },
+            {
+                locationKey: 'ankara_proje_2',
+                startDate: '2025-11-16',
+                endDate: '2025-12-31'
+            },
+            {
+                locationKey: 'istanbul_fabrika_1',
+                startDate: '2025-10-01',
+                endDate: '2025-11-10'
+            },
+            {
+                locationKey: 'izmir_proje',
+                startDate: '2025-11-20',
+                endDate: '2025-12-20'
             }
+        ];
+
+        // İş günü hesaplama (hafta sonları hariç)
+        function calculateWorkingDays(startDate, endDate) {
+            const start = new Date(startDate);
+            const end = new Date(endDate);
+            let count = 0;
+            const current = new Date(start);
+
+            while (current <= end) {
+                const dayOfWeek = current.getDay();
+                if (dayOfWeek !== 0 && dayOfWeek !== 6) { // 0 = Pazar, 6 = Cumartesi
+                    count++;
+                }
+                current.setDate(current.getDate() + 1);
+            }
+
+            return count;
+        }
+
+        // İki tarih aralığının çakışıp çakışmadığını kontrol et
+        function dateRangesOverlap(start1, end1, start2, end2) {
+            const s1 = new Date(start1);
+            const e1 = new Date(end1);
+            const s2 = new Date(start2);
+            const e2 = new Date(end2);
+            return s1 <= e2 && s2 <= e1;
+        }
+
+        // İki tarih aralığının çakışan kısmını hesapla
+        function getOverlapDates(start1, end1, start2, end2) {
+            const s1 = new Date(start1);
+            const e1 = new Date(end1);
+            const s2 = new Date(start2);
+            const e2 = new Date(end2);
+
+            // Çakışma yoksa null dön
+            if (s1 > e2 || s2 > e1) {
+                return null;
+            }
+
+            // Çakışan tarih aralığı
+            const overlapStart = new Date(Math.max(s1.getTime(), s2.getTime()));
+            const overlapEnd = new Date(Math.min(e1.getTime(), e2.getTime()));
+
+            return {
+                start: overlapStart,
+                end: overlapEnd,
+                days: calculateWorkingDays(overlapStart, overlapEnd)
+            };
+        }
+
+        // Tarihi formatla (DD.MM.YYYY)
+        function formatDateTR(dateStr) {
+            const date = new Date(dateStr);
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+            return `${day}.${month}.${year}`;
+        }
+
+        // Çalışanın atandığı lokasyonları liste formatında render et
+        function renderEmployeeLocations() {
+            const container = document.getElementById('employeeLocationsContainer');
+
+            if (employeeLocationAssignments.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 20px; color: #6b7280;">
+                        <div style="font-size: 32px; margin-bottom: 8px;">📍</div>
+                        <div>Bu çalışana atanmış lokasyon bulunmamaktadır</div>
+                    </div>
+                `;
+                return;
+            }
+
+            // Seçili izin tarihlerini al
+            const leaveStartDate = document.getElementById('startDate')?.value;
+            const leaveEndDate = document.getElementById('endDate')?.value;
+
+            container.innerHTML = employeeLocationAssignments.map((assignment, index) => {
+                const location = locations[assignment.locationKey];
+
+                // İzin tarihleri ile görevlendirme çakışıyor mu?
+                const isOverlapping = leaveStartDate && leaveEndDate &&
+                    dateRangesOverlap(assignment.startDate, assignment.endDate, leaveStartDate, leaveEndDate);
+
+                // Çakışan günleri hesapla
+                const overlapInfo = isOverlapping ?
+                    getOverlapDates(assignment.startDate, assignment.endDate, leaveStartDate, leaveEndDate) : null;
+
+                // Çakışan lokasyonlara özel stil
+                const borderColor = isOverlapping ? '#f59e0b' : '#e5e7eb';
+                const bgColor = isOverlapping ? '#fffbeb' : 'white';
+                const highlightBadge = isOverlapping && overlapInfo ? `
+                    <span style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; background: #f59e0b; color: white; border-radius: 6px; font-size: 11px; font-weight: 600;">
+                        ⚠️ ${overlapInfo.days} İş Günü Çakışıyor
+                    </span>
+                ` : '';
+
+                // Çakışan tarih aralığı bilgisi
+                const overlapDateInfo = isOverlapping && overlapInfo ? `
+                    <div style="background: linear-gradient(135deg, #fef3c715 0%, #fde68a15 100%); padding: 12px; border-radius: 8px; margin-top: 12px; border: 1px solid #fbbf24;">
+                        <div style="font-size: 11px; color: #92400e; margin-bottom: 6px; font-weight: 700; text-transform: uppercase;">⚠️ Çakışan Tarih Aralığı</div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;">
+                            <div>
+                                <div style="font-size: 10px; color: #78350f; margin-bottom: 3px; font-weight: 600;">Başlangıç</div>
+                                <div style="font-size: 12px; font-weight: 700; color: #92400e;">${formatDateTR(overlapInfo.start)}</div>
+                            </div>
+                            <div>
+                                <div style="font-size: 10px; color: #78350f; margin-bottom: 3px; font-weight: 600;">Bitiş</div>
+                                <div style="font-size: 12px; font-weight: 700; color: #92400e;">${formatDateTR(overlapInfo.end)}</div>
+                            </div>
+                            <div>
+                                <div style="font-size: 10px; color: #78350f; margin-bottom: 3px; font-weight: 600;">İş Günü</div>
+                                <div style="font-size: 12px; font-weight: 700; color: #92400e;">${overlapInfo.days} gün</div>
+                            </div>
+                        </div>
+                    </div>
+                ` : '';
+
+                return `
+                    <div style="display: block; padding: 16px; margin-bottom: 12px; border: 2px solid ${borderColor}; border-radius: 8px; background: ${bgColor}; transition: all 0.3s;">
+                        <div style="display: flex; align-items: start; gap: 12px;">
+                            <div style="font-size: 24px;">📍</div>
+                            <div style="flex: 1;">
+                                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
+                                    <div>
+                                        <div style="font-weight: 600; color: #1f2937; font-size: 15px;">${location.name}</div>
+                                        <div style="font-size: 12px; color: #6b7280; margin-top: 2px;">Kod: ${location.code}</div>
+                                    </div>
+                                    ${highlightBadge}
+                                </div>
+                                <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid ${isOverlapping ? '#fbbf24' : '#e5e7eb'};">
+                                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+                                        <div>
+                                            <div style="font-size: 11px; color: #6b7280; margin-bottom: 4px; font-weight: 600;">📅 Görevlendirme Başlangıç</div>
+                                            <div style="font-size: 13px; font-weight: 600; color: #1f2937;">${formatDateTR(assignment.startDate)}</div>
+                                        </div>
+                                        <div>
+                                            <div style="font-size: 11px; color: #6b7280; margin-bottom: 4px; font-weight: 600;">📅 Görevlendirme Bitiş</div>
+                                            <div style="font-size: 13px; font-weight: 600; color: #1f2937;">${formatDateTR(assignment.endDate)}</div>
+                                        </div>
+                                    </div>
+                                    ${overlapDateInfo}
+                                    <div style="display: flex; align-items: center; gap: 8px; margin-top: 12px;">
+                                        <span style="font-size: 12px; font-weight: 600; color: #6b7280;">Proje Lideri:</span>
+                                        <span style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; background: ${isOverlapping ? '#fef3c7' : '#f3f4f6'}; border-radius: 6px; font-size: 13px; color: #374151;">
+                                            <span style="font-size: 12px;">👤</span>
+                                            ${location.leader}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Tüm lokasyonlardaki firmaları topla ve firma listesini doldur
+        function populateAllServiceCompanies() {
+            const companiesSelect = document.getElementById('serviceCompanies');
+            companiesSelect.innerHTML = '';
+
+            // Tüm firmalaları benzersiz şekilde topla
+            const allCompanies = new Set();
+            Object.values(locations).forEach(location => {
+                location.companies.forEach(company => allCompanies.add(company));
+            });
+
+            // Alfabetik sırala ve dropdown'a ekle
+            Array.from(allCompanies).sort().forEach(company => {
+                const option = document.createElement('option');
+                option.value = company;
+                option.textContent = company;
+                companiesSelect.appendChild(option);
+            });
+        }
+
+        // Sayfa yüklendiğinde lokasyonları ve firmaları render et
+        document.addEventListener('DOMContentLoaded', () => {
+            renderEmployeeLocations();
+            populateAllServiceCompanies();
         });
 
-        // Yerine görevlendirme checkbox
-        document.getElementById('needReplacement').addEventListener('change', function() {
-            const replacementField = document.getElementById('replacementLocationField');
-            replacementField.style.display = this.checked ? 'block' : 'none';
-        });
 
         // İzin tipi değiştiğinde
         const documentRequiredTypes = ['death', 'sickness', 'birth', 'marriage'];
@@ -503,6 +682,8 @@
                     endDatePicker.set('minDate', selectedDates[0]);
                 }
                 updateLeaveDaysDisplay();
+                // Lokasyonları yeniden render et (çakışma kontrolü için)
+                renderEmployeeLocations();
             }
         });
 
@@ -510,6 +691,8 @@
             ...getFlatpickrConfig(),
             onChange: function(selectedDates, dateStr, instance) {
                 updateLeaveDaysDisplay();
+                // Lokasyonları yeniden render et (çakışma kontrolü için)
+                renderEmployeeLocations();
             }
         });
 
@@ -532,48 +715,47 @@
             }
         }
 
-        // Form submit
-        document.getElementById('leaveRequestForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-
-            // Dosya yükleme kontrolü
-            const documentUpload = document.getElementById('documentUpload');
+        // Form submit fonksiyonu
+        function submitRequest(uploadedDocuments = []) {
             const leaveType = document.getElementById('leaveType').value;
-            let uploadedDocuments = [];
-
-            if (documentRequiredTypes.includes(leaveType) && documentUpload.files.length > 0) {
-                // Dosya bilgilerini kaydet (gerçek uygulamada sunucuya yüklenecek)
-                for (let i = 0; i < documentUpload.files.length; i++) {
-                    const file = documentUpload.files[i];
-                    uploadedDocuments.push({
-                        name: file.name,
-                        size: file.size,
-                        type: file.type,
-                        uploadedAt: new Date().toISOString()
-                    });
-                }
-            }
 
             // Seçili hizmet firmalarını al
             const serviceCompaniesSelect = document.getElementById('serviceCompanies');
             const selectedCompanies = Array.from(serviceCompaniesSelect.selectedOptions).map(opt => opt.value);
 
+            // İzin tarihleri ile çakışan lokasyonları bul
+            const leaveStartDate = document.getElementById('startDate').value;
+            const leaveEndDate = document.getElementById('endDate').value;
+            const overlappingLocations = employeeLocationAssignments
+                .filter(assignment => dateRangesOverlap(assignment.startDate, assignment.endDate, leaveStartDate, leaveEndDate))
+                .map(assignment => {
+                    const overlapInfo = getOverlapDates(assignment.startDate, assignment.endDate, leaveStartDate, leaveEndDate);
+                    return {
+                        locationKey: assignment.locationKey,
+                        locationName: locations[assignment.locationKey].name,
+                        locationCode: locations[assignment.locationKey].code,
+                        projectName: locations[assignment.locationKey].projectName,
+                        projectLeader: locations[assignment.locationKey].leader,
+                        assignmentStartDate: assignment.startDate,
+                        assignmentEndDate: assignment.endDate,
+                        overlapStartDate: overlapInfo ? formatDateTR(overlapInfo.start) : null,
+                        overlapEndDate: overlapInfo ? formatDateTR(overlapInfo.end) : null,
+                        overlapDays: overlapInfo ? overlapInfo.days : 0
+                    };
+                });
+
             const requestData = {
                 type: leaveType,
-                startDate: document.getElementById('startDate').value,
-                endDate: document.getElementById('endDate').value,
+                startDate: leaveStartDate,
+                endDate: leaveEndDate,
                 days: document.getElementById('totalDays').value,
                 description: document.getElementById('description').value,
                 workLocation: document.getElementById('workLocation').value,
-                needReplacement: document.getElementById('needReplacement')?.checked || false,
-                // Yeni: Yerine görevlendirme lokasyonu
-                replacementLocation: document.getElementById('replacementLocation')?.value || '',
-                // Saha workflow additional fields - GÜNCELLENDİ
-                employeeLocation: document.getElementById('employeeLocation')?.value || '',
-                locationLeader: document.getElementById('locationLeader')?.value || '',
-                notifyMIL: document.getElementById('notifyMIL')?.checked || false,
+                // Saha workflow additional fields
+                employeeLocationAssignments: employeeLocationAssignments, // Tüm görevlendirmeler
+                overlappingLocations: overlappingLocations, // İzin tarihleri ile çakışan lokasyonlar
                 noServiceGap: document.getElementById('noServiceGap')?.checked || false,
-                serviceCompanies: selectedCompanies, // Çoklu seçim
+                serviceCompanies: selectedCompanies, // Çoklu seçim - tüm lokasyonlardan
                 // Yeni: Yüklenen dosyalar
                 documents: uploadedDocuments,
                 hasDocuments: uploadedDocuments.length > 0,
@@ -601,6 +783,45 @@
                 setTimeout(() => window.location.href = 'izinlerim.html', 1500);
             } else {
                 App.showNotification('Talep oluşturulamadı. Lütfen tekrar deneyin.', 'error');
+            }
+        }
+
+        // Form submit
+        document.getElementById('leaveRequestForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // Dosya yükleme kontrolü
+            const documentUpload = document.getElementById('documentUpload');
+            const leaveType = document.getElementById('leaveType').value;
+
+            if (documentRequiredTypes.includes(leaveType) && documentUpload.files.length > 0) {
+                // Dosyaları Base64 olarak oku ve kaydet
+                const filePromises = [];
+                for (let i = 0; i < documentUpload.files.length; i++) {
+                    const file = documentUpload.files[i];
+                    const promise = new Promise((resolve) => {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            resolve({
+                                name: file.name,
+                                size: file.size,
+                                type: file.type,
+                                uploadedAt: new Date().toISOString(),
+                                data: e.target.result // Base64 data
+                            });
+                        };
+                        reader.readAsDataURL(file);
+                    });
+                    filePromises.push(promise);
+                }
+
+                // Tüm dosyaların okunmasını bekle
+                Promise.all(filePromises).then(files => {
+                    submitRequest(files);
+                });
+            } else {
+                // Dosya yok, direkt submit et
+                submitRequest([]);
             }
         });
     </script>

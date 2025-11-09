@@ -305,6 +305,35 @@
                 </div>
             </div>
 
+            <!-- Top Unused Leave (HR Only) -->
+            <div class="card mb-5" id="topUnusedLeaveCard" style="display: none;">
+                <div class="card-header" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white;">
+                    <h3 class="card-title" style="color: white; margin: 0;">⚠️ En Fazla Kullanılmamış İzni Olan 10 Çalışan</h3>
+                    <p style="margin: 8px 0 0 0; font-size: 13px; opacity: 0.9;">İK raporlaması - izin kullanımı düşük çalışanlar</p>
+                </div>
+                <div class="table-container">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Sıra</th>
+                                <th>Personel</th>
+                                <th>Departman</th>
+                                <th>Hak Edilen</th>
+                                <th>Kullanılan</th>
+                                <th>Kalan İzin</th>
+                                <th>Durum</th>
+                            </tr>
+                        </thead>
+                        <tbody id="topUnusedLeaveTableBody">
+                            <!-- JavaScript ile doldurulacak -->
+                        </tbody>
+                    </table>
+                </div>
+                <div class="card-footer">
+                    <small class="text-muted">Bu rapor sadece İK yetkilileri tarafından görüntülenebilir</small>
+                </div>
+            </div>
+
             <!-- Top Users -->
             <div class="card">
                 <div class="card-header">
@@ -385,8 +414,14 @@
         const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
 
         document.getElementById('userName').textContent = user.name || '-';
-        document.getElementById('userRole').textContent = user.role === 'manager' ? 'Yönetici' : user.role === 'hr' ? 'İnsan Kaynakları' : 'Operasyon';
+        document.getElementById('userRole').textContent = user.role === 'manager' ? 'Yönetici' : user.role === 'hr' ? 'İnsan Kaynakları' : user.role === 'customerRelations' ? 'Müşteri İlişkileri' : 'Çalışan';
         document.getElementById('userAvatar').textContent = (user.name || '-').split(' ').map(n => n[0]).join('');
+
+        // İK kullanıcısı ise "Kullanılmamış İzin" raporunu göster
+        if (user.role === 'hr') {
+            document.getElementById('topUnusedLeaveCard').style.display = 'block';
+            loadTopUnusedLeaveReport();
+        }
 
         // Örnek veri oluştur (eğer yoksa)
         function ensureSampleData() {
@@ -490,6 +525,76 @@
 
         // Sayfa yüklendiğinde örnek verileri kontrol et
         ensureSampleData();
+
+        // İK için: En fazla kullanılmamış izni olan 10 çalışan
+        function loadTopUnusedLeaveReport() {
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            const employeeLeaveData = [];
+
+            // Tüm kullanıcıların izin bilgilerini topla
+            users.forEach(u => {
+                if (u.role === 'employee') { // Sadece çalışanları göster
+                    const userData = JSON.parse(localStorage.getItem(`userData_${u.id}`) || '{}');
+                    const leaveBalance = userData.leaveBalance || { earned: 20, used: 0, remaining: 20 };
+
+                    employeeLeaveData.push({
+                        name: u.name,
+                        department: u.department,
+                        earned: leaveBalance.earned || 20,
+                        used: leaveBalance.used || 0,
+                        remaining: leaveBalance.remaining || 20
+                    });
+                }
+            });
+
+            // Kalan izne göre azalan sırada sırala (en fazla kalan en üstte)
+            employeeLeaveData.sort((a, b) => b.remaining - a.remaining);
+
+            // İlk 10'u al
+            const top10 = employeeLeaveData.slice(0, 10);
+
+            // Tabloyu doldur
+            const tableBody = document.getElementById('topUnusedLeaveTableBody');
+            if (!tableBody) return;
+
+            if (top10.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="7" style="text-align: center; padding: 40px; color: #6b7280;">
+                            <div style="font-size: 32px; margin-bottom: 8px;">📊</div>
+                            <div>Henüz çalışan verisi bulunmuyor</div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tableBody.innerHTML = top10.map((emp, index) => {
+                const usageRate = emp.earned > 0 ? Math.round((emp.used / emp.earned) * 100) : 0;
+                let badgeClass = 'success';
+                let statusText = 'Normal';
+
+                if (usageRate < 25) {
+                    badgeClass = 'danger';
+                    statusText = 'Çok Düşük';
+                } else if (usageRate < 50) {
+                    badgeClass = 'warning';
+                    statusText = 'Düşük';
+                }
+
+                return `
+                    <tr>
+                        <td><strong>#${index + 1}</strong></td>
+                        <td>${emp.name}</td>
+                        <td>${emp.department || 'Bilinmiyor'}</td>
+                        <td><span class="badge badge-info">${emp.earned} gün</span></td>
+                        <td><span class="badge badge-secondary">${emp.used} gün</span></td>
+                        <td><strong style="color: #f59e0b; font-size: 16px;">${emp.remaining} gün</strong></td>
+                        <td><span class="badge badge-${badgeClass}">${statusText} (%${usageRate})</span></td>
+                    </tr>
+                `;
+            }).join('');
+        }
 
         // Gerçek verileri yükle
         function loadReportData() {
