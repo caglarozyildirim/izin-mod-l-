@@ -233,6 +233,11 @@
                             </div>
                         </div>
 
+                        <div class="form-group">
+                            <label class="form-label form-label-required">İşe Başlangıç Tarihi</label>
+                            <input type="date" class="form-control" id="returnToWorkDate" required>
+                        </div>
+
                         <!-- Mazeret İzni Saat Alanları -->
                         <div id="excuseTimeFields" style="display: none;">
                             <div class="grid grid-cols-2">
@@ -291,9 +296,10 @@
                         <div id="serviceGapFields" style="margin-top: 16px;">
                             <div class="form-group">
                                 <label class="form-label">Eksik Hizmet Sağlayacak Firmalar (Çoklu Seçim)</label>
-                                <select class="form-control" id="serviceCompanies" multiple style="min-height: 120px;">
-                                </select>
-                                <small class="form-text text-muted">Tüm lokasyonlarda bulunan şirketler listelenmektedir. Ctrl/Cmd tuşu ile birden fazla firma seçebilirsiniz</small>
+                                <div id="serviceCompaniesContainer" style="display: flex; flex-direction: column; gap: 16px; padding: 16px; border: 1px solid #e5e7eb; border-radius: 8px; background: #f9fafb;">
+                                    <!-- JavaScript ile doldurulacak -->
+                                </div>
+                                <small class="form-text text-muted">Her firma için saat bilgisi girebilirsiniz</small>
                             </div>
                         </div>
                     </div>
@@ -613,8 +619,8 @@
 
         // Tüm lokasyonlardaki firmaları topla ve firma listesini doldur
         function populateAllServiceCompanies() {
-            const companiesSelect = document.getElementById('serviceCompanies');
-            companiesSelect.innerHTML = '';
+            const container = document.getElementById('serviceCompaniesContainer');
+            container.innerHTML = '';
 
             // Tüm firmalaları benzersiz şekilde topla
             const allCompanies = new Set();
@@ -622,12 +628,38 @@
                 location.companies.forEach(company => allCompanies.add(company));
             });
 
-            // Alfabetik sırala ve dropdown'a ekle
+            // Alfabetik sırala ve her firma için checkbox + saat alanları oluştur
             Array.from(allCompanies).sort().forEach(company => {
-                const option = document.createElement('option');
-                option.value = company;
-                option.textContent = company;
-                companiesSelect.appendChild(option);
+                const companyDiv = document.createElement('div');
+                companyDiv.style.cssText = 'padding: 12px; background: white; border: 2px solid #e5e7eb; border-radius: 8px;';
+
+                companyDiv.innerHTML = `
+                    <div style="display: flex; flex-direction: column; gap: 12px;">
+                        <label style="display: flex; align-items: center; cursor: pointer;">
+                            <input type="checkbox" class="company-checkbox" value="${company}" style="margin-right: 10px; width: 18px; height: 18px; cursor: pointer;">
+                            <span style="font-weight: 600; font-size: 14px; color: #1f2937;">${company}</span>
+                        </label>
+                        <div class="company-time-fields" style="display: none; grid-template-columns: 1fr 1fr; gap: 12px; margin-left: 28px;">
+                            <div>
+                                <label style="display: block; font-size: 12px; color: #6b7280; margin-bottom: 4px; font-weight: 500;">Başlangıç Saati</label>
+                                <input type="time" class="form-control company-start-time" data-company="${company}" style="padding: 8px;">
+                            </div>
+                            <div>
+                                <label style="display: block; font-size: 12px; color: #6b7280; margin-bottom: 4px; font-weight: 500;">Bitiş Saati</label>
+                                <input type="time" class="form-control company-end-time" data-company="${company}" style="padding: 8px;">
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                // Checkbox değiştiğinde saat alanlarını göster/gizle
+                const checkbox = companyDiv.querySelector('.company-checkbox');
+                const timeFields = companyDiv.querySelector('.company-time-fields');
+                checkbox.addEventListener('change', function() {
+                    timeFields.style.display = this.checked ? 'grid' : 'none';
+                });
+
+                container.appendChild(companyDiv);
             });
         }
 
@@ -690,24 +722,38 @@
         endDatePicker = flatpickr("#endDate", {
             ...getFlatpickrConfig(),
             onChange: function(selectedDates, dateStr, instance) {
+                // İşe Başlangıç Tarihi'nin minimum değerini güncelle
+                if (returnToWorkDatePicker && selectedDates[0]) {
+                    const nextDay = new Date(selectedDates[0]);
+                    nextDay.setDate(nextDay.getDate() + 1);
+                    returnToWorkDatePicker.set('minDate', nextDay);
+                }
                 updateLeaveDaysDisplay();
                 // Lokasyonları yeniden render et (çakışma kontrolü için)
                 renderEmployeeLocations();
             }
         });
 
+        // İşe Başlangıç Tarihi picker'ı
+        let returnToWorkDatePicker = flatpickr("#returnToWorkDate", {
+            ...getFlatpickrConfig(),
+            onChange: function(selectedDates, dateStr, instance) {
+                updateLeaveDaysDisplay();
+            }
+        });
+
         // İş günü sayısını hesapla ve göster
         function updateLeaveDaysDisplay() {
             const startInput = document.getElementById('startDate');
-            const endInput = document.getElementById('endDate');
+            const returnToWorkInput = document.getElementById('returnToWorkDate');
 
-            if (startInput.value && endInput.value) {
+            if (startInput.value && returnToWorkInput.value) {
                 // Flatpickr'dan tarihleri al
                 const startDate = startDatePicker.selectedDates[0];
-                const endDate = endDatePicker.selectedDates[0];
+                const returnToWorkDate = returnToWorkDatePicker.selectedDates[0];
 
-                if (startDate && endDate && startDate <= endDate) {
-                    const workingDaysCount = calculateWorkingDays(startDate, endDate);
+                if (startDate && returnToWorkDate && startDate < returnToWorkDate) {
+                    const workingDaysCount = calculateWorkingDays(startDate, returnToWorkDate);
                     document.getElementById('totalDays').value = workingDaysCount + ' iş günü';
                 } else {
                     document.getElementById('totalDays').value = '0 iş günü';
@@ -719,9 +765,18 @@
         function submitRequest(uploadedDocuments = []) {
             const leaveType = document.getElementById('leaveType').value;
 
-            // Seçili hizmet firmalarını al
-            const serviceCompaniesSelect = document.getElementById('serviceCompanies');
-            const selectedCompanies = Array.from(serviceCompaniesSelect.selectedOptions).map(opt => opt.value);
+            // Seçili hizmet firmalarını ve saat bilgilerini al
+            const selectedCompaniesWithTime = [];
+            document.querySelectorAll('.company-checkbox:checked').forEach(checkbox => {
+                const company = checkbox.value;
+                const startTime = document.querySelector(`.company-start-time[data-company="${company}"]`).value;
+                const endTime = document.querySelector(`.company-end-time[data-company="${company}"]`).value;
+                selectedCompaniesWithTime.push({
+                    company: company,
+                    startTime: startTime,
+                    endTime: endTime
+                });
+            });
 
             // İzin tarihleri ile çakışan lokasyonları bul
             const leaveStartDate = document.getElementById('startDate').value;
@@ -748,6 +803,7 @@
                 type: leaveType,
                 startDate: leaveStartDate,
                 endDate: leaveEndDate,
+                returnToWorkDate: document.getElementById('returnToWorkDate').value,
                 days: document.getElementById('totalDays').value,
                 description: document.getElementById('description').value,
                 workLocation: document.getElementById('workLocation').value,
@@ -755,7 +811,7 @@
                 employeeLocationAssignments: employeeLocationAssignments, // Tüm görevlendirmeler
                 overlappingLocations: overlappingLocations, // İzin tarihleri ile çakışan lokasyonlar
                 noServiceGap: document.getElementById('noServiceGap')?.checked || false,
-                serviceCompanies: selectedCompanies, // Çoklu seçim - tüm lokasyonlardan
+                serviceCompanies: selectedCompaniesWithTime, // Firma adı + saat bilgileri
                 // Yeni: Yüklenen dosyalar
                 documents: uploadedDocuments,
                 hasDocuments: uploadedDocuments.length > 0,
