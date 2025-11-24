@@ -333,6 +333,16 @@
         document.getElementById('fullName').value = user.name || '';
         document.getElementById('department').value = user.department || '';
 
+        // Unvan role göre ayarla
+        const titleMap = {
+            'employee': 'Uzman',
+            'manager': 'Yönetici',
+            'hr': 'İnsan Kaynakları Uzmanı',
+            'operation': 'Operasyon Yöneticisi',
+            'customerRelations': 'Müşteri İlişkileri Uzmanı'
+        };
+        document.getElementById('title').value = titleMap[user.role] || 'Uzman';
+
         // Saha alanlarını göster/gizle fonksiyonu
         function toggleSahaFields() {
             const workLocation = document.getElementById('workLocation').value;
