@@ -323,7 +323,7 @@ const App = {
     const workLocations = ['merkez', 'saha'];
 
     const sampleRequests = [
-      // Bekleyen talepler (10 adet)
+      // Bekleyen talepler (10 adet - Tümü IT Departmanı)
       {
         type: 'annual',
         startDate: '2025-12-15',
@@ -334,26 +334,19 @@ const App = {
         needReplacement: false,
         userId: 'emp1',
         userName: demoUsers[0].name,
-        userDepartment: demoUsers[0].department
+        userDepartment: 'IT Departmanı'
       },
       {
-        type: 'marriage',
+        type: 'annual',
         startDate: '2025-11-20',
         endDate: '2025-11-24',
         days: '5 iş günü',
-        description: 'Düğün töreni',
-        workLocation: 'saha',
-        projectLocation: 'Ankara Proje Sahası',
-        projectLeader: 'Mehmet Kaya',
-        notifyMIL: true,
-        noServiceGap: true,
-        serviceCompany: 'ABC Güvenlik',
-        serviceDuration: '1 hafta',
-        needReplacement: true,
+        description: 'Aile ziyareti',
+        workLocation: 'merkez',
+        needReplacement: false,
         userId: 'emp2',
         userName: demoUsers[1].name,
-        userDepartment: demoUsers[1].department,
-        _forceStatus: 'customer_relations_pending'
+        userDepartment: 'IT Departmanı'
       },
       {
         type: 'excuse',
@@ -367,19 +360,19 @@ const App = {
         needReplacement: false,
         userId: 'emp3',
         userName: demoUsers[2].name,
-        userDepartment: demoUsers[2].department
+        userDepartment: 'IT Departmanı'
       },
       {
         type: 'annual',
         startDate: '2025-11-25',
         endDate: '2025-11-29',
         days: '5 iş günü',
-        description: 'Aile ziyareti',
+        description: 'Yıllık izin talebi',
         workLocation: 'merkez',
         needReplacement: false,
         userId: 'emp4',
         userName: demoUsers[3].name,
-        userDepartment: demoUsers[3].department
+        userDepartment: 'IT Departmanı'
       },
       {
         type: 'sickness',
@@ -391,7 +384,7 @@ const App = {
         needReplacement: false,
         userId: 'emp5',
         userName: demoUsers[4].name,
-        userDepartment: demoUsers[4].department
+        userDepartment: 'IT Departmanı'
       },
       {
         type: 'annual',
@@ -399,18 +392,11 @@ const App = {
         endDate: '2025-12-05',
         days: '5 iş günü',
         description: 'Kişisel işler',
-        workLocation: 'saha',
-        projectLocation: 'İzmir Proje Sahası',
-        projectLeader: 'Ali Yurt',
-        notifyMIL: false,
-        noServiceGap: true,
-        serviceCompany: 'DEF Güvenlik',
-        serviceDuration: '1 hafta',
-        needReplacement: true,
+        workLocation: 'merkez',
+        needReplacement: false,
         userId: 'emp6',
         userName: demoUsers[5].name,
-        userDepartment: demoUsers[5].department,
-        _forceStatus: 'customer_relations_pending'
+        userDepartment: 'IT Departmanı'
       },
       {
         type: 'excuse',
@@ -424,7 +410,7 @@ const App = {
         needReplacement: false,
         userId: 'emp7',
         userName: demoUsers[6].name,
-        userDepartment: demoUsers[6].department
+        userDepartment: 'IT Departmanı'
       },
       {
         type: 'annual',
@@ -436,7 +422,7 @@ const App = {
         needReplacement: false,
         userId: 'emp8',
         userName: demoUsers[7].name,
-        userDepartment: demoUsers[7].department
+        userDepartment: 'IT Departmanı'
       },
       {
         type: 'education',
@@ -448,7 +434,7 @@ const App = {
         needReplacement: false,
         userId: 'emp9',
         userName: demoUsers[8].name,
-        userDepartment: demoUsers[8].department
+        userDepartment: 'IT Departmanı'
       },
       {
         type: 'sickness',
@@ -456,18 +442,11 @@ const App = {
         endDate: '2025-11-15',
         days: '2 iş günü',
         description: 'Sağlık raporu mevcut',
-        workLocation: 'saha',
-        projectLocation: 'Bursa Proje Sahası',
-        projectLeader: 'Kemal Acar',
-        notifyMIL: true,
-        noServiceGap: true,
-        serviceCompany: 'XYZ Güvenlik',
-        serviceDuration: '3 gün',
-        needReplacement: true,
+        workLocation: 'merkez',
+        needReplacement: false,
         userId: 'emp10',
         userName: demoUsers[9].name,
-        userDepartment: demoUsers[9].department,
-        _forceStatus: 'customer_relations_pending'
+        userDepartment: 'IT Departmanı'
       },
 
       // Reddedilen talepler (16 adet)
