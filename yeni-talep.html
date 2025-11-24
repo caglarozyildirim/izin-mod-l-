@@ -784,21 +784,6 @@
             renderEmployeeLocations();
         }
 
-        // Yakınlık derecesi değiştiğinde tarihleri otomatik hesapla
-        document.getElementById('relationshipDegree').addEventListener('change', function() {
-            const leaveType = document.getElementById('leaveType').value;
-            if (leaveType !== 'death') return;
-
-            const startDate = document.getElementById('startDate').value;
-            if (!startDate) {
-                App.showNotification('Lütfen önce başlangıç tarihi seçiniz.', 'warning');
-                return;
-            }
-
-            const allowedDays = ['anne', 'baba', 'es', 'cocuk'].includes(this.value) ? 3 : 1;
-            autoSetDeathLeaveDates(startDate, allowedDays);
-        });
-
         // Çalışma yeri değiştiğinde
         document.getElementById('workLocation').addEventListener('change', toggleSahaFields);
 
@@ -855,6 +840,27 @@
             onChange: function(selectedDates, dateStr, instance) {
                 updateLeaveDaysDisplay();
             }
+        });
+
+        // Yakınlık derecesi değiştiğinde tarihleri otomatik hesapla
+        // NOT: Flatpickr initialize edildikten SONRA eklenmeli
+        document.getElementById('relationshipDegree').addEventListener('change', function() {
+            const leaveType = document.getElementById('leaveType').value;
+            if (leaveType !== 'death') return;
+
+            // Flatpickr'dan seçili tarihi al
+            if (!startDatePicker || !startDatePicker.selectedDates || startDatePicker.selectedDates.length === 0) {
+                App.showNotification('Lütfen önce başlangıç tarihi seçiniz.', 'warning');
+                return;
+            }
+
+            const startDate = startDatePicker.selectedDates[0];
+            const dateStr = startDate.getFullYear() + '-' +
+                           String(startDate.getMonth() + 1).padStart(2, '0') + '-' +
+                           String(startDate.getDate()).padStart(2, '0');
+
+            const allowedDays = ['anne', 'baba', 'es', 'cocuk'].includes(this.value) ? 3 : 1;
+            autoSetDeathLeaveDates(dateStr, allowedDays);
         });
 
         // İş günü sayısını hesapla ve göster
