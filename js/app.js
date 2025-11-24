@@ -62,7 +62,18 @@ const App = {
     };
 
     // Allow all to access common pages
-    const commonPages = ['index.html', 'profil.html', 'takvim.html'];
+    const commonPages = [
+      'index.html',
+      'profil.html',
+      'takvim.html',
+      'email-preview.html',
+      'email-templates.html',
+      'notifications.html',
+      'form-print.html',
+      'form-upload.html',
+      'izin-onay.html',
+      'clear-cache.html'
+    ];
 
     if (commonPages.includes(page)) return;
 
@@ -448,6 +459,91 @@ const App = {
         userId: 'emp10',
         userName: demoUsers[9].name,
         userDepartment: 'IT Departmanı'
+      },
+      // Saha talepleri (Müşteri İlişkileri onayı gerektirir - 5 adet)
+      {
+        type: 'annual',
+        startDate: '2025-12-10',
+        endDate: '2025-12-15',
+        days: '5 iş günü',
+        description: 'Yıllık izin - Saha görevlisi',
+        workLocation: 'saha',
+        noServiceGap: false,
+        serviceCompanies: [
+          { company: 'ABC Hastanesi', startTime: '09:00', endTime: '17:00' },
+          { company: 'XYZ Klinik', startTime: '10:00', endTime: '16:00' }
+        ],
+        needReplacement: false,
+        userId: 'emp11',
+        userName: demoUsers[10].name,
+        userDepartment: 'Saha Operasyonları'
+      },
+      {
+        type: 'annual',
+        startDate: '2025-12-18',
+        endDate: '2025-12-22',
+        days: '5 iş günü',
+        description: 'Ailevi sebepler - Saha lokasyonu',
+        workLocation: 'saha',
+        noServiceGap: false,
+        serviceCompanies: [
+          { company: 'DEF Tıp Merkezi', startTime: '08:00', endTime: '18:00' }
+        ],
+        needReplacement: false,
+        userId: 'emp12',
+        userName: demoUsers[11].name,
+        userDepartment: 'Saha Operasyonları'
+      },
+      {
+        type: 'excuse',
+        startDate: '2025-11-28',
+        endDate: '2025-11-28',
+        days: '4 saat',
+        startTime: '14:00',
+        endTime: '18:00',
+        description: 'Acil aile durumu - Saha',
+        workLocation: 'saha',
+        noServiceGap: false,
+        serviceCompanies: [
+          { company: 'GHI Sağlık Merkezi', startTime: '14:00', endTime: '18:00' }
+        ],
+        needReplacement: false,
+        userId: 'emp13',
+        userName: demoUsers[12].name,
+        userDepartment: 'Saha Operasyonları'
+      },
+      {
+        type: 'annual',
+        startDate: '2025-12-25',
+        endDate: '2025-12-30',
+        days: '4 iş günü',
+        description: 'Yıl sonu izni - Saha görevlisi',
+        workLocation: 'saha',
+        noServiceGap: false,
+        serviceCompanies: [
+          { company: 'JKL Poliklinik', startTime: '09:00', endTime: '17:00' },
+          { company: 'MNO Hastanesi', startTime: '10:00', endTime: '16:00' }
+        ],
+        needReplacement: false,
+        userId: 'emp14',
+        userName: demoUsers[13].name,
+        userDepartment: 'Saha Operasyonları'
+      },
+      {
+        type: 'annual',
+        startDate: '2025-11-22',
+        endDate: '2025-11-26',
+        days: '3 iş günü',
+        description: 'Kişisel izin - Saha',
+        workLocation: 'saha',
+        noServiceGap: false,
+        serviceCompanies: [
+          { company: 'PQR Özel Hastane', startTime: '08:30', endTime: '17:30' }
+        ],
+        needReplacement: false,
+        userId: 'emp15',
+        userName: demoUsers[14].name,
+        userDepartment: 'Saha Operasyonları'
       },
 
       // Reddedilen talepler (16 adet)
