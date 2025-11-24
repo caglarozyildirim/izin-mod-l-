@@ -268,6 +268,20 @@
                             <input type="file" class="form-control" id="documentUpload" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" multiple>
                             <small class="form-text text-muted" id="documentHint">Bu izin tipi için gerekli belgeleri yüklemeniz gerekmektedir.</small>
                         </div>
+
+                        <!-- Ölüm İzni İçin Yakınlık Derecesi -->
+                        <div class="form-group" id="relationshipDegreeField" style="display: none;">
+                            <label class="form-label form-label-required">Yakınlık Derecesi</label>
+                            <select class="form-control form-select" id="relationshipDegree" required>
+                                <option value="">Seçiniz...</option>
+                                <option value="anne">Anne</option>
+                                <option value="baba">Baba</option>
+                                <option value="es">Eş</option>
+                                <option value="cocuk">Çocuk</option>
+                                <option value="diger">Diğer</option>
+                            </select>
+                            <small class="form-text text-muted" id="relationshipHint">Anne/Baba/Eş/Çocuk için 3 gün, diğer yakınlar için 1 gün izin hakkınız bulunmaktadır.</small>
+                        </div>
                     </div>
                     </div>
                 </div>
@@ -682,28 +696,92 @@
 
 
         // İzin tipi değiştiğinde
-        const documentRequiredTypes = ['death', 'sickness', 'birth', 'marriage'];
+        const documentRequiredTypes = ['sickness', 'birth', 'marriage']; // death çıkarıldı
         document.getElementById('leaveType').addEventListener('change', function() {
             const excuseFields = document.getElementById('excuseTimeFields');
             const documentField = document.getElementById('documentUploadField');
             const documentHint = document.getElementById('documentHint');
+            const relationshipField = document.getElementById('relationshipDegreeField');
+            const relationshipDegree = document.getElementById('relationshipDegree');
 
             excuseFields.style.display = this.value === 'excuse' ? 'block' : 'none';
 
-            // Belge gerekli mi kontrol et
-            if (documentRequiredTypes.includes(this.value)) {
-                documentField.style.display = 'block';
-                const hints = {
-                    'death': 'Ölüm belgesi yüklemeniz gerekmektedir.',
-                    'sickness': 'Sağlık raporu yüklemeniz gerekmektedir.',
-                    'birth': 'Doğum belgesi yüklemeniz gerekmektedir.',
-                    'marriage': 'Evlilik cüzdanı yüklemeniz gerekmektedir.'
-                };
-                documentHint.textContent = hints[this.value] || 'Gerekli belgeleri yüklemeniz gerekmektedir.';
-            } else {
+            // Ölüm izni için özel akış
+            if (this.value === 'death') {
                 documentField.style.display = 'none';
+                relationshipField.style.display = 'block';
+                relationshipDegree.required = true;
+            } else {
+                relationshipField.style.display = 'none';
+                relationshipDegree.required = false;
+                relationshipDegree.value = '';
+
+                // Diğer belge gerekli izinler için
+                if (documentRequiredTypes.includes(this.value)) {
+                    documentField.style.display = 'block';
+                    const hints = {
+                        'sickness': 'Sağlık raporu yüklemeniz gerekmektedir.',
+                        'birth': 'Doğum belgesi yüklemeniz gerekmektedir.',
+                        'marriage': 'Evlilik cüzdanı yüklemeniz gerekmektedir.'
+                    };
+                    documentHint.textContent = hints[this.value] || 'Gerekli belgeleri yüklemeniz gerekmektedir.';
+                } else {
+                    documentField.style.display = 'none';
+                }
             }
         });
+
+        // Yakınlık derecesi değiştiğinde izin süresini validate et
+        document.getElementById('relationshipDegree').addEventListener('change', function() {
+            const leaveType = document.getElementById('leaveType').value;
+            if (leaveType !== 'death') return;
+
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+
+            if (!startDate || !endDate) return;
+
+            const start = new Date(startDate);
+            const end = new Date(endDate);
+            const daysDiff = Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1;
+
+            const allowedDays = ['anne', 'baba', 'es', 'cocuk'].includes(this.value) ? 3 : 1;
+
+            if (daysDiff > allowedDays) {
+                alert(`Seçilen yakınlık derecesi için maksimum ${allowedDays} gün izin hakkınız bulunmaktadır. Lütfen bitiş tarihini düzenleyin.`);
+                document.getElementById('endDate').value = '';
+                document.getElementById('totalDays').value = '0 iş günü';
+            }
+        });
+
+        // Ölüm izni için tarih değiştiğinde de validasyon yap
+        document.getElementById('startDate').addEventListener('change', validateDeathLeave);
+        document.getElementById('endDate').addEventListener('change', validateDeathLeave);
+
+        function validateDeathLeave() {
+            const leaveType = document.getElementById('leaveType').value;
+            if (leaveType !== 'death') return;
+
+            const relationshipDegree = document.getElementById('relationshipDegree').value;
+            if (!relationshipDegree) return;
+
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+
+            if (!startDate || !endDate) return;
+
+            const start = new Date(startDate);
+            const end = new Date(endDate);
+            const daysDiff = Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1;
+
+            const allowedDays = ['anne', 'baba', 'es', 'cocuk'].includes(relationshipDegree) ? 3 : 1;
+
+            if (daysDiff > allowedDays) {
+                alert(`Seçilen yakınlık derecesi için maksimum ${allowedDays} gün izin hakkınız bulunmaktadır. Lütfen bitiş tarihini düzenleyin.`);
+                document.getElementById('endDate').value = '';
+                document.getElementById('totalDays').value = '0 iş günü';
+            }
+        }
 
         // Çalışma yeri değiştiğinde
         document.getElementById('workLocation').addEventListener('change', toggleSahaFields);
@@ -828,7 +906,9 @@
                 hasDocuments: uploadedDocuments.length > 0,
                 // Mazeret izni için saat bilgileri
                 startTime: document.getElementById('startTime')?.value || '',
-                endTime: document.getElementById('endTime')?.value || ''
+                endTime: document.getElementById('endTime')?.value || '',
+                // Ölüm izni için yakınlık derecesi
+                relationshipDegree: leaveType === 'death' ? document.getElementById('relationshipDegree').value : null
             };
 
             // WorkflowEngine ile talep oluştur
@@ -860,6 +940,15 @@
             // Dosya yükleme kontrolü
             const documentUpload = document.getElementById('documentUpload');
             const leaveType = document.getElementById('leaveType').value;
+
+            // Ölüm izni için yakınlık derecesi kontrolü
+            if (leaveType === 'death') {
+                const relationshipDegree = document.getElementById('relationshipDegree').value;
+                if (!relationshipDegree) {
+                    App.showNotification('Lütfen yakınlık derecesi seçiniz.', 'error');
+                    return;
+                }
+            }
 
             if (documentRequiredTypes.includes(leaveType) && documentUpload.files.length > 0) {
                 // Dosyaları Base64 olarak oku ve kaydet
