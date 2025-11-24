@@ -731,57 +731,85 @@
             }
         });
 
-        // Yakınlık derecesi değiştiğinde izin süresini validate et
+        // Ölüm izni için tarihleri otomatik hesapla ve set et
+        function autoSetDeathLeaveDates(startDate, allowedDays) {
+            if (!startDate || !allowedDays) return;
+
+            const start = new Date(startDate);
+
+            // Bitiş tarihini hesapla (başlangıç + izin günleri - 1)
+            const end = new Date(start);
+            end.setDate(end.getDate() + allowedDays - 1);
+
+            // İşe dönüş tarihini hesapla (bitiş tarihi + 1, hafta sonu kontrolü ile)
+            const returnToWork = new Date(end);
+            returnToWork.setDate(returnToWork.getDate() + 1);
+
+            // Hafta sonu kontrolü - Cumartesi ise Pazartesi'ye atla
+            if (returnToWork.getDay() === 6) {
+                returnToWork.setDate(returnToWork.getDate() + 2);
+            }
+            // Pazar ise Pazartesi'ye atla
+            else if (returnToWork.getDay() === 0) {
+                returnToWork.setDate(returnToWork.getDate() + 1);
+            }
+
+            // Tarihleri formatla (YYYY-MM-DD)
+            const formatDateForInput = (date) => {
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            };
+
+            // Tarih alanlarını set et
+            const endDateInput = document.getElementById('endDate');
+            const returnToWorkInput = document.getElementById('returnToWorkDate');
+
+            endDateInput.value = formatDateForInput(end);
+            returnToWorkInput.value = formatDateForInput(returnToWork);
+
+            // Flatpickr instance'larını güncelle
+            if (endDatePicker) {
+                endDatePicker.setDate(end, false);
+            }
+            if (returnToWorkDatePicker) {
+                returnToWorkDatePicker.setDate(returnToWork, false);
+            }
+
+            // İş günü sayısını güncelle
+            updateLeaveDaysDisplay();
+
+            // Lokasyonları yeniden render et (çakışma kontrolü için)
+            renderEmployeeLocations();
+        }
+
+        // Yakınlık derecesi değiştiğinde tarihleri otomatik hesapla
         document.getElementById('relationshipDegree').addEventListener('change', function() {
             const leaveType = document.getElementById('leaveType').value;
             if (leaveType !== 'death') return;
 
             const startDate = document.getElementById('startDate').value;
-            const endDate = document.getElementById('endDate').value;
-
-            if (!startDate || !endDate) return;
-
-            const start = new Date(startDate);
-            const end = new Date(endDate);
-            const daysDiff = Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1;
+            if (!startDate) {
+                App.showNotification('Lütfen önce başlangıç tarihi seçiniz.', 'warning');
+                return;
+            }
 
             const allowedDays = ['anne', 'baba', 'es', 'cocuk'].includes(this.value) ? 3 : 1;
-
-            if (daysDiff > allowedDays) {
-                alert(`Seçilen yakınlık derecesi için maksimum ${allowedDays} gün izin hakkınız bulunmaktadır. Lütfen bitiş tarihini düzenleyin.`);
-                document.getElementById('endDate').value = '';
-                document.getElementById('totalDays').value = '0 iş günü';
-            }
+            autoSetDeathLeaveDates(startDate, allowedDays);
         });
 
-        // Ölüm izni için tarih değiştiğinde de validasyon yap
-        document.getElementById('startDate').addEventListener('change', validateDeathLeave);
-        document.getElementById('endDate').addEventListener('change', validateDeathLeave);
-
-        function validateDeathLeave() {
+        // Ölüm izni için başlangıç tarihi değiştiğinde de otomatik hesapla
+        document.getElementById('startDate').addEventListener('change', function() {
             const leaveType = document.getElementById('leaveType').value;
             if (leaveType !== 'death') return;
 
             const relationshipDegree = document.getElementById('relationshipDegree').value;
             if (!relationshipDegree) return;
 
-            const startDate = document.getElementById('startDate').value;
-            const endDate = document.getElementById('endDate').value;
-
-            if (!startDate || !endDate) return;
-
-            const start = new Date(startDate);
-            const end = new Date(endDate);
-            const daysDiff = Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1;
-
             const allowedDays = ['anne', 'baba', 'es', 'cocuk'].includes(relationshipDegree) ? 3 : 1;
-
-            if (daysDiff > allowedDays) {
-                alert(`Seçilen yakınlık derecesi için maksimum ${allowedDays} gün izin hakkınız bulunmaktadır. Lütfen bitiş tarihini düzenleyin.`);
-                document.getElementById('endDate').value = '';
-                document.getElementById('totalDays').value = '0 iş günü';
-            }
-        }
+            autoSetDeathLeaveDates(this.value, allowedDays);
+        });
 
         // Çalışma yeri değiştiğinde
         document.getElementById('workLocation').addEventListener('change', toggleSahaFields);
