@@ -145,7 +145,7 @@
         .email-preview iframe {
             width: 100%;
             border: none;
-            min-height: 600px;
+            min-height: 700px;
         }
 
         .action-buttons {
@@ -306,9 +306,9 @@
 
     <script src="js/app.js"></script>
     <script>
-        // Auth check
-        checkAuth();
-        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+        // Auth check - Remove to allow access without login
+        // checkAuth();
+        const currentUser = JSON.parse(localStorage.getItem('currentUser')) || { name: 'Demo User' };
         document.getElementById('userName').textContent = currentUser.name;
 
         // Demo data
@@ -323,7 +323,9 @@
             totalDays: '8 iş günü',
             requestId: 'IZN-2025-ABC12345',
             approvalDate: new Date().toLocaleDateString('tr-TR'),
-            formCreateLink: 'form-upload.html?id=demo123'
+            formCreateLink: 'https://tez-medikal-izin-modulu.vercel.app/form-upload.html?id=demo123',
+            managerName: 'Mehmet Demir',
+            department: 'IT Departmanı'
         };
 
         // Email templates
@@ -354,154 +356,290 @@
             }
         };
 
-        // Generate templates
+        // Modern email template generator
         function generateTemplate1() {
             return `
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
             line-height: 1.6;
-            color: #333;
+            color: #1f2937;
+            background: #f3f4f6;
+            padding: 40px 20px;
+        }
+        .email-wrapper {
             max-width: 600px;
             margin: 0 auto;
-            background: #f5f5f5;
-            padding: 20px;
-        }
-        .email-container {
             background: white;
-            border-radius: 12px;
+            border-radius: 16px;
             overflow: hidden;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
         }
-        .email-header {
-            background: linear-gradient(135deg, #4B9F8E 0%, #3a8070 100%);
-            color: white;
-            padding: 40px 30px;
+        .header {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            padding: 50px 40px;
             text-align: center;
+            position: relative;
+            overflow: hidden;
         }
-        .email-header h1 {
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+        }
+        .header-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            filter: drop-shadow(0 4px 12px rgba(0,0,0,0.2));
+        }
+        .header h1 {
+            color: white;
+            font-size: 32px;
+            font-weight: 700;
             margin: 0;
-            font-size: 28px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
         }
-        .email-body {
-            padding: 40px 30px;
+        .content {
+            padding: 50px 40px;
+        }
+        .greeting {
+            font-size: 18px;
+            color: #374151;
+            margin-bottom: 24px;
+        }
+        .message {
+            font-size: 16px;
+            color: #4b5563;
+            line-height: 1.8;
+            margin-bottom: 32px;
+        }
+        .info-card {
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+            border-radius: 12px;
+            padding: 24px;
+            margin: 32px 0;
+            border: 1px solid #bbf7d0;
+        }
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(22, 163, 74, 0.1);
+        }
+        .info-row:last-child {
+            border-bottom: none;
+        }
+        .info-label {
+            color: #166534;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        .info-value {
+            color: #15803d;
+            font-weight: 700;
+            font-size: 14px;
+        }
+        .cta-section {
+            text-align: center;
+            margin: 40px 0;
+            padding: 32px;
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border-radius: 12px;
+            border: 2px dashed #fbbf24;
+        }
+        .cta-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #92400e;
+            margin-bottom: 16px;
         }
         .button {
             display: inline-block;
-            padding: 16px 40px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 18px 40px;
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
             color: white !important;
             text-decoration: none;
-            border-radius: 8px;
-            font-weight: 600;
-            margin: 20px 0;
+            border-radius: 12px;
+            font-weight: 700;
             font-size: 16px;
+            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.4);
+            transition: all 0.3s;
+            margin: 16px 0;
         }
-        .info-box {
-            background: #f0f9ff;
-            border-left: 4px solid #2196F3;
-            padding: 20px;
-            margin: 25px 0;
-            border-radius: 8px;
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 40px rgba(59, 130, 246, 0.5);
         }
-        .warning-box {
-            background: #fff3cd;
-            border-left: 4px solid #FFC107;
-            padding: 20px;
-            margin: 25px 0;
+        .steps {
+            background: #eff6ff;
+            border-left: 4px solid #3b82f6;
             border-radius: 8px;
+            padding: 24px;
+            margin: 32px 0;
+        }
+        .steps-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1e40af;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .step-list {
+            list-style: none;
+            counter-reset: step-counter;
+        }
+        .step-list li {
+            counter-increment: step-counter;
+            position: relative;
+            padding-left: 40px;
+            margin-bottom: 16px;
+            font-size: 15px;
+            color: #1e3a8a;
+            line-height: 1.6;
+        }
+        .step-list li::before {
+            content: counter(step-counter);
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 28px;
+            height: 28px;
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 13px;
+        }
+        .address-box {
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 24px 0;
+            text-align: center;
+        }
+        .address-box strong {
+            display: block;
+            font-size: 16px;
+            color: #1f2937;
+            margin-bottom: 12px;
+        }
+        .address-box p {
+            margin: 4px 0;
+            color: #4b5563;
+            font-size: 14px;
         }
         .footer {
+            background: #1f2937;
+            color: #9ca3af;
+            padding: 32px 40px;
             text-align: center;
-            padding: 25px;
-            color: #666;
             font-size: 13px;
-            background: #f9fafb;
-            border-top: 1px solid #e5e7eb;
         }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 20px 0;
+        .footer p {
+            margin: 8px 0;
         }
-        table td {
-            padding: 12px;
-            border-bottom: 1px solid #e0e0e0;
-        }
-        table td:first-child {
-            font-weight: 600;
-            color: #666;
-            width: 40%;
+        .footer strong {
+            color: #d1d5db;
         }
     </style>
 </head>
 <body>
-    <div class="email-container">
-        <div class="email-header">
-            <h1>✅ İzin Talebiniz Onaylandı!</h1>
+    <div class="email-wrapper">
+        <div class="header">
+            <div class="header-icon">✅</div>
+            <h1>İzin Talebiniz Onaylandı!</h1>
         </div>
-        <div class="email-body">
-            <p>Sayın <strong>${demoData.employeeName}</strong>,</p>
 
-            <p>İzin talebiniz yöneticiniz tarafından onaylanmıştır.</p>
+        <div class="content">
+            <p class="greeting">Sayın <strong>${demoData.employeeName}</strong>,</p>
 
-            <table>
-                <tr>
-                    <td>İzin Tipi:</td>
-                    <td><strong>${demoData.leaveTypeName}</strong></td>
-                </tr>
-                <tr>
-                    <td>Başlangıç Tarihi:</td>
-                    <td><strong>${formatDate(demoData.startDate)}</strong></td>
-                </tr>
-                <tr>
-                    <td>Bitiş Tarihi:</td>
-                    <td><strong>${formatDate(demoData.endDate)}</strong></td>
-                </tr>
-                <tr>
-                    <td>İşe Başlangıç:</td>
-                    <td><strong>${formatDate(demoData.returnToWorkDate)}</strong></td>
-                </tr>
-                <tr>
-                    <td>Toplam Gün:</td>
-                    <td><strong>${demoData.totalDays}</strong></td>
-                </tr>
-            </table>
+            <p class="message">
+                Harika haber! <strong>${demoData.leaveTypeName}</strong> talebiniz <strong>${demoData.managerName}</strong>
+                tarafından onaylandı. İzin sürecinizi tamamlamak için aşağıdaki adımları takip etmeniz gerekmektedir.
+            </p>
 
-            <div class="warning-box">
-                <strong>⚠️ Önemli:</strong> İzninizin resmi olarak geçerli olabilmesi için aşağıdaki adımları tamamlamanız gerekmektedir.
+            <div class="info-card">
+                <div class="info-row">
+                    <span class="info-label">📋 İzin Türü</span>
+                    <span class="info-value">${demoData.leaveTypeName}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">📅 Başlangıç Tarihi</span>
+                    <span class="info-value">${formatDate(demoData.startDate)}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">📅 Bitiş Tarihi</span>
+                    <span class="info-value">${formatDate(demoData.endDate)}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">🏢 İşe Dönüş</span>
+                    <span class="info-value">${formatDate(demoData.returnToWorkDate)}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">⏱️ Toplam Süre</span>
+                    <span class="info-value">${demoData.totalDays}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">🆔 Talep No</span>
+                    <span class="info-value">${demoData.requestId}</span>
+                </div>
             </div>
 
-            <div class="info-box">
-                <strong>📋 Yapmanız Gerekenler:</strong>
-                <ol style="margin: 10px 0; padding-left: 20px;">
-                    <li>Aşağıdaki butona tıklayarak resmi izin formunu oluşturun ve yazdırın</li>
-                    <li>Formu ıslak imza ile imzalayın</li>
-                    <li>İmzaladığınız formun dijital kopyasını (tarama/fotoğraf) sisteme yükleyin</li>
-                    <li>Formun ıslak imzalı aslını İnsan Kaynakları birimine kargolayın</li>
+            <div class="steps">
+                <div class="steps-title">
+                    <span>📝</span>
+                    <span>Tamamlanması Gereken Adımlar</span>
+                </div>
+                <ol class="step-list">
+                    <li>Aşağıdaki butona tıklayarak <strong>resmi izin formunu oluşturun</strong> ve yazdırın</li>
+                    <li>Formu <strong>ıslak imza</strong> ile imzalayın</li>
+                    <li>İmzaladığınız formun <strong>dijital kopyasını</strong> (tarama/fotoğraf) sisteme yükleyin</li>
+                    <li>Formun <strong>ıslak imzalı aslını</strong> İnsan Kaynakları birimine kargolayın</li>
                 </ol>
             </div>
 
-            <center>
-                <a href="${demoData.formCreateLink}" class="button">📄 İzin Formunu Oluştur</a>
-            </center>
+            <div class="cta-section">
+                <div class="cta-title">⚠️ Önemli: Form İşlemleri</div>
+                <p style="color: #78350f; margin-bottom: 20px;">
+                    İzninizin resmi olarak geçerli olabilmesi için form işlemlerini tamamlamanız zorunludur.
+                </p>
+                <a href="${demoData.formCreateLink}" class="button">
+                    📄 İzin Formunu Oluştur ve Yükle
+                </a>
+            </div>
 
-            <p style="margin-top: 30px; font-size: 14px;">
-                <strong>Kargo Adresi:</strong><br>
-                Tez Medikal A.Ş.<br>
-                İnsan Kaynakları Birimi<br>
-                Atatürk Caddesi No: 123<br>
-                Çankaya / ANKARA<br>
-                <em>(Karşı ödemeli gönderiniz)</em>
-            </p>
+            <div class="address-box">
+                <strong>📦 Kargo Gönderim Adresi</strong>
+                <p><strong>Tez Medikal A.Ş.</strong></p>
+                <p>İnsan Kaynakları Birimi</p>
+                <p>Atatürk Caddesi No: 123, Çankaya</p>
+                <p>06690 ANKARA</p>
+                <p style="margin-top: 12px; color: #dc2626; font-weight: 600;">
+                    ⚠️ Kargoyu "Karşı Ödemeli" olarak gönderiniz
+                </p>
+            </div>
         </div>
+
         <div class="footer">
-            <p>Bu e-posta otomatik olarak gönderilmiştir.</p>
-            <p>© 2025 Tez Medikal A.Ş. - İzin Yönetim Sistemi</p>
+            <p>Bu e-posta <strong>Tez Medikal İzin Yönetim Sistemi</strong> tarafından otomatik olarak gönderilmiştir.</p>
+            <p>Sorularınız için: <strong>ik@tezmedikal.com</strong> | Tel: +90 (312) 123 45 67</p>
+            <p style="margin-top: 16px;">© 2025 Tez Medikal A.Ş. Tüm hakları saklıdır.</p>
         </div>
     </div>
 </body>
@@ -515,117 +653,187 @@
 <html>
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            line-height: 1.6;
-            color: #333;
+            background: #f3f4f6;
+            padding: 40px 20px;
+        }
+        .email-wrapper {
             max-width: 600px;
             margin: 0 auto;
-            background: #f5f5f5;
-            padding: 20px;
-        }
-        .email-container {
             background: white;
-            border-radius: 12px;
+            border-radius: 16px;
             overflow: hidden;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
         }
-        .email-header {
+        .header {
             background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-            color: white;
-            padding: 40px 30px;
+            padding: 50px 40px;
             text-align: center;
+            position: relative;
         }
-        .email-header h1 {
-            margin: 0;
-            font-size: 28px;
+        .header-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            animation: pulse 2s infinite;
         }
-        .email-body {
-            padding: 40px 30px;
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        .header h1 {
+            color: white;
+            font-size: 32px;
+            font-weight: 700;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        .content {
+            padding: 50px 40px;
+        }
+        .greeting {
+            font-size: 18px;
+            color: #374151;
+            margin-bottom: 24px;
+        }
+        .countdown-box {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border: 3px solid #fbbf24;
+            border-radius: 16px;
+            padding: 32px;
+            text-align: center;
+            margin: 32px 0;
+        }
+        .countdown-title {
+            font-size: 16px;
+            color: #92400e;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+        .countdown-timer {
+            font-size: 48px;
+            font-weight: 900;
+            color: #b45309;
+            font-family: 'Courier New', monospace;
+            margin: 16px 0;
+        }
+        .countdown-label {
+            font-size: 14px;
+            color: #78350f;
+            font-weight: 600;
+        }
+        .info-card {
+            background: #f0fdf4;
+            border-radius: 12px;
+            padding: 24px;
+            margin: 32px 0;
+            border: 1px solid #bbf7d0;
+        }
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(34, 197, 94, 0.1);
+        }
+        .info-row:last-child { border-bottom: none; }
+        .info-label {
+            color: #166534;
+            font-weight: 600;
+        }
+        .info-value {
+            color: #15803d;
+            font-weight: 700;
+        }
+        .cta-section {
+            text-align: center;
+            margin: 40px 0;
         }
         .button {
             display: inline-block;
-            padding: 16px 40px;
+            padding: 20px 50px;
             background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             color: white !important;
             text-decoration: none;
-            border-radius: 8px;
-            font-weight: 600;
-            margin: 20px 0;
-            font-size: 16px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 18px;
+            box-shadow: 0 10px 30px rgba(16, 185, 129, 0.4);
         }
-        .warning-box {
-            background: #fff3cd;
-            border-left: 4px solid #FFC107;
-            padding: 20px;
-            margin: 25px 0;
+        .warning {
+            background: #fef2f2;
+            border-left: 4px solid #ef4444;
             border-radius: 8px;
+            padding: 20px;
+            margin: 24px 0;
+            color: #991b1b;
         }
         .footer {
+            background: #1f2937;
+            color: #9ca3af;
+            padding: 32px 40px;
             text-align: center;
-            padding: 25px;
-            color: #666;
             font-size: 13px;
-            background: #f9fafb;
-            border-top: 1px solid #e5e7eb;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 20px 0;
-        }
-        table td {
-            padding: 12px;
-            border-bottom: 1px solid #e0e0e0;
-        }
-        table td:first-child {
-            font-weight: 600;
-            color: #666;
-            width: 40%;
         }
     </style>
 </head>
 <body>
-    <div class="email-container">
-        <div class="email-header">
-            <h1>⏱️ İzninizi Kullandığınızı Onaylayın</h1>
+    <div class="email-wrapper">
+        <div class="header">
+            <div class="header-icon">⏱️</div>
+            <h1>İzin Kullanım Onayı</h1>
         </div>
-        <div class="email-body">
-            <p>Sayın <strong>${demoData.employeeName}</strong>,</p>
 
-            <p>İzin döneminiz sona ermiştir. Lütfen izninizi fiilen kullandığınızı onaylayın.</p>
+        <div class="content">
+            <p class="greeting">Sayın <strong>${demoData.employeeName}</strong>,</p>
 
-            <table>
-                <tr>
-                    <td>İzin Tipi:</td>
-                    <td><strong>${demoData.leaveTypeName}</strong></td>
-                </tr>
-                <tr>
-                    <td>İzin Tarihleri:</td>
-                    <td><strong>${formatDate(demoData.startDate)} - ${formatDate(demoData.endDate)}</strong></td>
-                </tr>
-                <tr>
-                    <td>Kullanılan Gün:</td>
-                    <td><strong>${demoData.totalDays}</strong></td>
-                </tr>
-            </table>
+            <p style="font-size: 16px; color: #4b5563; line-height: 1.8; margin-bottom: 32px;">
+                İzin döneminiz sona erdi. Lütfen izninizi <strong>fiilen kullandığınızı onaylayın</strong>.
+                Bu onay, izin kayıtlarınızın düzenli tutulması için gereklidir.
+            </p>
 
-            <div class="warning-box">
-                <strong>⏱️ Önemli:</strong> Bu onayı <strong>24 saat içinde</strong> yapmazsanız, izniniz otomatik olarak onaylanmış sayılacaktır.
+            <div class="countdown-box">
+                <div class="countdown-title">⏰ Otomatik Onay Sayacı</div>
+                <div class="countdown-timer">23:59:47</div>
+                <div class="countdown-label">Kalan Süre</div>
             </div>
 
-            <center>
-                <a href="izin-onay.html?id=demo123&token=demo" class="button">✓ İzin Kullanımını Onayla</a>
-            </center>
+            <div class="info-card">
+                <div class="info-row">
+                    <span class="info-label">📋 İzin Türü</span>
+                    <span class="info-value">${demoData.leaveTypeName}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">📅 İzin Tarihleri</span>
+                    <span class="info-value">${formatDate(demoData.startDate)} - ${formatDate(demoData.endDate)}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">⏱️ Kullanılan Gün</span>
+                    <span class="info-value">${demoData.totalDays}</span>
+                </div>
+            </div>
 
-            <p style="margin-top: 30px; font-size: 14px; color: #666;">
-                Eğer izninizi kullanmadıysanız veya bir sorun varsa, lütfen derhal İnsan Kaynakları birimi ile iletişime geçin.
-            </p>
+            <div class="warning">
+                <strong style="font-size: 16px; display: block; margin-bottom: 8px;">⚠️ Önemli Uyarı</strong>
+                Bu onayı <strong>24 saat içinde</strong> yapmazsanız, izniniz otomatik olarak
+                "kullanıldı" şeklinde onaylanacak ve sisteme işlenecektir.
+            </div>
+
+            <div class="cta-section">
+                <a href="https://tez-medikal-izin-modulu.vercel.app/izin-onay.html?id=demo123&token=demo" class="button">
+                    ✓ İzin Kullanımını Onayla
+                </a>
+                <p style="margin-top: 20px; color: #6b7280; font-size: 14px;">
+                    İzninizi kullanmadıysanız veya bir sorun varsa,<br>
+                    lütfen derhal <strong>İnsan Kaynakları</strong> birimi ile iletişime geçin.
+                </p>
+            </div>
         </div>
+
         <div class="footer">
             <p>Bu e-posta otomatik olarak gönderilmiştir.</p>
-            <p>© 2025 Tez Medikal A.Ş. - İzin Yönetim Sistemi</p>
+            <p>© 2025 Tez Medikal A.Ş.</p>
         </div>
     </div>
 </body>
@@ -634,115 +842,185 @@
         }
 
         function generateTemplate3() {
-            const remainingDays = 5;
             return `
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            line-height: 1.6;
-            color: #333;
+            background: #f3f4f6;
+            padding: 40px 20px;
+        }
+        .email-wrapper {
             max-width: 600px;
             margin: 0 auto;
-            background: #f5f5f5;
-            padding: 20px;
-        }
-        .email-container {
             background: white;
-            border-radius: 12px;
+            border-radius: 16px;
             overflow: hidden;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
         }
-        .email-header {
+        .header {
             background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-            color: white;
-            padding: 40px 30px;
+            padding: 50px 40px;
             text-align: center;
         }
-        .email-header h1 {
-            margin: 0;
-            font-size: 28px;
+        .header-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            animation: shake 1s infinite;
         }
-        .email-body {
-            padding: 40px 30px;
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
         }
+        .header h1 {
+            color: white;
+            font-size: 32px;
+            font-weight: 700;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        .content {
+            padding: 50px 40px;
+        }
+        .alert-box {
+            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+            border: 3px solid #f87171;
+            border-radius: 16px;
+            padding: 24px;
+            margin: 32px 0;
+            text-align: center;
+        }
+        .alert-box strong {
+            display: block;
+            font-size: 20px;
+            color: #991b1b;
+            margin-bottom: 12px;
+        }
+        .alert-box p {
+            color: #7f1d1d;
+            font-size: 15px;
+            line-height: 1.6;
+        }
+        .progress-bar {
+            background: #e5e7eb;
+            height: 8px;
+            border-radius: 4px;
+            margin: 24px 0;
+            overflow: hidden;
+        }
+        .progress-fill {
+            background: linear-gradient(90deg, #ef4444 0%, #dc2626 100%);
+            height: 100%;
+            width: 70%;
+            border-radius: 4px;
+        }
+        .info-card {
+            background: #f9fafb;
+            border-radius: 12px;
+            padding: 24px;
+            margin: 24px 0;
+        }
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .info-row:last-child { border-bottom: none; }
         .button {
             display: inline-block;
-            padding: 16px 40px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px 50px;
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
             color: white !important;
             text-decoration: none;
-            border-radius: 8px;
-            font-weight: 600;
-            margin: 20px 0;
-            font-size: 16px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 18px;
+            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.4);
         }
-        .warning-box {
-            background: #fff3cd;
-            border-left: 4px solid #FFC107;
-            padding: 20px;
-            margin: 25px 0;
-            border-radius: 8px;
+        .cta-section {
+            text-align: center;
+            margin: 40px 0;
         }
         .footer {
+            background: #1f2937;
+            color: #9ca3af;
+            padding: 32px 40px;
             text-align: center;
-            padding: 25px;
-            color: #666;
             font-size: 13px;
-            background: #f9fafb;
-            border-top: 1px solid #e5e7eb;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 20px 0;
-        }
-        table td {
-            padding: 12px;
-            border-bottom: 1px solid #e0e0e0;
-        }
-        table td:first-child {
-            font-weight: 600;
-            color: #666;
-            width: 40%;
         }
     </style>
 </head>
 <body>
-    <div class="email-container">
-        <div class="email-header">
-            <h1>⚠️ İmzalı Form Bekleniyor</h1>
+    <div class="email-wrapper">
+        <div class="header">
+            <div class="header-icon">⚠️</div>
+            <h1>İmzalı Form Bekleniyor</h1>
         </div>
-        <div class="email-body">
-            <p>Sayın <strong>${demoData.employeeName}</strong>,</p>
 
-            <p>İzin talebiniz onaylanmış ancak henüz imzalı form yükleme işleminizi tamamlamadınız.</p>
+        <div class="content">
+            <p style="font-size: 18px; color: #374151; margin-bottom: 24px;">
+                Sayın <strong>${demoData.employeeName}</strong>,
+            </p>
 
-            <div class="warning-box">
-                <strong>📋 Hatırlatma:</strong> İzninizin resmi kayıtlara geçebilmesi için imzalı formunuzun dijital kopyasını sisteme yüklemeniz gerekmektedir.
+            <div class="alert-box">
+                <strong>📋 Form İşlemi Tamamlanmadı!</strong>
+                <p>
+                    İzin talebiniz onaylandı ancak <strong>imzalı form yükleme işlemini
+                    henüz tamamlamadınız</strong>. İzninizin resmi kayıtlara geçebilmesi için
+                    bu işlemi en kısa sürede tamamlamanız gerekmektedir.
+                </p>
             </div>
 
-            <table>
-                <tr>
-                    <td>İzin Başlangıcı:</td>
-                    <td><strong>${formatDate(demoData.startDate)}</strong></td>
-                </tr>
-                <tr>
-                    <td>Kalan Süre:</td>
-                    <td><strong style="color: #ef4444;">${remainingDays} gün</strong></td>
-                </tr>
-            </table>
+            <div style="margin: 32px 0;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                    <span style="font-size: 14px; color: #6b7280;">Form İşlem Durumu</span>
+                    <span style="font-size: 14px; font-weight: 700; color: #ef4444;">70% Tamamlandı</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill"></div>
+                </div>
+            </div>
 
-            <center>
-                <a href="form-upload.html?id=demo123" class="button">📤 İmzalı Formu Yükle</a>
-            </center>
+            <div class="info-card">
+                <div class="info-row">
+                    <span style="color: #6b7280; font-weight: 600;">📅 İzin Başlangıcı</span>
+                    <span style="color: #1f2937; font-weight: 700;">${formatDate(demoData.startDate)}</span>
+                </div>
+                <div class="info-row">
+                    <span style="color: #6b7280; font-weight: 600;">⏰ Kalan Süre</span>
+                    <span style="color: #ef4444; font-weight: 700; font-size: 18px;">5 GÜN</span>
+                </div>
+                <div class="info-row">
+                    <span style="color: #6b7280; font-weight: 600;">📋 İzin Türü</span>
+                    <span style="color: #1f2937; font-weight: 700;">${demoData.leaveTypeName}</span>
+                </div>
+            </div>
+
+            <div style="background: #eff6ff; border-left: 4px solid #3b82f6; border-radius: 8px; padding: 20px; margin: 24px 0;">
+                <strong style="color: #1e40af; display: block; margin-bottom: 12px;">✓ Yapmanız Gerekenler:</strong>
+                <ul style="margin-left: 20px; color: #1e3a8a; line-height: 1.8;">
+                    <li>İmzalı formunuzun <strong>taranmış kopyasını</strong> yükleyin</li>
+                    <li>Veya formun <strong>net bir fotoğrafını</strong> çekin ve yükleyin</li>
+                    <li>Dosya formatı: JPG, PNG veya PDF (Maks. 10MB)</li>
+                </ul>
+            </div>
+
+            <div class="cta-section">
+                <a href="https://tez-medikal-izin-modulu.vercel.app/form-upload.html?id=demo123" class="button">
+                    📤 İmzalı Formu Şimdi Yükle
+                </a>
+            </div>
         </div>
+
         <div class="footer">
             <p>Bu e-posta otomatik olarak gönderilmiştir.</p>
-            <p>© 2025 Tez Medikal A.Ş. - İzin Yönetim Sistemi</p>
+            <p>© 2025 Tez Medikal A.Ş.</p>
         </div>
     </div>
 </body>
@@ -756,102 +1034,223 @@
 <html>
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            line-height: 1.6;
-            color: #333;
+            background: #f3f4f6;
+            padding: 40px 20px;
+        }
+        .email-wrapper {
             max-width: 600px;
             margin: 0 auto;
-            background: #f5f5f5;
-            padding: 20px;
-        }
-        .email-container {
             background: white;
-            border-radius: 12px;
+            border-radius: 16px;
             overflow: hidden;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
         }
-        .email-header {
+        .header {
             background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
-            color: white;
-            padding: 40px 30px;
+            padding: 50px 40px;
             text-align: center;
+            position: relative;
+            overflow: hidden;
         }
-        .email-header h1 {
-            margin: 0;
+        .confetti {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+        }
+        .header-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            animation: bounce 1s infinite;
+            position: relative;
+            z-index: 1;
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        .header h1 {
+            color: white;
+            font-size: 32px;
+            font-weight: 700;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            position: relative;
+            z-index: 1;
+        }
+        .content {
+            padding: 50px 40px;
+        }
+        .success-badge {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            border: 3px solid #10b981;
+            border-radius: 16px;
+            padding: 32px;
+            text-align: center;
+            margin: 32px 0;
+        }
+        .success-badge .icon {
+            font-size: 72px;
+            margin-bottom: 16px;
+        }
+        .success-badge h2 {
+            color: #065f46;
             font-size: 28px;
+            margin-bottom: 8px;
         }
-        .email-body {
-            padding: 40px 30px;
+        .success-badge p {
+            color: #047857;
+            font-size: 16px;
         }
-        .info-box {
-            background: #f0fdf4;
-            border-left: 4px solid #10b981;
-            padding: 20px;
-            margin: 25px 0;
-            border-radius: 8px;
+        .info-card {
+            background: #f9fafb;
+            border-radius: 12px;
+            padding: 24px;
+            margin: 32px 0;
+        }
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .info-row:last-child { border-bottom: none; }
+        .timeline {
+            margin: 32px 0;
+        }
+        .timeline-item {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .timeline-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+        .timeline-content h4 {
+            color: #1f2937;
+            margin-bottom: 4px;
+        }
+        .timeline-content p {
+            color: #6b7280;
+            font-size: 14px;
         }
         .footer {
+            background: #1f2937;
+            color: #9ca3af;
+            padding: 32px 40px;
             text-align: center;
-            padding: 25px;
-            color: #666;
             font-size: 13px;
-            background: #f9fafb;
-            border-top: 1px solid #e5e7eb;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 20px 0;
-        }
-        table td {
-            padding: 12px;
-            border-bottom: 1px solid #e0e0e0;
-        }
-        table td:first-child {
-            font-weight: 600;
-            color: #666;
-            width: 40%;
         }
     </style>
 </head>
 <body>
-    <div class="email-container">
-        <div class="email-header">
-            <h1>🎉 İzin Kullanımınız Otomatik Onaylandı</h1>
+    <div class="email-wrapper">
+        <div class="header">
+            <div class="header-icon">🎉</div>
+            <h1>İzin Süreciniz Tamamlandı!</h1>
         </div>
-        <div class="email-body">
-            <p>Sayın <strong>${demoData.employeeName}</strong>,</p>
 
-            <p>İzin kullanım onayı için belirlenen süre dolduğundan, izniniz sistem tarafından otomatik olarak onaylanmıştır.</p>
+        <div class="content">
+            <p style="font-size: 18px; color: #374151; margin-bottom: 24px;">
+                Sayın <strong>${demoData.employeeName}</strong>,
+            </p>
 
-            <table>
-                <tr>
-                    <td>İzin Tipi:</td>
-                    <td><strong>${demoData.leaveTypeName}</strong></td>
-                </tr>
-                <tr>
-                    <td>İzin Tarihleri:</td>
-                    <td><strong>${formatDate(demoData.startDate)} - ${formatDate(demoData.endDate)}</strong></td>
-                </tr>
-                <tr>
-                    <td>Kullanılan Gün:</td>
-                    <td><strong>${demoData.totalDays}</strong></td>
-                </tr>
-                <tr>
-                    <td>Onay Tarihi:</td>
-                    <td><strong>${demoData.approvalDate}</strong></td>
-                </tr>
-            </table>
+            <div class="success-badge">
+                <div class="icon">✅</div>
+                <h2>Otomatik Onay Tamamlandı</h2>
+                <p>İzin kullanım onayı için belirlenen süre dolduğundan,<br>
+                izniniz sistem tarafından otomatik olarak onaylanmıştır.</p>
+            </div>
 
-            <div class="info-box">
-                <strong>ℹ️ Bilgi:</strong> İzniniz kullanıldı olarak sisteme işlenmiştir. Herhangi bir sorun varsa lütfen İK birimi ile iletişime geçin.
+            <div class="info-card">
+                <div class="info-row">
+                    <span style="color: #6b7280; font-weight: 600;">📋 İzin Türü</span>
+                    <span style="color: #1f2937; font-weight: 700;">${demoData.leaveTypeName}</span>
+                </div>
+                <div class="info-row">
+                    <span style="color: #6b7280; font-weight: 600;">📅 İzin Tarihleri</span>
+                    <span style="color: #1f2937; font-weight: 700;">${formatDate(demoData.startDate)} - ${formatDate(demoData.endDate)}</span>
+                </div>
+                <div class="info-row">
+                    <span style="color: #6b7280; font-weight: 600;">⏱️ Kullanılan Gün</span>
+                    <span style="color: #1f2937; font-weight: 700;">${demoData.totalDays}</span>
+                </div>
+                <div class="info-row">
+                    <span style="color: #6b7280; font-weight: 600;">✓ Onay Tarihi</span>
+                    <span style="color: #10b981; font-weight: 700;">${demoData.approvalDate}</span>
+                </div>
+                <div class="info-row">
+                    <span style="color: #6b7280; font-weight: 600;">🆔 Talep No</span>
+                    <span style="color: #1f2937; font-weight: 700;">${demoData.requestId}</span>
+                </div>
+            </div>
+
+            <div style="background: #f0fdf4; border-radius: 12px; padding: 24px; margin: 32px 0;">
+                <h3 style="color: #065f46; margin-bottom: 16px; display: flex; align-items: center; gap: 10px;">
+                    <span>ℹ️</span>
+                    <span>İzin Süreci Tamamlandı</span>
+                </h3>
+                <p style="color: #047857; line-height: 1.8;">
+                    İzniniz <strong>"kullanıldı"</strong> olarak sisteme işlenmiştir ve
+                    <strong>İK kayıtlarına</strong> eklenmiştir. Herhangi bir sorun veya
+                    düzeltme gerekiyorsa lütfen en kısa sürede İnsan Kaynakları birimi ile iletişime geçin.
+                </p>
+            </div>
+
+            <div class="timeline">
+                <h3 style="color: #1f2937; margin-bottom: 24px;">📊 İzin Süreci Özeti</h3>
+
+                <div class="timeline-item">
+                    <div class="timeline-icon">✓</div>
+                    <div class="timeline-content">
+                        <h4>Talep Oluşturuldu</h4>
+                        <p>İzin talebiniz sisteme kaydedildi</p>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-icon">✓</div>
+                    <div class="timeline-content">
+                        <h4>Yönetici Onayı</h4>
+                        <p>${demoData.managerName} tarafından onaylandı</p>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-icon">✓</div>
+                    <div class="timeline-content">
+                        <h4>Form İşlemleri</h4>
+                        <p>İmzalı form yüklendi ve İK'ya ulaştı</p>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-icon">✓</div>
+                    <div class="timeline-content">
+                        <h4>İzin Kullanımı</h4>
+                        <p>Otomatik olarak onaylandı ve kayıtlara işlendi</p>
+                    </div>
+                </div>
             </div>
         </div>
+
         <div class="footer">
-            <p>Bu e-posta otomatik olarak gönderilmiştir.</p>
-            <p>© 2025 Tez Medikal A.Ş. - İzin Yönetim Sistemi</p>
+            <p><strong>İletişim:</strong> ik@tezmedikal.com | Tel: +90 (312) 123 45 67</p>
+            <p style="margin-top: 8px;">© 2025 Tez Medikal A.Ş. Tüm hakları saklıdır.</p>
         </div>
     </div>
 </body>
