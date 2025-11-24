@@ -799,18 +799,6 @@
             autoSetDeathLeaveDates(startDate, allowedDays);
         });
 
-        // Ölüm izni için başlangıç tarihi değiştiğinde de otomatik hesapla
-        document.getElementById('startDate').addEventListener('change', function() {
-            const leaveType = document.getElementById('leaveType').value;
-            if (leaveType !== 'death') return;
-
-            const relationshipDegree = document.getElementById('relationshipDegree').value;
-            if (!relationshipDegree) return;
-
-            const allowedDays = ['anne', 'baba', 'es', 'cocuk'].includes(relationshipDegree) ? 3 : 1;
-            autoSetDeathLeaveDates(this.value, allowedDays);
-        });
-
         // Çalışma yeri değiştiğinde
         document.getElementById('workLocation').addEventListener('change', toggleSahaFields);
 
@@ -833,6 +821,16 @@
                 updateLeaveDaysDisplay();
                 // Lokasyonları yeniden render et (çakışma kontrolü için)
                 renderEmployeeLocations();
+
+                // Ölüm izni için tarihleri otomatik hesapla
+                const leaveType = document.getElementById('leaveType').value;
+                if (leaveType === 'death') {
+                    const relationshipDegree = document.getElementById('relationshipDegree').value;
+                    if (relationshipDegree) {
+                        const allowedDays = ['anne', 'baba', 'es', 'cocuk'].includes(relationshipDegree) ? 3 : 1;
+                        autoSetDeathLeaveDates(dateStr, allowedDays);
+                    }
+                }
             }
         });
 
