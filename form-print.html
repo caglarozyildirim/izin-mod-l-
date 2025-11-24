@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>İzin Formu - Tez Medikal</title>
+    <style>
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+            body {
+                padding: 0;
+                margin: 0;
+            }
+        }
+
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            line-height: 1.6;
+            color: #000;
+            max-width: 210mm;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+
+        .form-container {
+            background: white;
+            padding: 40px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 3px solid #4B9F8E;
+            padding-bottom: 20px;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+            color: #4B9F8E;
+        }
+
+        .header p {
+            margin: 5px 0;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .form-title {
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+            margin: 30px 0;
+            text-transform: uppercase;
+        }
+
+        .info-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        .info-table td {
+            padding: 12px;
+            border: 1px solid #333;
+        }
+
+        .info-table td:first-child {
+            font-weight: bold;
+            width: 35%;
+            background: #f5f5f5;
+        }
+
+        .signature-section {
+            margin-top: 60px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .signature-box {
+            width: 45%;
+        }
+
+        .signature-box p {
+            margin: 5px 0;
+            font-weight: bold;
+        }
+
+        .signature-line {
+            margin-top: 60px;
+            border-top: 1px solid #333;
+            padding-top: 5px;
+            text-align: center;
+        }
+
+        .notes {
+            margin-top: 40px;
+            padding: 15px;
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            font-size: 12px;
+        }
+
+        .notes h3 {
+            margin-top: 0;
+            color: #856404;
+        }
+
+        .notes ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+
+        .button-group {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 1000;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+        }
+
+        .form-number {
+            text-align: right;
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .approval-section {
+            margin-top: 40px;
+            padding: 20px;
+            border: 2px solid #4B9F8E;
+        }
+
+        .approval-section h3 {
+            margin-top: 0;
+            color: #4B9F8E;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="button-group no-print">
+        <button onclick="window.print()" class="btn btn-primary">🖨️ Yazdır</button>
+        <a href="form-upload.html" class="btn btn-secondary">↩️ Geri</a>
+    </div>
+
+    <div class="form-container">
+        <div class="header">
+            <h1>TEZ MEDİKAL A.Ş.</h1>
+            <p>İnsan Kaynakları Birimi</p>
+            <p>Tel: +90 (XXX) XXX XX XX | E-posta: ik@tezmedikal.com</p>
+        </div>
+
+        <div class="form-number">
+            Form No: <span id="formNumber">IZN-2025-XXXX</span>
+        </div>
+
+        <div class="form-title">
+            İZİN TALEP FORMU
+        </div>
+
+        <table class="info-table">
+            <tr>
+                <td>Adı Soyadı</td>
+                <td id="employeeName"></td>
+            </tr>
+            <tr>
+                <td>Unvan</td>
+                <td id="employeeTitle"></td>
+            </tr>
+            <tr>
+                <td>Departman</td>
+                <td id="employeeDepartment"></td>
+            </tr>
+            <tr>
+                <td>Personel No</td>
+                <td id="employeeId"></td>
+            </tr>
+            <tr>
+                <td>TC Kimlik No</td>
+                <td id="employeeTCKN"></td>
+            </tr>
+        </table>
+
+        <table class="info-table">
+            <tr>
+                <td>İzin Türü</td>
+                <td id="leaveType"></td>
+            </tr>
+            <tr>
+                <td>İzin Başlangıç Tarihi</td>
+                <td id="startDate"></td>
+            </tr>
+            <tr>
+                <td>İzin Bitiş Tarihi</td>
+                <td id="endDate"></td>
+            </tr>
+            <tr>
+                <td>İşe Başlangıç Tarihi</td>
+                <td id="returnToWorkDate"></td>
+            </tr>
+            <tr>
+                <td>Toplam İzin Süresi</td>
+                <td id="totalDays"></td>
+            </tr>
+            <tr>
+                <td>Çalışma Konumu</td>
+                <td id="workLocation"></td>
+            </tr>
+            <tr>
+                <td>İzin Açıklaması</td>
+                <td id="description"></td>
+            </tr>
+        </table>
+
+        <div id="fieldServiceInfo" style="display: none;">
+            <table class="info-table">
+                <tr>
+                    <td colspan="2" style="background: #4B9F8E; color: white; text-align: center; font-weight: bold;">
+                        Saha Bilgileri
+                    </td>
+                </tr>
+                <tr>
+                    <td>Görevlendirme Yapılan Firmalar</td>
+                    <td id="serviceCompanies"></td>
+                </tr>
+            </table>
+        </div>
+
+        <div id="replacementInfo" style="display: none;">
+            <table class="info-table">
+                <tr>
+                    <td>Yerine Bakan Personel</td>
+                    <td id="replacementPerson"></td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="approval-section">
+            <h3>YÖNETİCİ ONAYI</h3>
+            <table class="info-table">
+                <tr>
+                    <td>Onaylayan Yönetici</td>
+                    <td id="approverName"></td>
+                </tr>
+                <tr>
+                    <td>Onay Tarihi</td>
+                    <td id="approvalDate"></td>
+                </tr>
+                <tr>
+                    <td>Onay Durumu</td>
+                    <td style="color: #28a745; font-weight: bold;">✓ ONAYLANDI</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="signature-section">
+            <div class="signature-box">
+                <p>Personel</p>
+                <div class="signature-line">
+                    İmza / Tarih
+                </div>
+            </div>
+            <div class="signature-box">
+                <p>İnsan Kaynakları</p>
+                <div class="signature-line">
+                    İmza / Tarih / Kaşe
+                </div>
+            </div>
+        </div>
+
+        <div class="notes">
+            <h3>⚠️ ÖNEMLI NOTLAR</h3>
+            <ul>
+                <li>Bu form ıslak imza ile imzalanmalı ve İnsan Kaynakları birimine ulaştırılmalıdır.</li>
+                <li>İmzalanan formun dijital kopyası (tarama veya fotoğraf) sisteme yüklenmelidir.</li>
+                <li>Formun aslı karşı ödemeli kargo ile İK birimine gönderilmelidir.</li>
+                <li>Form İK birimine ulaşmadan izin resmi olarak geçerli sayılmayacaktır.</li>
+                <li>İzin dönüşünde "İzin Kullanım Onayı" yapılması zorunludur.</li>
+            </ul>
+        </div>
+
+        <div style="margin-top: 30px; text-align: center; font-size: 10px; color: #999;">
+            Bu form Tez Medikal İzin Yönetim Sistemi tarafından otomatik olarak oluşturulmuştur.
+            <br>Oluşturma Tarihi: <span id="creationDate"></span>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script>
+        // URL parametrelerinden talep ID'sini al
+        const urlParams = new URLSearchParams(window.location.search);
+        const requestId = urlParams.get('id');
+
+        if (!requestId) {
+            alert('Geçersiz form linki!');
+            window.location.href = 'izinlerim.html';
+        }
+
+        // Talep bilgilerini yükle
+        const leaveRequests = JSON.parse(localStorage.getItem('leaveRequests') || '[]');
+        const request = leaveRequests.find(r => r.id === requestId);
+
+        if (!request) {
+            alert('Talep bulunamadı!');
+            window.location.href = 'izinlerim.html';
+        }
+
+        // Kullanıcı bilgilerini yükle
+        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+        const users = JSON.parse(localStorage.getItem('users') || '[]');
+        const user = users.find(u => u.id === request.userId) || currentUser;
+
+        // İzin tipi çevirisi
+        const leaveTypeMap = {
+            'annual': 'Yıllık İzin',
+            'sick': 'Hastalık İzni',
+            'excused': 'Mazeret İzni',
+            'maternity': 'Doğum İzni',
+            'paternity': 'Babalık İzni',
+            'unpaid': 'Ücretsiz İzin',
+            'marriage': 'Evlilik İzni',
+            'death': 'Ölüm İzni'
+        };
+
+        // Çalışma konumu çevirisi
+        const locationMap = {
+            'merkez': 'Merkez',
+            'saha': 'Saha (Servis Hizmeti)'
+        };
+
+        // Form numarası oluştur
+        const formNumber = `IZN-${new Date().getFullYear()}-${requestId.substring(0, 8).toUpperCase()}`;
+        document.getElementById('formNumber').textContent = formNumber;
+
+        // Çalışan bilgileri
+        document.getElementById('employeeName').textContent = user.name;
+        document.getElementById('employeeTitle').textContent = user.title || 'Uzman';
+        document.getElementById('employeeDepartment').textContent = user.department || request.userDepartment || 'Belirtilmemiş';
+        document.getElementById('employeeId').textContent = user.employeeId || user.id;
+        document.getElementById('employeeTCKN').textContent = user.tckn || '___________';
+
+        // İzin bilgileri
+        document.getElementById('leaveType').textContent = leaveTypeMap[request.type] || request.type;
+        document.getElementById('startDate').textContent = formatDate(request.startDate);
+        document.getElementById('endDate').textContent = formatDate(request.endDate);
+        document.getElementById('returnToWorkDate').textContent = formatDate(request.returnToWorkDate || request.endDate);
+        document.getElementById('totalDays').textContent = request.days;
+        document.getElementById('workLocation').textContent = locationMap[request.workLocation] || request.workLocation;
+        document.getElementById('description').textContent = request.description || '-';
+
+        // Saha bilgileri
+        if (request.workLocation === 'saha' && request.serviceCompanies && request.serviceCompanies.length > 0) {
+            document.getElementById('fieldServiceInfo').style.display = 'block';
+            const companiesText = request.serviceCompanies.map(c => {
+                if (c.company) {
+                    return `${c.company}${c.startTime && c.endTime ? ` (${c.startTime} - ${c.endTime})` : ''}`;
+                }
+                return c;
+            }).join(', ');
+            document.getElementById('serviceCompanies').textContent = companiesText;
+        }
+
+        // Yerine bakan bilgisi
+        if (request.needReplacement && request.replacementPerson) {
+            document.getElementById('replacementInfo').style.display = 'block';
+            const replacement = users.find(u => u.id === request.replacementPerson);
+            document.getElementById('replacementPerson').textContent = replacement ? replacement.name : request.replacementPerson;
+        }
+
+        // Onay bilgileri
+        if (request.approvals && request.approvals.length > 0) {
+            const lastApproval = request.approvals[request.approvals.length - 1];
+            const approver = users.find(u => u.id === lastApproval.approverId);
+            document.getElementById('approverName').textContent = approver ? approver.name : 'Yönetici';
+            document.getElementById('approvalDate').textContent = formatDate(lastApproval.date);
+        }
+
+        // Oluşturma tarihi
+        document.getElementById('creationDate').textContent = formatDate(new Date().toISOString());
+
+        // Tarih formatlama
+        function formatDate(dateStr) {
+            if (!dateStr) return '-';
+            const date = new Date(dateStr);
+            return date.toLocaleDateString('tr-TR', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            });
+        }
+
+        // Formu yazdırdıktan sonra upload sayfasına geri dön
+        window.onafterprint = function() {
+            if (confirm('Form yazdırıldı mı? İmzaladıktan sonra sisteme yüklemek için geri dönün.')) {
+                window.location.href = `form-upload.html?id=${requestId}`;
+            }
+        };
+    </script>
+</body>
+</html>

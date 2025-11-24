@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>İmzalı Form Yükleme - Tez Medikal</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .upload-container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+
+        .upload-card {
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .upload-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .upload-header h1 {
+            font-size: 28px;
+            color: #1f2937;
+            margin-bottom: 10px;
+        }
+
+        .upload-header p {
+            color: #6b7280;
+            font-size: 16px;
+        }
+
+        .steps {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .steps::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 10%;
+            right: 10%;
+            height: 2px;
+            background: #e5e7eb;
+            z-index: 0;
+        }
+
+        .step {
+            flex: 1;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .step-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #e5e7eb;
+            color: #9ca3af;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+            font-weight: 600;
+            font-size: 18px;
+        }
+
+        .step.active .step-circle {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .step.completed .step-circle {
+            background: #10b981;
+            color: white;
+        }
+
+        .step-label {
+            font-size: 13px;
+            color: #6b7280;
+            font-weight: 500;
+        }
+
+        .info-box {
+            background: #f0f9ff;
+            border-left: 4px solid #2196F3;
+            padding: 20px;
+            margin: 30px 0;
+            border-radius: 6px;
+        }
+
+        .info-box h3 {
+            margin: 0 0 15px 0;
+            color: #1e40af;
+            font-size: 18px;
+        }
+
+        .info-box ol {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+
+        .info-box li {
+            margin: 8px 0;
+            color: #1e3a8a;
+        }
+
+        .cargo-box {
+            background: #fff7ed;
+            border: 2px solid #fb923c;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+
+        .cargo-box h3 {
+            margin: 0 0 15px 0;
+            color: #c2410c;
+            font-size: 18px;
+        }
+
+        .cargo-address {
+            background: white;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 10px;
+        }
+
+        .cargo-address p {
+            margin: 5px 0;
+            color: #292524;
+            font-weight: 500;
+        }
+
+        .cargo-note {
+            margin-top: 15px;
+            padding: 10px;
+            background: #fef3c7;
+            border-radius: 4px;
+            font-weight: 600;
+            color: #92400e;
+        }
+
+        .upload-area {
+            border: 3px dashed #cbd5e1;
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            margin: 30px 0;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .upload-area:hover {
+            border-color: #667eea;
+            background: #f8fafc;
+        }
+
+        .upload-area.drag-over {
+            border-color: #667eea;
+            background: #eef2ff;
+        }
+
+        .upload-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+
+        .upload-area h3 {
+            margin: 0 0 10px 0;
+            color: #1f2937;
+        }
+
+        .upload-area p {
+            color: #6b7280;
+            margin: 5px 0;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .preview-container {
+            margin: 30px 0;
+            display: none;
+        }
+
+        .preview-image {
+            max-width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .file-info {
+            background: #f9fafb;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .file-name {
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .file-size {
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        .remove-file {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .remove-file:hover {
+            background: #dc2626;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .btn-full {
+            flex: 1;
+        }
+
+        .warning-banner {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+            display: flex;
+            align-items: start;
+            gap: 10px;
+        }
+
+        .warning-banner .icon {
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+
+        .warning-banner .content {
+            flex: 1;
+        }
+
+        .warning-banner h4 {
+            margin: 0 0 5px 0;
+            color: #991b1b;
+        }
+
+        .warning-banner p {
+            margin: 0;
+            color: #7f1d1d;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="topbar">
+        <div class="topbar-container">
+            <div class="topbar-left">
+                <div class="logo">Tez Medikal</div>
+            </div>
+            <div class="topbar-right">
+                <div class="user-info">
+                    <span id="userName"></span>
+                    <button onclick="logout()" class="btn btn-sm btn-outline-light">Çıkış</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="upload-container">
+        <div class="upload-card">
+            <div class="upload-header">
+                <h1>📄 İmzalı İzin Formu Yükleme</h1>
+                <p>İzin talebinizin tamamlanması için gerekli adımları tamamlayın</p>
+            </div>
+
+            <!-- Adım İzleyici -->
+            <div class="steps">
+                <div class="step completed">
+                    <div class="step-circle">✓</div>
+                    <div class="step-label">Onay Alındı</div>
+                </div>
+                <div class="step completed">
+                    <div class="step-circle">✓</div>
+                    <div class="step-label">Form Oluşturuldu</div>
+                </div>
+                <div class="step active">
+                    <div class="step-circle">3</div>
+                    <div class="step-label">Form Yükleme</div>
+                </div>
+                <div class="step">
+                    <div class="step-circle">4</div>
+                    <div class="step-label">Kargo Gönderimi</div>
+                </div>
+            </div>
+
+            <!-- Talep Bilgileri -->
+            <div id="requestInfo" style="background: #f9fafb; padding: 20px; border-radius: 8px; margin-bottom: 30px;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div>
+                        <strong>İzin Türü:</strong> <span id="leaveType"></span>
+                    </div>
+                    <div>
+                        <strong>Başlangıç:</strong> <span id="startDate"></span>
+                    </div>
+                    <div>
+                        <strong>Bitiş:</strong> <span id="endDate"></span>
+                    </div>
+                    <div>
+                        <strong>Süre:</strong> <span id="totalDays"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Talimatlar -->
+            <div class="info-box">
+                <h3>📋 Yapmanız Gerekenler</h3>
+                <ol>
+                    <li><strong>Formu Yazdırın:</strong> Aşağıdaki butonu kullanarak resmi izin formunu yazdırın</li>
+                    <li><strong>İmzalayın:</strong> Formu ıslak imza ile imzalayın</li>
+                    <li><strong>Dijital Kopya Yükleyin:</strong> İmzaladığınız formun taramasını veya net fotoğrafını sisteme yükleyin</li>
+                    <li><strong>Kargolayın:</strong> Formun ıslak imzalı aslını aşağıdaki adrese karşı ödemeli gönderin</li>
+                </ol>
+            </div>
+
+            <!-- Form Yazdırma Butonu -->
+            <div style="text-align: center; margin: 30px 0;">
+                <button onclick="printForm()" class="btn btn-primary" style="padding: 15px 40px; font-size: 16px;">
+                    🖨️ İzin Formunu Yazdır
+                </button>
+            </div>
+
+            <!-- Kargo Bilgileri -->
+            <div class="cargo-box">
+                <h3>📦 Kargo Gönderim Adresi</h3>
+                <div class="cargo-address">
+                    <p><strong>Tez Medikal A.Ş.</strong></p>
+                    <p>İnsan Kaynakları Birimi</p>
+                    <p>Atatürk Caddesi No: 123</p>
+                    <p>Çankaya / ANKARA</p>
+                    <p>Tel: +90 (312) 123 45 67</p>
+                </div>
+                <div class="cargo-note">
+                    ⚠️ Önemli: Kargoyu "Karşı Ödemeli" olarak gönderiniz
+                </div>
+            </div>
+
+            <!-- Upload Area -->
+            <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
+                <div class="upload-icon">📤</div>
+                <h3>İmzalı Formu Buraya Yükleyin</h3>
+                <p>Tarama veya fotoğraf olarak yükleyebilirsiniz</p>
+                <p style="font-size: 14px; color: #9ca3af;">Desteklenen formatlar: JPG, PNG, PDF (Maks. 10MB)</p>
+                <input type="file" id="fileInput" class="file-input" accept="image/*,.pdf" onchange="handleFileSelect(event)">
+            </div>
+
+            <!-- Preview Container -->
+            <div class="preview-container" id="previewContainer">
+                <h3>Yüklenen Dosya</h3>
+                <img id="previewImage" class="preview-image" alt="Form Preview">
+                <div class="file-info">
+                    <div>
+                        <div class="file-name" id="fileName"></div>
+                        <div class="file-size" id="fileSize"></div>
+                    </div>
+                    <button class="remove-file" onclick="removeFile()">🗑️ Kaldır</button>
+                </div>
+            </div>
+
+            <!-- Uyarı -->
+            <div class="warning-banner">
+                <div class="icon">⚠️</div>
+                <div class="content">
+                    <h4>Dikkat!</h4>
+                    <p>İzninizin resmi olarak geçerli olabilmesi için ıslak imzalı formun aslını kargo ile İK birimine göndermeniz gerekmektedir. Dijital yükleme sadece ara onay içindir.</p>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="button-group">
+                <a href="izinlerim.html" class="btn btn-secondary btn-full">↩️ İptal</a>
+                <button id="uploadBtn" class="btn btn-primary btn-full" disabled onclick="uploadForm()">
+                    ✓ Formu Kaydet ve Devam Et
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script>
+        // Kullanıcı kontrolü
+        checkAuth();
+        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+        document.getElementById('userName').textContent = currentUser.name;
+
+        // URL parametrelerinden talep ID'sini al
+        const urlParams = new URLSearchParams(window.location.search);
+        const requestId = urlParams.get('id');
+
+        if (!requestId) {
+            alert('Geçersiz form linki!');
+            window.location.href = 'izinlerim.html';
+        }
+
+        // Talep bilgilerini yükle
+        const leaveRequests = JSON.parse(localStorage.getItem('leaveRequests') || '[]');
+        const request = leaveRequests.find(r => r.id === requestId);
+
+        if (!request) {
+            alert('Talep bulunamadı!');
+            window.location.href = 'izinlerim.html';
+        }
+
+        // İzin tipi çevirisi
+        const leaveTypeMap = {
+            'annual': 'Yıllık İzin',
+            'sick': 'Hastalık İzni',
+            'excused': 'Mazeret İzni',
+            'maternity': 'Doğum İzni',
+            'paternity': 'Babalık İzni',
+            'unpaid': 'Ücretsiz İzin',
+            'marriage': 'Evlilik İzni',
+            'death': 'Ölüm İzni'
+        };
+
+        // Talep bilgilerini göster
+        document.getElementById('leaveType').textContent = leaveTypeMap[request.type] || request.type;
+        document.getElementById('startDate').textContent = formatDate(request.startDate);
+        document.getElementById('endDate').textContent = formatDate(request.endDate);
+        document.getElementById('totalDays').textContent = request.days;
+
+        // Tarih formatlama
+        function formatDate(dateStr) {
+            const date = new Date(dateStr);
+            return date.toLocaleDateString('tr-TR', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            });
+        }
+
+        // Form yazdırma
+        function printForm() {
+            window.open(`form-print.html?id=${requestId}`, '_blank');
+        }
+
+        // Drag and drop
+        const uploadArea = document.getElementById('uploadArea');
+
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('drag-over');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('drag-over');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('drag-over');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFile(files[0]);
+            }
+        });
+
+        let selectedFile = null;
+
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                handleFile(file);
+            }
+        }
+
+        function handleFile(file) {
+            // Dosya boyutu kontrolü (10MB)
+            if (file.size > 10 * 1024 * 1024) {
+                alert('Dosya boyutu 10MB\'dan küçük olmalıdır!');
+                return;
+            }
+
+            // Dosya tipi kontrolü
+            const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'application/pdf'];
+            if (!allowedTypes.includes(file.type)) {
+                alert('Sadece JPG, PNG veya PDF dosyaları yükleyebilirsiniz!');
+                return;
+            }
+
+            selectedFile = file;
+
+            // Preview göster
+            const previewContainer = document.getElementById('previewContainer');
+            const previewImage = document.getElementById('previewImage');
+
+            if (file.type === 'application/pdf') {
+                previewImage.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><path d="M369.9 97.9L286 14C277 5 264.8-.1 252.1-.1H48C21.5 0 0 21.5 0 48v416c0 26.5 21.5 48 48 48h288c26.5 0 48-21.5 48-48V131.9c0-12.7-5.1-25-14.1-34zM332.1 128H256V51.9l76.1 76.1zM48 464V48h160v104c0 13.3 10.7 24 24 24h104v288H48z"/></svg>';
+                previewImage.style.maxWidth = '200px';
+            } else {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    previewImage.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+
+            document.getElementById('fileName').textContent = file.name;
+            document.getElementById('fileSize').textContent = formatFileSize(file.size);
+            previewContainer.style.display = 'block';
+            document.getElementById('uploadBtn').disabled = false;
+
+            // Upload area'yı gizle
+            uploadArea.style.display = 'none';
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(2) + ' KB';
+            return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+        }
+
+        function removeFile() {
+            selectedFile = null;
+            document.getElementById('previewContainer').style.display = 'none';
+            document.getElementById('fileInput').value = '';
+            document.getElementById('uploadBtn').disabled = true;
+            uploadArea.style.display = 'block';
+        }
+
+        function uploadForm() {
+            if (!selectedFile) {
+                alert('Lütfen bir dosya seçin!');
+                return;
+            }
+
+            // Simüle edilmiş dosya yükleme
+            const uploadBtn = document.getElementById('uploadBtn');
+            uploadBtn.disabled = true;
+            uploadBtn.innerHTML = '<span style="display:inline-block;animation:spin 1s linear infinite;">⏳</span> Yükleniyor...';
+
+            setTimeout(() => {
+                // Talep durumunu güncelle
+                const requestIndex = leaveRequests.findIndex(r => r.id === requestId);
+                if (requestIndex !== -1) {
+                    leaveRequests[requestIndex].formUploaded = true;
+                    leaveRequests[requestIndex].formUploadDate = new Date().toISOString();
+                    leaveRequests[requestIndex].uploadedFileName = selectedFile.name;
+                    leaveRequests[requestIndex].uploadedFileSize = selectedFile.size;
+                    localStorage.setItem('leaveRequests', JSON.stringify(leaveRequests));
+                }
+
+                alert('✓ Form başarıyla yüklendi!\n\nLütfen ıslak imzalı formun aslını belirtilen adrese kargo ile gönderin.');
+                window.location.href = 'izinlerim.html';
+            }, 1500);
+        }
+
+        // CSS animasyonu
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes spin {
+                from { transform: rotate(0deg); }
+                to { transform: rotate(360deg); }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

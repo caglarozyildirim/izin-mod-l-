@@ -265,6 +265,12 @@
                         <td>
                             <div style="display: flex; gap: 8px;">
                                 <button class="btn btn-sm btn-secondary" onclick='showDetail(${JSON.stringify(req)})'>👁 Detay</button>
+                                ${req.status === 'approved' && !req.formUploaded ? `
+                                    <a href="form-upload.html?id=${req.id}" class="btn btn-sm btn-primary" title="İzin formunu oluştur ve yükle">📄 Form Oluştur</a>
+                                ` : ''}
+                                ${req.status === 'approved' && req.formUploaded && !req.leaveConfirmed ? `
+                                    <span class="badge badge-success" style="font-size: 11px; padding: 6px 10px;">✓ Form Yüklendi</span>
+                                ` : ''}
                             </div>
                         </td>
                     </tr>

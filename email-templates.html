@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Tez Medikal - E-posta Şablonları</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .template {
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .template h2 {
+            color: #4B9F8E;
+            border-bottom: 3px solid #4B9F8E;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .email-container {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .email-header {
+            background: linear-gradient(135deg, #4B9F8E 0%, #3a8070 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .email-header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .email-body {
+            padding: 30px;
+            background: #ffffff;
+        }
+        .button {
+            display: inline-block;
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white !important;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 600;
+            margin: 20px 0;
+        }
+        .info-box {
+            background: #f0f9ff;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        .warning-box {
+            background: #fff3cd;
+            border-left: 4px solid #FFC107;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            font-size: 12px;
+            background: #f9fafb;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        table td {
+            padding: 10px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        table td:first-child {
+            font-weight: 600;
+            color: #666;
+            width: 150px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Template 1: Yönetici Onayı Bildirimi -->
+    <div class="template">
+        <h2>📧 Template 1: Yönetici Onayı Bildirimi</h2>
+        <div class="email-container">
+            <div class="email-header">
+                <h1>✅ İzin Talebiniz Onaylandı!</h1>
+            </div>
+            <div class="email-body">
+                <p>Sayın <strong>[ÇALIŞAN_ADI]</strong>,</p>
+
+                <p>İzin talebiniz yöneticiniz tarafından onaylanmıştır.</p>
+
+                <table>
+                    <tr>
+                        <td>İzin Tipi:</td>
+                        <td><strong>[İZİN_TİPİ]</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Başlangıç Tarihi:</td>
+                        <td><strong>[BAŞLANGIÇ_TARİHİ]</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Bitiş Tarihi:</td>
+                        <td><strong>[BİTİŞ_TARİHİ]</strong></td>
+                    </tr>
+                    <tr>
+                        <td>İşe Başlangıç:</td>
+                        <td><strong>[İŞE_BAŞLANGIÇ_TARİHİ]</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Toplam Gün:</td>
+                        <td><strong>[TOPLAM_GÜN]</strong></td>
+                    </tr>
+                </table>
+
+                <div class="warning-box">
+                    <strong>⚠️ Önemli:</strong> İzninizin resmi olarak geçerli olabilmesi için aşağıdaki adımları tamamlamanız gerekmektedir.
+                </div>
+
+                <div class="info-box">
+                    <strong>📋 Yapmanız Gerekenler:</strong>
+                    <ol>
+                        <li>Aşağıdaki butona tıklayarak resmi izin formunu oluşturun ve yazdırın</li>
+                        <li>Formu ıslak imza ile imzalayın</li>
+                        <li>İmzaladığınız formun dijital kopyasını (tarama/fotoğraf) sisteme yükleyin</li>
+                        <li>Formun ıslak imzalı aslını İnsan Kaynakları birimine kargolayın</li>
+                    </ol>
+                </div>
+
+                <center>
+                    <a href="[FORM_OLUŞTUR_LİNK]" class="button">📄 İzin Formunu Oluştur</a>
+                </center>
+
+                <p style="margin-top: 30px;">
+                    <strong>Kargo Adresi:</strong><br>
+                    Tez Medikal A.Ş.<br>
+                    İnsan Kaynakları Birimi<br>
+                    [ADRES_BİLGİSİ]<br>
+                    <em>(Karşı ödemeli gönderiniz)</em>
+                </p>
+            </div>
+            <div class="footer">
+                <p>Bu e-posta otomatik olarak gönderilmiştir.</p>
+                <p>© 2025 Tez Medikal A.Ş. - İzin Yönetim Sistemi</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Template 2: İzin Kullanım Onayı -->
+    <div class="template">
+        <h2>📧 Template 2: İzin Kullanım Onayı Talebi</h2>
+        <div class="email-container">
+            <div class="email-header">
+                <h1>✓ İzninizi Kullandığınızı Onaylayın</h1>
+            </div>
+            <div class="email-body">
+                <p>Sayın <strong>[ÇALIŞAN_ADI]</strong>,</p>
+
+                <p>İzin döneminiz sona ermiştir. Lütfen izninizi fiilen kullandığınızı onaylayın.</p>
+
+                <table>
+                    <tr>
+                        <td>İzin Tipi:</td>
+                        <td><strong>[İZİN_TİPİ]</strong></td>
+                    </tr>
+                    <tr>
+                        <td>İzin Tarihleri:</td>
+                        <td><strong>[BAŞLANGIÇ_TARİHİ] - [BİTİŞ_TARİHİ]</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Kullanılan Gün:</td>
+                        <td><strong>[TOPLAM_GÜN]</strong></td>
+                    </tr>
+                </table>
+
+                <div class="warning-box">
+                    <strong>⏱️ Önemli:</strong> Bu onayı 24 saat içinde yapmazsanız, izniniz otomatik olarak onaylanmış sayılacaktır.
+                </div>
+
+                <center>
+                    <a href="[ONAY_LİNK]" class="button">✓ İzin Kullanımını Onayla</a>
+                </center>
+
+                <p style="margin-top: 30px; font-size: 13px; color: #666;">
+                    Eğer izninizi kullanmadıysanız veya bir sorun varsa, lütfen derhal İnsan Kaynakları birimi ile iletişime geçin.
+                </p>
+            </div>
+            <div class="footer">
+                <p>Bu e-posta otomatik olarak gönderilmiştir.</p>
+                <p>© 2025 Tez Medikal A.Ş. - İzin Yönetim Sistemi</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Template 3: Form Yükleme Hatırlatması -->
+    <div class="template">
+        <h2>📧 Template 3: İmzalı Form Yükleme Hatırlatması</h2>
+        <div class="email-container">
+            <div class="email-header">
+                <h1>⚠️ İmzalı Form Bekleniyor</h1>
+            </div>
+            <div class="email-body">
+                <p>Sayın <strong>[ÇALIŞAN_ADI]</strong>,</p>
+
+                <p>İzin talebiniz onaylanmış ancak henüz imzalı form yükleme işleminizi tamamlamadınız.</p>
+
+                <div class="warning-box">
+                    <strong>📋 Hatırlatma:</strong> İzninizin resmi kayıtlara geçebilmesi için imzalı formunuzun dijital kopyasını sisteme yüklemeniz gerekmektedir.
+                </div>
+
+                <table>
+                    <tr>
+                        <td>İzin Başlangıcı:</td>
+                        <td><strong>[BAŞLANGIÇ_TARİHİ]</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Kalan Süre:</td>
+                        <td><strong>[KALAN_GÜN] gün</strong></td>
+                    </tr>
+                </table>
+
+                <center>
+                    <a href="[FORM_YÜKLE_LİNK]" class="button">📤 İmzalı Formu Yükle</a>
+                </center>
+            </div>
+            <div class="footer">
+                <p>Bu e-posta otomatik olarak gönderilmiştir.</p>
+                <p>© 2025 Tez Medikal A.Ş. - İzin Yönetim Sistemi</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Template 4: Otomatik Onay Bildirimi -->
+    <div class="template">
+        <h2>📧 Template 4: Otomatik İzin Onayı Bildirimi</h2>
+        <div class="email-container">
+            <div class="email-header">
+                <h1>✅ İzin Kullanımınız Otomatik Onaylandı</h1>
+            </div>
+            <div class="email-body">
+                <p>Sayın <strong>[ÇALIŞAN_ADI]</strong>,</p>
+
+                <p>İzin kullanım onayı için belirlenen süre dolduğundan, izniniz sistem tarafından otomatik olarak onaylanmıştır.</p>
+
+                <table>
+                    <tr>
+                        <td>İzin Tipi:</td>
+                        <td><strong>[İZİN_TİPİ]</strong></td>
+                    </tr>
+                    <tr>
+                        <td>İzin Tarihleri:</td>
+                        <td><strong>[BAŞLANGIÇ_TARİHİ] - [BİTİŞ_TARİHİ]</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Kullanılan Gün:</td>
+                        <td><strong>[TOPLAM_GÜN]</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Onay Tarihi:</td>
+                        <td><strong>[ONAY_TARİHİ]</strong></td>
+                    </tr>
+                </table>
+
+                <div class="info-box">
+                    <strong>ℹ️ Bilgi:</strong> İzniniz kullanıldı olarak sisteme işlenmiştir. Herhangi bir sorun varsa lütfen İK birimi ile iletişime geçin.
+                </div>
+            </div>
+            <div class="footer">
+                <p>Bu e-posta otomatik olarak gönderilmiştir.</p>
+                <p>© 2025 Tez Medikal A.Ş. - İzin Yönetim Sistemi</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

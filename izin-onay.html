@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>İzin Kullanım Onayı - Tez Medikal</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .confirmation-container {
+            max-width: 700px;
+            width: 100%;
+        }
+
+        .confirmation-card {
+            background: white;
+            border-radius: 16px;
+            padding: 50px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: slideUp 0.5s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .confirmation-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .confirmation-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+        }
+
+        .confirmation-header h1 {
+            font-size: 28px;
+            color: #1f2937;
+            margin: 0 0 10px 0;
+        }
+
+        .confirmation-header p {
+            color: #6b7280;
+            font-size: 16px;
+            margin: 0;
+        }
+
+        .leave-details {
+            background: #f9fafb;
+            border-radius: 12px;
+            padding: 25px;
+            margin: 30px 0;
+        }
+
+        .leave-details h3 {
+            margin: 0 0 20px 0;
+            color: #1f2937;
+            font-size: 18px;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 10px;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: #6b7280;
+        }
+
+        .detail-value {
+            color: #1f2937;
+            font-weight: 500;
+        }
+
+        .warning-box {
+            background: #fff7ed;
+            border: 2px solid #fb923c;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 25px 0;
+            display: flex;
+            gap: 15px;
+        }
+
+        .warning-box .icon {
+            font-size: 32px;
+            flex-shrink: 0;
+        }
+
+        .warning-box .content h3 {
+            margin: 0 0 8px 0;
+            color: #c2410c;
+            font-size: 18px;
+        }
+
+        .warning-box .content p {
+            margin: 0;
+            color: #9a3412;
+            line-height: 1.6;
+        }
+
+        .timer-box {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            margin: 25px 0;
+        }
+
+        .timer-box h3 {
+            margin: 0 0 15px 0;
+            color: #92400e;
+            font-size: 16px;
+        }
+
+        .countdown {
+            font-size: 48px;
+            font-weight: 700;
+            color: #b45309;
+            font-family: 'Courier New', monospace;
+        }
+
+        .countdown-label {
+            font-size: 14px;
+            color: #92400e;
+            margin-top: 5px;
+        }
+
+        .confirmation-question {
+            background: #f0f9ff;
+            border-left: 4px solid #3b82f6;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 25px 0;
+        }
+
+        .confirmation-question h3 {
+            margin: 0 0 15px 0;
+            color: #1e40af;
+            font-size: 18px;
+        }
+
+        .confirmation-question p {
+            margin: 0;
+            color: #1e3a8a;
+            line-height: 1.6;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .btn-full {
+            flex: 1;
+            padding: 16px;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-confirm {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+
+        .btn-confirm:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-problem {
+            background: #f3f4f6;
+            color: #374151;
+            border: 2px solid #d1d5db;
+        }
+
+        .btn-problem:hover {
+            background: #e5e7eb;
+        }
+
+        .success-message {
+            display: none;
+            text-align: center;
+            animation: scaleIn 0.5s ease-out;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+
+        @keyframes scaleIn {
+            from {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .success-icon {
+            font-size: 100px;
+            margin-bottom: 20px;
+        }
+
+        .success-message h2 {
+            color: #10b981;
+            font-size: 32px;
+            margin: 0 0 15px 0;
+        }
+
+        .success-message p {
+            color: #6b7280;
+            font-size: 16px;
+            margin: 10px 0;
+        }
+
+        .contact-box {
+            background: #fef2f2;
+            border: 2px solid #fca5a5;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 25px 0;
+            text-align: center;
+        }
+
+        .contact-box h4 {
+            margin: 0 0 10px 0;
+            color: #991b1b;
+        }
+
+        .contact-box p {
+            margin: 5px 0;
+            color: #7f1d1d;
+        }
+
+        .contact-box a {
+            color: #dc2626;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .expired-message {
+            display: none;
+            text-align: center;
+        }
+
+        .expired-message.show {
+            display: block;
+        }
+
+        .expired-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="confirmation-container">
+        <div class="confirmation-card">
+            <!-- Normal Confirmation View -->
+            <div id="confirmationView">
+                <div class="confirmation-header">
+                    <div class="confirmation-icon">✓</div>
+                    <h1>İzin Kullanım Onayı</h1>
+                    <p>Lütfen izninizi kullandığınızı onaylayın</p>
+                </div>
+
+                <!-- Leave Details -->
+                <div class="leave-details">
+                    <h3>İzin Bilgileri</h3>
+                    <div class="detail-row">
+                        <span class="detail-label">Çalışan:</span>
+                        <span class="detail-value" id="employeeName"></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">İzin Türü:</span>
+                        <span class="detail-value" id="leaveType"></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">İzin Tarihleri:</span>
+                        <span class="detail-value" id="leaveDates"></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Toplam Süre:</span>
+                        <span class="detail-value" id="totalDays"></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">İşe Dönüş:</span>
+                        <span class="detail-value" id="returnDate"></span>
+                    </div>
+                </div>
+
+                <!-- Timer -->
+                <div class="timer-box">
+                    <h3>⏱️ Otomatik Onay Zamanı</h3>
+                    <div class="countdown" id="countdown">23:59:59</div>
+                    <div class="countdown-label">Kalan süre</div>
+                </div>
+
+                <!-- Warning -->
+                <div class="warning-box">
+                    <div class="icon">⚠️</div>
+                    <div class="content">
+                        <h3>Otomatik Onaylama</h3>
+                        <p>
+                            Bu onayı <strong>24 saat içinde</strong> yapmazsanız, izniniz otomatik olarak
+                            "kullanıldı" şeklinde onaylanacak ve sisteme işlenecektir.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Question -->
+                <div class="confirmation-question">
+                    <h3>İzninizi fiilen kullandınız mı?</h3>
+                    <p>
+                        İzin süreniz boyunca çalışmadığınızı ve izninizi kullandığınızı onaylıyorsanız,
+                        aşağıdaki butona tıklayın. İzniniz onaylandıktan sonra İK kayıtlarına işlenecektir.
+                    </p>
+                </div>
+
+                <!-- Buttons -->
+                <div class="button-group">
+                    <button class="btn-full btn-problem" onclick="reportProblem()">
+                        ⚠️ Sorun Var
+                    </button>
+                    <button class="btn-full btn-confirm" onclick="confirmLeave()">
+                        ✓ İznimi Kullandım, Onayla
+                    </button>
+                </div>
+
+                <!-- Contact Info -->
+                <div class="contact-box">
+                    <h4>Bir sorun mu var?</h4>
+                    <p>İzninizi kullanmadıysanız veya bir problem varsa</p>
+                    <p><a href="mailto:ik@tezmedikal.com">ik@tezmedikal.com</a> | Tel: +90 (312) 123 45 67</p>
+                </div>
+            </div>
+
+            <!-- Success View -->
+            <div id="successView" class="success-message">
+                <div class="success-icon">✅</div>
+                <h2>İzin Onaylandı!</h2>
+                <p>İzin kullanımınız başarıyla onaylandı.</p>
+                <p>İzniniz İK kayıtlarına işlenmiştir.</p>
+                <button onclick="window.close()" class="btn btn-primary" style="margin-top: 30px; padding: 12px 30px;">
+                    Kapat
+                </button>
+            </div>
+
+            <!-- Expired View -->
+            <div id="expiredView" class="expired-message">
+                <div class="expired-icon">⏰</div>
+                <h2 style="color: #dc2626;">Onay Süresi Doldu</h2>
+                <p>İzniniz otomatik olarak onaylanmıştır.</p>
+                <p>Herhangi bir sorun varsa İK birimi ile iletişime geçin.</p>
+                <button onclick="window.close()" class="btn btn-secondary" style="margin-top: 30px; padding: 12px 30px;">
+                    Kapat
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script>
+        // URL parametrelerinden talep ID ve token al
+        const urlParams = new URLSearchParams(window.location.search);
+        const requestId = urlParams.get('id');
+        const token = urlParams.get('token');
+
+        if (!requestId || !token) {
+            alert('Geçersiz onay linki!');
+            window.close();
+        }
+
+        // Talep bilgilerini yükle
+        const leaveRequests = JSON.parse(localStorage.getItem('leaveRequests') || '[]');
+        const request = leaveRequests.find(r => r.id === requestId);
+
+        if (!request) {
+            alert('Talep bulunamadı!');
+            window.close();
+        }
+
+        // Token kontrolü (basit doğrulama)
+        const expectedToken = btoa(requestId + request.userId);
+        if (token !== expectedToken) {
+            alert('Geçersiz token!');
+            window.close();
+        }
+
+        // Kullanıcı bilgilerini yükle
+        const users = JSON.parse(localStorage.getItem('users') || '[]');
+        const user = users.find(u => u.id === request.userId);
+
+        // İzin tipi çevirisi
+        const leaveTypeMap = {
+            'annual': 'Yıllık İzin',
+            'sick': 'Hastalık İzni',
+            'excused': 'Mazeret İzni',
+            'maternity': 'Doğum İzni',
+            'paternity': 'Babalık İzni',
+            'unpaid': 'Ücretsiz İzin',
+            'marriage': 'Evlilik İzni',
+            'death': 'Ölüm İzni'
+        };
+
+        // Bilgileri doldur
+        document.getElementById('employeeName').textContent = user ? user.name : 'Bilinmiyor';
+        document.getElementById('leaveType').textContent = leaveTypeMap[request.type] || request.type;
+        document.getElementById('leaveDates').textContent = `${formatDate(request.startDate)} - ${formatDate(request.endDate)}`;
+        document.getElementById('totalDays').textContent = request.days;
+        document.getElementById('returnDate').textContent = formatDate(request.returnToWorkDate || request.endDate);
+
+        // Tarih formatlama
+        function formatDate(dateStr) {
+            const date = new Date(dateStr);
+            return date.toLocaleDateString('tr-TR', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            });
+        }
+
+        // Onay e-postası gönderilme tarihi (simulasyon - izin bitiş tarihinden 1 gün sonra)
+        const emailSentDate = request.confirmationEmailSent
+            ? new Date(request.confirmationEmailSent)
+            : new Date(new Date(request.endDate).getTime() + 24 * 60 * 60 * 1000);
+
+        // 24 saatlik süre kontrolü
+        const expirationTime = new Date(emailSentDate.getTime() + 24 * 60 * 60 * 1000);
+        const now = new Date();
+
+        // Süre dolmuşsa otomatik onay
+        if (now >= expirationTime) {
+            if (!request.leaveConfirmed) {
+                autoConfirmLeave();
+            }
+            showExpiredView();
+        } else if (request.leaveConfirmed) {
+            // Zaten onaylanmış
+            showSuccessView();
+        } else {
+            // Geri sayım başlat
+            startCountdown(expirationTime);
+        }
+
+        function startCountdown(targetTime) {
+            function updateCountdown() {
+                const now = new Date();
+                const diff = targetTime - now;
+
+                if (diff <= 0) {
+                    autoConfirmLeave();
+                    showExpiredView();
+                    return;
+                }
+
+                const hours = Math.floor(diff / (1000 * 60 * 60));
+                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+                document.getElementById('countdown').textContent =
+                    `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            }
+
+            updateCountdown();
+            setInterval(updateCountdown, 1000);
+        }
+
+        function confirmLeave() {
+            if (!confirm('İzninizi kullandığınızı onaylıyor musunuz?')) {
+                return;
+            }
+
+            // Talebi onayla
+            const requestIndex = leaveRequests.findIndex(r => r.id === requestId);
+            if (requestIndex !== -1) {
+                leaveRequests[requestIndex].leaveConfirmed = true;
+                leaveRequests[requestIndex].leaveConfirmationDate = new Date().toISOString();
+                leaveRequests[requestIndex].leaveConfirmationType = 'manual';
+                leaveRequests[requestIndex].status = 'completed';
+                localStorage.setItem('leaveRequests', JSON.stringify(leaveRequests));
+            }
+
+            showSuccessView();
+        }
+
+        function autoConfirmLeave() {
+            // Otomatik onay
+            const requestIndex = leaveRequests.findIndex(r => r.id === requestId);
+            if (requestIndex !== -1 && !leaveRequests[requestIndex].leaveConfirmed) {
+                leaveRequests[requestIndex].leaveConfirmed = true;
+                leaveRequests[requestIndex].leaveConfirmationDate = new Date().toISOString();
+                leaveRequests[requestIndex].leaveConfirmationType = 'auto';
+                leaveRequests[requestIndex].status = 'completed';
+                localStorage.setItem('leaveRequests', JSON.stringify(leaveRequests));
+            }
+        }
+
+        function reportProblem() {
+            alert('İnsan Kaynakları birimi ile iletişime geçiniz.\n\nE-posta: ik@tezmedikal.com\nTel: +90 (312) 123 45 67');
+        }
+
+        function showSuccessView() {
+            document.getElementById('confirmationView').style.display = 'none';
+            document.getElementById('successView').classList.add('show');
+        }
+
+        function showExpiredView() {
+            document.getElementById('confirmationView').style.display = 'none';
+            document.getElementById('expiredView').classList.add('show');
+        }
+    </script>
+</body>
+</html>
