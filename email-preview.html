@@ -230,12 +230,12 @@
 
     <div class="email-preview-container">
         <div class="page-header">
-            <h1>📧 Email Template Önizleme <span class="badge-poc">POC DEMO</span></h1>
+            <h1>Email Template Önizleme <span class="badge-poc">POC DEMO</span></h1>
             <p>Sistemin göndereceği email şablonlarının önizlemesi</p>
         </div>
 
         <div class="info-banner">
-            <div class="info-banner-icon">ℹ️</div>
+            <div class="info-banner-icon" style="width: 24px; height: 24px; background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 14px;">i</div>
             <div class="info-banner-content">
                 <h4>POC Amaçlı Email Önizleme</h4>
                 <p>Bu sayfada sistemin farklı durumlarda göndereceği email şablonlarını gerçek verilerle önizleyebilirsiniz. Gerçek sistemde bu email'ler otomatik olarak kullanıcılara gönderilecektir.</p>
@@ -248,25 +248,25 @@
                 <h3>Email Şablonları (4)</h3>
 
                 <div class="email-item active" onclick="showEmailPreview(1)" id="email-item-1">
-                    <div class="email-item-icon">✅</div>
+                    <div class="email-item-icon" style="color: #10b981;">●</div>
                     <div class="email-item-title">Yönetici Onayı Bildirimi</div>
                     <div class="email-item-desc">İzin onaylandıktan sonra çalışana gönderilen email</div>
                 </div>
 
                 <div class="email-item" onclick="showEmailPreview(2)" id="email-item-2">
-                    <div class="email-item-icon">⏱️</div>
+                    <div class="email-item-icon" style="color: #f59e0b;">●</div>
                     <div class="email-item-title">İzin Kullanım Onayı</div>
                     <div class="email-item-desc">İzin bitiminde kullanım onayı isteyen email</div>
                 </div>
 
                 <div class="email-item" onclick="showEmailPreview(3)" id="email-item-3">
-                    <div class="email-item-icon">📋</div>
+                    <div class="email-item-icon" style="color: #ef4444;">●</div>
                     <div class="email-item-title">Form Yükleme Hatırlatması</div>
                     <div class="email-item-desc">İmzalı form yüklenmediğinde gönderilen hatırlatma</div>
                 </div>
 
                 <div class="email-item" onclick="showEmailPreview(4)" id="email-item-4">
-                    <div class="email-item-icon">🎉</div>
+                    <div class="email-item-icon" style="color: #8b5cf6;">●</div>
                     <div class="email-item-title">Otomatik İzin Onayı</div>
                     <div class="email-item-desc">24 saat sonra otomatik onaylanan email</div>
                 </div>
@@ -297,8 +297,8 @@
                 </div>
 
                 <div class="action-buttons">
-                    <button class="btn btn-primary" onclick="openInNewTab()">🔍 Yeni Sekmede Aç</button>
-                    <button class="btn btn-secondary" onclick="copyEmailHTML()">📋 HTML Kopyala</button>
+                    <button class="btn btn-primary" onclick="openInNewTab()">Yeni Sekmede Aç</button>
+                    <button class="btn btn-secondary" onclick="copyEmailHTML()">HTML Kopyala</button>
                 </div>
             </div>
         </div>
@@ -332,25 +332,25 @@
         const emailTemplates = {
             1: {
                 title: 'Yönetici Onayı Bildirimi',
-                subject: '✅ İzin Talebiniz Onaylandı!',
+                subject: 'İzin Talebiniz Onaylandı',
                 to: `${demoData.employeeName} <${demoData.employeeEmail}>`,
                 html: generateTemplate1()
             },
             2: {
                 title: 'İzin Kullanım Onayı',
-                subject: '⏱️ İzninizi Kullandığınızı Onaylayın',
+                subject: 'İzninizi Kullandığınızı Onaylayın',
                 to: `${demoData.employeeName} <${demoData.employeeEmail}>`,
                 html: generateTemplate2()
             },
             3: {
                 title: 'Form Yükleme Hatırlatması',
-                subject: '📋 İmzalı Form Bekleniyor',
+                subject: 'İmzalı Form Bekleniyor',
                 to: `${demoData.employeeName} <${demoData.employeeEmail}>`,
                 html: generateTemplate3()
             },
             4: {
                 title: 'Otomatik İzin Onayı',
-                subject: '🎉 İzin Kullanımınız Otomatik Onaylandı',
+                subject: 'İzin Kullanımınız Otomatik Onaylandı',
                 to: `${demoData.employeeName} <${demoData.employeeEmail}>`,
                 html: generateTemplate4()
             }
@@ -398,9 +398,18 @@
             background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
         }
         .header-icon {
-            font-size: 64px;
-            margin-bottom: 20px;
-            filter: drop-shadow(0 4px 12px rgba(0,0,0,0.2));
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            font-weight: 900;
+            color: #10b981;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
         }
         .header h1 {
             color: white;
@@ -562,7 +571,7 @@
 <body>
     <div class="email-wrapper">
         <div class="header">
-            <div class="header-icon">✅</div>
+            <div class="header-icon">✓</div>
             <h1>İzin Talebiniz Onaylandı!</h1>
         </div>
 
@@ -576,34 +585,33 @@
 
             <div class="info-card">
                 <div class="info-row">
-                    <span class="info-label">📋 İzin Türü</span>
+                    <span class="info-label">İzin Türü</span>
                     <span class="info-value">${demoData.leaveTypeName}</span>
                 </div>
                 <div class="info-row">
-                    <span class="info-label">📅 Başlangıç Tarihi</span>
+                    <span class="info-label">Başlangıç Tarihi</span>
                     <span class="info-value">${formatDate(demoData.startDate)}</span>
                 </div>
                 <div class="info-row">
-                    <span class="info-label">📅 Bitiş Tarihi</span>
+                    <span class="info-label">Bitiş Tarihi</span>
                     <span class="info-value">${formatDate(demoData.endDate)}</span>
                 </div>
                 <div class="info-row">
-                    <span class="info-label">🏢 İşe Dönüş</span>
+                    <span class="info-label">İşe Dönüş</span>
                     <span class="info-value">${formatDate(demoData.returnToWorkDate)}</span>
                 </div>
                 <div class="info-row">
-                    <span class="info-label">⏱️ Toplam Süre</span>
+                    <span class="info-label">Toplam Süre</span>
                     <span class="info-value">${demoData.totalDays}</span>
                 </div>
                 <div class="info-row">
-                    <span class="info-label">🆔 Talep No</span>
+                    <span class="info-label">Talep No</span>
                     <span class="info-value">${demoData.requestId}</span>
                 </div>
             </div>
 
             <div class="steps">
                 <div class="steps-title">
-                    <span>📝</span>
                     <span>Tamamlanması Gereken Adımlar</span>
                 </div>
                 <ol class="step-list">
@@ -615,23 +623,23 @@
             </div>
 
             <div class="cta-section">
-                <div class="cta-title">⚠️ Önemli: Form İşlemleri</div>
+                <div class="cta-title">Önemli: Form İşlemleri</div>
                 <p style="color: #78350f; margin-bottom: 20px;">
                     İzninizin resmi olarak geçerli olabilmesi için form işlemlerini tamamlamanız zorunludur.
                 </p>
                 <a href="${demoData.formCreateLink}" class="button">
-                    📄 İzin Formunu Oluştur ve Yükle
+                    İzin Formunu Oluştur ve Yükle
                 </a>
             </div>
 
             <div class="address-box">
-                <strong>📦 Kargo Gönderim Adresi</strong>
+                <strong>Kargo Gönderim Adresi</strong>
                 <p><strong>Tez Medikal A.Ş.</strong></p>
                 <p>İnsan Kaynakları Birimi</p>
                 <p>Atatürk Caddesi No: 123, Çankaya</p>
                 <p>06690 ANKARA</p>
                 <p style="margin-top: 12px; color: #dc2626; font-weight: 600;">
-                    ⚠️ Kargoyu "Karşı Ödemeli" olarak gönderiniz
+                    Not: Kargoyu "Karşı Ödemeli" olarak gönderiniz
                 </p>
             </div>
         </div>
@@ -676,8 +684,18 @@
             position: relative;
         }
         .header-icon {
-            font-size: 64px;
-            margin-bottom: 20px;
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            font-weight: 900;
+            color: #f59e0b;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
             animation: pulse 2s infinite;
         }
         @keyframes pulse {
@@ -781,7 +799,7 @@
 <body>
     <div class="email-wrapper">
         <div class="header">
-            <div class="header-icon">⏱️</div>
+            <div class="header-icon">24h</div>
             <h1>İzin Kullanım Onayı</h1>
         </div>
 
@@ -794,35 +812,35 @@
             </p>
 
             <div class="countdown-box">
-                <div class="countdown-title">⏰ Otomatik Onay Sayacı</div>
+                <div class="countdown-title">Otomatik Onay Sayacı</div>
                 <div class="countdown-timer">23:59:47</div>
                 <div class="countdown-label">Kalan Süre</div>
             </div>
 
             <div class="info-card">
                 <div class="info-row">
-                    <span class="info-label">📋 İzin Türü</span>
+                    <span class="info-label">İzin Türü</span>
                     <span class="info-value">${demoData.leaveTypeName}</span>
                 </div>
                 <div class="info-row">
-                    <span class="info-label">📅 İzin Tarihleri</span>
+                    <span class="info-label">İzin Tarihleri</span>
                     <span class="info-value">${formatDate(demoData.startDate)} - ${formatDate(demoData.endDate)}</span>
                 </div>
                 <div class="info-row">
-                    <span class="info-label">⏱️ Kullanılan Gün</span>
+                    <span class="info-label">Kullanılan Gün</span>
                     <span class="info-value">${demoData.totalDays}</span>
                 </div>
             </div>
 
             <div class="warning">
-                <strong style="font-size: 16px; display: block; margin-bottom: 8px;">⚠️ Önemli Uyarı</strong>
+                <strong style="font-size: 16px; display: block; margin-bottom: 8px;">Önemli Uyarı</strong>
                 Bu onayı <strong>24 saat içinde</strong> yapmazsanız, izniniz otomatik olarak
                 "kullanıldı" şeklinde onaylanacak ve sisteme işlenecektir.
             </div>
 
             <div class="cta-section">
                 <a href="https://tez-medikal-izin-modulu.vercel.app/izin-onay.html?id=demo123&token=demo" class="button">
-                    ✓ İzin Kullanımını Onayla
+                    İzin Kullanımını Onayla
                 </a>
                 <p style="margin-top: 20px; color: #6b7280; font-size: 14px;">
                     İzninizi kullanmadıysanız veya bir sorun varsa,<br>
@@ -869,8 +887,18 @@
             text-align: center;
         }
         .header-icon {
-            font-size: 64px;
-            margin-bottom: 20px;
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            font-weight: 900;
+            color: #ef4444;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
             animation: shake 1s infinite;
         }
         @keyframes shake {
@@ -959,7 +987,7 @@
 <body>
     <div class="email-wrapper">
         <div class="header">
-            <div class="header-icon">⚠️</div>
+            <div class="header-icon">!</div>
             <h1>İmzalı Form Bekleniyor</h1>
         </div>
 
@@ -969,7 +997,7 @@
             </p>
 
             <div class="alert-box">
-                <strong>📋 Form İşlemi Tamamlanmadı!</strong>
+                <strong>Form İşlemi Tamamlanmadı!</strong>
                 <p>
                     İzin talebiniz onaylandı ancak <strong>imzalı form yükleme işlemini
                     henüz tamamlamadınız</strong>. İzninizin resmi kayıtlara geçebilmesi için
@@ -989,21 +1017,21 @@
 
             <div class="info-card">
                 <div class="info-row">
-                    <span style="color: #6b7280; font-weight: 600;">📅 İzin Başlangıcı</span>
+                    <span style="color: #6b7280; font-weight: 600;">İzin Başlangıcı</span>
                     <span style="color: #1f2937; font-weight: 700;">${formatDate(demoData.startDate)}</span>
                 </div>
                 <div class="info-row">
-                    <span style="color: #6b7280; font-weight: 600;">⏰ Kalan Süre</span>
+                    <span style="color: #6b7280; font-weight: 600;">Kalan Süre</span>
                     <span style="color: #ef4444; font-weight: 700; font-size: 18px;">5 GÜN</span>
                 </div>
                 <div class="info-row">
-                    <span style="color: #6b7280; font-weight: 600;">📋 İzin Türü</span>
+                    <span style="color: #6b7280; font-weight: 600;">İzin Türü</span>
                     <span style="color: #1f2937; font-weight: 700;">${demoData.leaveTypeName}</span>
                 </div>
             </div>
 
             <div style="background: #eff6ff; border-left: 4px solid #3b82f6; border-radius: 8px; padding: 20px; margin: 24px 0;">
-                <strong style="color: #1e40af; display: block; margin-bottom: 12px;">✓ Yapmanız Gerekenler:</strong>
+                <strong style="color: #1e40af; display: block; margin-bottom: 12px;">Yapmanız Gerekenler:</strong>
                 <ul style="margin-left: 20px; color: #1e3a8a; line-height: 1.8;">
                     <li>İmzalı formunuzun <strong>taranmış kopyasını</strong> yükleyin</li>
                     <li>Veya formun <strong>net bir fotoğrafını</strong> çekin ve yükleyin</li>
@@ -1013,7 +1041,7 @@
 
             <div class="cta-section">
                 <a href="https://tez-medikal-izin-modulu.vercel.app/form-upload.html?id=demo123" class="button">
-                    📤 İmzalı Formu Şimdi Yükle
+                    İmzalı Formu Şimdi Yükle
                 </a>
             </div>
         </div>
@@ -1065,8 +1093,18 @@
             left: 0;
         }
         .header-icon {
-            font-size: 64px;
-            margin-bottom: 20px;
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            font-weight: 900;
+            color: #8b5cf6;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
             animation: bounce 1s infinite;
             position: relative;
             z-index: 1;
@@ -1160,7 +1198,7 @@
 <body>
     <div class="email-wrapper">
         <div class="header">
-            <div class="header-icon">🎉</div>
+            <div class="header-icon">✓</div>
             <h1>İzin Süreciniz Tamamlandı!</h1>
         </div>
 
@@ -1170,7 +1208,7 @@
             </p>
 
             <div class="success-badge">
-                <div class="icon">✅</div>
+                <div class="icon" style="font-size: 72px; margin-bottom: 16px; color: #10b981; font-weight: 900;">✓</div>
                 <h2>Otomatik Onay Tamamlandı</h2>
                 <p>İzin kullanım onayı için belirlenen süre dolduğundan,<br>
                 izniniz sistem tarafından otomatik olarak onaylanmıştır.</p>
@@ -1178,31 +1216,30 @@
 
             <div class="info-card">
                 <div class="info-row">
-                    <span style="color: #6b7280; font-weight: 600;">📋 İzin Türü</span>
+                    <span style="color: #6b7280; font-weight: 600;">İzin Türü</span>
                     <span style="color: #1f2937; font-weight: 700;">${demoData.leaveTypeName}</span>
                 </div>
                 <div class="info-row">
-                    <span style="color: #6b7280; font-weight: 600;">📅 İzin Tarihleri</span>
+                    <span style="color: #6b7280; font-weight: 600;">İzin Tarihleri</span>
                     <span style="color: #1f2937; font-weight: 700;">${formatDate(demoData.startDate)} - ${formatDate(demoData.endDate)}</span>
                 </div>
                 <div class="info-row">
-                    <span style="color: #6b7280; font-weight: 600;">⏱️ Kullanılan Gün</span>
+                    <span style="color: #6b7280; font-weight: 600;">Kullanılan Gün</span>
                     <span style="color: #1f2937; font-weight: 700;">${demoData.totalDays}</span>
                 </div>
                 <div class="info-row">
-                    <span style="color: #6b7280; font-weight: 600;">✓ Onay Tarihi</span>
+                    <span style="color: #6b7280; font-weight: 600;">Onay Tarihi</span>
                     <span style="color: #10b981; font-weight: 700;">${demoData.approvalDate}</span>
                 </div>
                 <div class="info-row">
-                    <span style="color: #6b7280; font-weight: 600;">🆔 Talep No</span>
+                    <span style="color: #6b7280; font-weight: 600;">Talep No</span>
                     <span style="color: #1f2937; font-weight: 700;">${demoData.requestId}</span>
                 </div>
             </div>
 
             <div style="background: #f0fdf4; border-radius: 12px; padding: 24px; margin: 32px 0;">
-                <h3 style="color: #065f46; margin-bottom: 16px; display: flex; align-items: center; gap: 10px;">
-                    <span>ℹ️</span>
-                    <span>İzin Süreci Tamamlandı</span>
+                <h3 style="color: #065f46; margin-bottom: 16px;">
+                    İzin Süreci Tamamlandı
                 </h3>
                 <p style="color: #047857; line-height: 1.8;">
                     İzniniz <strong>"kullanıldı"</strong> olarak sisteme işlenmiştir ve
@@ -1212,7 +1249,7 @@
             </div>
 
             <div class="timeline">
-                <h3 style="color: #1f2937; margin-bottom: 24px;">📊 İzin Süreci Özeti</h3>
+                <h3 style="color: #1f2937; margin-bottom: 24px;">İzin Süreci Özeti</h3>
 
                 <div class="timeline-item">
                     <div class="timeline-icon">✓</div>
@@ -1302,7 +1339,7 @@
         function copyEmailHTML() {
             const template = emailTemplates[currentTemplate];
             navigator.clipboard.writeText(template.html).then(() => {
-                alert('✓ Email HTML kopyalandı!');
+                alert('Email HTML kopyalandı!');
             });
         }
 
