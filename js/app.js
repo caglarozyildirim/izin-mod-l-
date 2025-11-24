@@ -55,9 +55,10 @@ const App = {
 
     const rolePages = {
       employee: ['dashboard.html', 'yeni-talep.html', 'izinlerim.html'],
-      manager: ['dashboard.html', 'onay-yonetimi.html', 'tum-izinler.html', 'raporlar.html'],
-      hr: ['dashboard.html', 'onay-yonetimi.html', 'tum-izinler.html', 'raporlar.html'],
-      customerRelations: ['dashboard.html', 'onay-yonetimi.html', 'tum-izinler.html', 'raporlar.html', 'yerine-gorevlendirme.html']
+      manager: ['dashboard.html', 'yeni-talep.html', 'izinlerim.html', 'onay-yonetimi.html', 'tum-izinler.html', 'raporlar.html'],
+      hr: ['dashboard.html', 'yeni-talep.html', 'izinlerim.html', 'onay-yonetimi.html', 'tum-izinler.html', 'raporlar.html'],
+      operation: ['dashboard.html', 'yeni-talep.html', 'izinlerim.html', 'onay-yonetimi.html', 'tum-izinler.html', 'raporlar.html'],
+      customerRelations: ['dashboard.html', 'yeni-talep.html', 'izinlerim.html', 'onay-yonetimi.html', 'tum-izinler.html', 'raporlar.html', 'yerine-gorevlendirme.html']
     };
 
     // Allow all to access common pages
